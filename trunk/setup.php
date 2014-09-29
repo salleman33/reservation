@@ -4,10 +4,10 @@ function plugin_version_reservation() {
 
   return array(
       'name'           => _n('Réservation', 'Réservation', 2, 'Réservation'),
-      'version'        => '1.0.1',
+      'version'        => '1.1.0',
       'author'         => 'Sylvain Allemand',
       'license'        => 'GPLv2+',
-      'homepage'       => 'https://www.math.u-bordeaux1.fr/pagepro/salleman',
+      'homepage'       => 'https://forge.indepnet.net/projects/reservation',
       'minGlpiVersion' => '0.84');// For compatibility / no install in version < 0.80
 
 }
@@ -44,8 +44,9 @@ function plugin_init_reservation() {
   $PLUGIN_HOOKS['csrf_compliant']['reservation'] = true;
   $PLUGIN_HOOKS['add_css']['reservation'][]="css/views.css";
   $PLUGIN_HOOKS['add_javascript']['reservation']="tri.js";
+  $PLUGIN_HOOKS['config_page']['reservation'] = 'front/config.form.php';
 
-
+  Plugin::registerClass('PluginReservationConfig');
   Plugin::registerClass('PluginReservationReservation');
   Plugin::registerClass('PluginReservationTask');
 

@@ -125,9 +125,9 @@ class PluginReservationReservation extends CommonDBTM {
     $where = "";
 
     // TODO : A debuguer ! le premier form suivant est jsute là pour contourner un pb : si on l'enleve, le second form necessaire est zappé lors de la construction de la page web... 
-    echo "<div class='center'>
-      <form  method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'></form> 
-      <form name='form' method='GET' action='../../../front/reservation.form.php'>";
+    echo "<div class='center'>";
+     // <form  method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'></form> 
+     echo "<form name='form' method='GET' action='../../../front/reservation.form.php'>";
     echo "<table style=\"border-spacing:20px;\">";
     echo "<tr>";
 
@@ -224,7 +224,7 @@ class PluginReservationReservation extends CommonDBTM {
     echo "</table>\n";
     #echo "<input type='hidder' name='
     echo "<input type='hidden' name='id' value=''>";
-    echo "</form>";// No CSRF token needed
+    Html::closeForm(); //echo "</form>";// No CSRF token needed
     echo "</div>\n";
   }
 
