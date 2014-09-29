@@ -18,12 +18,23 @@ function plugin_reservation_install() {
     if (!TableExists("glpi_plugin_reservation_config")) 
         {
         // Création de la table config
-        $query = "CREATE TABLE `glpi_plugin_reseravation_config` (
+        $query = "CREATE TABLE `glpi_plugin_reservation_config` (
         `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-        `propriete` char(32) NOT NULL default '',
-        `valeur` int(1) NOT NULL default '1'
+        `jour` char(32) NOT NULL default '',
+        `actif` int(1) NOT NULL default '1'
         )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
         $DB->query($query) or die($DB->error());
+
+         $query = "INSERT INTO `glpi_plugin_reservation_config` (`jour` , `actif`)
+                VALUES (\"lundi\",1),
+                       (\"mardi\",1),
+                       (\"mercredi\",1),
+                       (\"jeudi\",1),
+                       (\"vendredi\",1),
+                       (\"samedi\",0),
+                       (\"dimanche\",0)";
+                       
+      $DB->queryOrDie($query) or die($DB->error());
         }
 
 
@@ -47,7 +58,7 @@ function plugin_reservation_install() {
 
 function plugin_reservation_uninstall() {
   global $DB;
-  $tables = array("glpi_plugin_reservation_manageresa","glpi_plugin_reseravation_config");
+  $tables = array("glpi_plugin_reservation_manageresa","glpi_plugin_reservation_config");
   foreach($tables as $table) 
   {$DB->query("DROP TABLE IF EXISTS `$table`;");}
   return true;

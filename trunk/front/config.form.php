@@ -12,8 +12,9 @@ $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {
    $PluginReservationConfig = new PluginReservationConfig();
    Session::checkRight("config", "w");
-   if (isset($_POST["update"])) {
-      $PluginReservationConfig->update($_POST);
+   if (isset($_POST["week"])) {
+      
+      $PluginReservationConfig->setConfiguration($_POST["week"]);
       Html::back();
    } else {
       Html::header(PluginReservationReservation::getTypeName(2), '', "plugins", "Reservation");
