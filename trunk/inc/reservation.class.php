@@ -45,6 +45,7 @@ class PluginReservationReservation extends CommonDBTM {
    **/
   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
 
+
     $monplugin = new self();
     switch ($tabnum) {
       case 1 : // mon premier onglet
@@ -124,10 +125,8 @@ class PluginReservationReservation extends CommonDBTM {
     $left = "";
     $where = "";
 
-    // TODO : A debuguer ! le premier form suivant est jsute là pour contourner un pb : si on l'enleve, le second form necessaire est zappé lors de la construction de la page web... 
     echo "<div class='center'>";
-     // <form  method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'></form> 
-     echo "<form name='form' method='GET' action='../../../front/reservation.form.php'>";
+    echo "<form name='form' method='GET' action='../../../front/reservation.form.php'>";
     echo "<table style=\"border-spacing:20px;\">";
     echo "<tr>";
 
@@ -206,7 +205,7 @@ class PluginReservationReservation extends CommonDBTM {
 	  echo "<td><a title=\"Voir le planning\" href='../../../front/reservation.php?reservationitems_id=".$row['id']."'>".
 	    "<img title=\"\" alt=\"\" src=\"/glpi/pics/reservation-3.png\"></img></a></td>";
 	  echo "</tr>\n";
-	  $ok = true;
+	  
 	}
       }
       if($DB->numrows($result)) {
@@ -216,15 +215,14 @@ class PluginReservationReservation extends CommonDBTM {
     }     
 
     echo "</tr>";
-    if ($ok) {
-      echo "<tr class='tab_bg_1 center'><td colspan='".($showentity?"5":"4")."'>";
-      echo "<input type='submit' value=\"Réserver\" class='submit'></td></tr>\n";
-    }
+    echo "<tr class='tab_bg_1 center'><td colspan='".($showentity?"5":"4")."'>";
+    echo "<input type='submit' value=\"Réserver\" class='submit'></td></tr>\n";
+    
 
     echo "</table>\n";
-    #echo "<input type='hidder' name='
+
     echo "<input type='hidden' name='id' value=''>";
-    Html::closeForm(); //echo "</form>";// No CSRF token needed
+    Html::closeForm(); 
     echo "</div>\n";
   }
 
@@ -277,8 +275,6 @@ class PluginReservationReservation extends CommonDBTM {
   function showCurrentResa() {
     global $DB, $CFG_GLPI;
     $showentity = Session::isMultiEntitiesMode();
-
-
 
     $begin = $_SESSION['reserve']["begin"];
     $end   = $_SESSION['reserve']["end"];
@@ -357,85 +353,80 @@ class PluginReservationReservation extends CommonDBTM {
 	}
       }
     }
-    
+ 
 
     echo "<div class='center'><form name='form' method='GET' action='reservation.form.php'>";
     echo "<table class='tab_cadre'>";
     echo "<thead>";
     echo "<tr><th colspan='".($showentity?"10":"9")."'>"."Matériels empruntés"."</th></tr>\n";
     echo "<tr class='tab_bg_2'>";
-    
-#echo "<td>Utilisateur</td><td>materiel</td><td>Debut</td><td>Fin</td><td>Commentaire</td><td>Mouvement</td><td><center>Marquer comme rendu</center></td><td>Editer la reservation</td></tr>";
-    
 
-
-
-    echo "<th><a href=\"#\" onclick=\"SortTable(0);\">Utilisateur</a></th>";
-    echo "<th><a href=\"#\" onclick=\"SortTable(1);\">Materiel</a></th>";
-    echo "<th><a href=\"#\" onclick=\"SortTable(2);\">Debut</a></th>";
-    echo "<th><a href=\"#\" onclick=\"SortTable(3);\">Fin</a></th>";
-    echo "<th><a href=\"#\" onclick=\"SortTable(4);\">Commentaires</a></th>";
-    echo "<th><a href=\"#\" onclick=\"SortTable(5);\">Mouvement</a></th>";
+    echo "<th><a href=\"#\" onclick=\"sortTable(this,0); return false;\">Utilisateur</a></th>";
+    echo "<th><a href=\"#\" onclick=\"sortTable(this,1); return false;\">Materiel</a></th>";
+    echo "<th><a href=\"#\" onclick=\"sortTable(this,2); return false;\">Debut</a></th>";
+    echo "<th><a href=\"#\" onclick=\"sortTable(this,3); return false;\">Fin</a></th>";
+    echo "<th><a href=\"#\" onclick=\"sortTable(this,4); return false;\">Commentaires</a></th>";
+    echo "<th><a href=\"#\" onclick=\"sortTable(this,5); return false;\">Mouvement</a></th>";
     echo "<th>Marquer comme rendu</th>";
     echo "<th>Editer la reservation</th>";
 
-    echo "</tr>";
-    echo "</thead>";
+    echo "</tr></thead>";
     echo "<tbody>";
+
 
     //on parcourt le tableau pour construire la table à afficher
     foreach($ResaByUser as $User => $arrayResa) {
       echo "<tr class='tab_bg_2'>";
       echo "<td rowspan=".count($arrayResa).">".$User."</td>";
       foreach($arrayResa as $Num => $resa) {
-	$colorRed = "";
-	// on regarde si la reservation actuelle a été prolongée par le plugin
-	$query = "SELECT `date_return`, `date_theorique` FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = ".$resa["resaid"];
-	if ($result = $DB->query($query)) {
-	  $dates = $DB->fetch_row($result);
-	}
+        	$colorRed = "";
+        	// on regarde si la reservation actuelle a été prolongée par le plugin
+        	$query = "SELECT `date_return`, `date_theorique` FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = ".$resa["resaid"];
+        	if ($result = $DB->query($query)) {
+        	  $dates = $DB->fetch_row($result);
+        	}
 
-	if($DB->numrows($result)) 
-	  if($dates[1] < date("Y-m-d H:i:s",time()) && $dates[0] == NULL) // on colore  en rouge seulement si la date de retour theorique est depassée et si le materiel n'est pas marqué comme rendu (avec une date de retour effectif)
-	    $colorRed = "bgcolor=\"red\"";
-	
-	// le nom du materiel
-	echo "<td $colorRed>".$resa['name']."</td>";
+        	if($DB->numrows($result)) 
+        	  if($dates[1] < date("Y-m-d H:i:s",time()) && $dates[0] == NULL) // on colore  en rouge seulement si la date de retour theorique est depassée et si le materiel n'est pas marqué comme rendu (avec une date de retour effectif)
+        	    $colorRed = "bgcolor=\"red\"";
+        	
+        	// le nom du materiel
+        	echo "<td $colorRed>".$resa['name']."</td>";
 
-	//date de debut de la resa
-	echo "<td $colorRed>".date("\L\e d-m-Y \à H:i:s",strtotime($resa["debut"]))."</td>";
+        	//date de debut de la resa
+        	echo "<td $colorRed>".date("\L\e d-m-Y \à H:i:s",strtotime($resa["debut"]))."</td>";
 
-	// si c'est une reservation prolongée, on affiche la date theorique plutot que la date reelle (qui est prolongée jusqu'au retour du materiel)
-	if($DB->numrows($result) && $dates[0] == NULL) 
-	  echo "<td $colorRed>".date("\L\e d-m-Y \à H:i:s",strtotime($dates[1]))."</td>";
-	else 
-	  echo "<td $colorRed>".date("\L\e d-m-Y \à H:i:s",strtotime($resa["fin"]))."</td>";
-	
-	//le commentaire
-	echo "<td $colorRed>".$resa["comment"]."</td>";
+        	// si c'est une reservation prolongée, on affiche la date theorique plutot que la date reelle (qui est prolongée jusqu'au retour du materiel)
+        	if($DB->numrows($result) && $dates[0] == NULL) 
+        	  echo "<td $colorRed>".date("\L\e d-m-Y \à H:i:s",strtotime($dates[1]))."</td>";
+        	else 
+        	  echo "<td $colorRed>".date("\L\e d-m-Y \à H:i:s",strtotime($resa["fin"]))."</td>";
+        	
+        	//le commentaire
+        	echo "<td $colorRed>".$resa["comment"]."</td>";
 
-	// les fleches de mouvements	
-	echo "<td ><center>";
-	if(date("Y-m-d",strtotime($resa["debut"])) == date("Y-m-d",strtotime($begin)))
-	  echo "<img title=\"\" alt=\"\" src=\"../pics/up-icon.png\"></img>";
-	if(date("Y-m-d",strtotime($resa["fin"])) == date("Y-m-d",strtotime($end)))
-	  echo "<img title=\"\" alt=\"\" src=\"../pics/down-icon.png\"></img>";
-	echo "</center></td>";
+        	// les fleches de mouvements	
+        	echo "<td ><center>";
+        	if(date("Y-m-d",strtotime($resa["debut"])) == date("Y-m-d",strtotime($begin)))
+        	  echo "<img title=\"\" alt=\"\" src=\"../pics/up-icon.png\"></img>";
+        	if(date("Y-m-d",strtotime($resa["fin"])) == date("Y-m-d",strtotime($end)))
+        	  echo "<img title=\"\" alt=\"\" src=\"../pics/down-icon.png\"></img>";
+        	echo "</center></td>";
 
-	// si la reservation est rendue, on affiche la date du retour, sinon le bouton pour acquitter le retour
-	if($dates[0] != NULL) 
-	  echo "<td>".date("\L\e d-m-Y \à H:i:s",strtotime($dates[0]))."</td>";
-	else
-	  echo "<td><center><a title=\"Marquer comme rendu\" href=\"reservation.php?resareturn=".$resa['resaid']."\"><img title=\"\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
+        	// si la reservation est rendue, on affiche la date du retour, sinon le bouton pour acquitter le retour
+        	if($dates[0] != NULL) 
+        	  echo "<td>".date("\L\e d-m-Y \à H:i:s",strtotime($dates[0]))."</td>";
+        	else
+        	  echo "<td><center><a title=\"Marquer comme rendu\" href=\"reservation.php?resareturn=".$resa['resaid']."\"><img title=\"\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
 
-	// bouton pour editer la reservation (renvoi vers l'interface glpi standard)
-	echo "<td><center><a title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=".$resa['resaid']."'>".
-	  "<img title=\"\" alt=\"\" src=\"/glpi/pics/reservation-3.png\"></img></a></center></td>";
+        	// bouton pour editer la reservation (renvoi vers l'interface glpi standard)
+        	echo "<td><center><a title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=".$resa['resaid']."'>".
+        	  "<img title=\"\" alt=\"\" src=\"/glpi/pics/reservation-3.png\"></img></a></center></td>";
 
-	echo "</tr>";
-	echo "<tr class='tab_bg_2'>";
-      }
-      echo "</tr>\n";
+        	echo "</tr>";
+        	echo "<tr class='tab_bg_2'>";
+          }
+        echo "</tr>\n";
     }
     echo "</tbody>";
     echo "</table>\n";

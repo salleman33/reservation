@@ -152,53 +152,41 @@ $where " . "ORDER BY username,
             
             
             if ($result = $DB->query($query)) {
-                while ($row = $DB->fetch_assoc($result)) {
-                    $newEnd = $temps + 5 * MINUTE_TIMESTAMP;
-                    $task->log("prolongation de la reservation numero " . $row['resaid'] . " : " . date("\L\e d-m-Y \à H:i:s", strtotime($row['end'])) . " => " . date("\L\e d-m-Y \à H:i:s", $newEnd));
-                    
-                    
-                    $query  = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = " . $row["resaid"];
-                    $trouve = 0;
+                while ($row = $DB->fetch_assoc($result)) {                    
+                    $query  = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = " . $row["resaid"];                    
+                    //on insere la reservation seulement si elle n'est pas deja presente dans la table
                     if ($res = $DB->query($query)) {
-                        if ($DB->numrows($res))
-                            $trouve = 1;
+                        if (!$DB->numrows($res)) {
+                            $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `matid`, `date_theorique`) VALUES ('" . $row["resaid"] . "','" . $row["items_id"] . "','" .$row['end'] . "');";
+                            $DB->query($query) or die("error on 'insert' into glpi_plugin_reservation_manageresa  lors du cron/ hash: " . $DB->error());
+                          }
                     }
-                    
-                    if (!$trouve) {
-                        $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `date_theorique`) VALUES ('" . $row["resaid"] . "','" . $row['end'] . "');";
-                        $DB->query($query) or die("error on 'insert' into glpi_plugin_reservation_manageresa  lors du cron/ hash: " . $DB->error());
-                    }
-                    
-                    // prolongation de la vrai resa
-                    self::verifDisponibiliteAndMailIGS($task, $itemtype, $row['items_id'], $row['resaid'], $begin, date("Y-m-d H:i:s", $newEnd));
-                    $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", $newEnd) . "' WHERE `id`='" . $row["resaid"] . "';";
-                    $DB->query($query) or die("error on 'update' into glpi_reservations lors du cron : " . $DB->error());
-                    
-                    array_push($listResaTraitee, $row['resaid']);
-                    $valreturn++;
                 }
-            }
-            
+            }            
         }
         
-        //verif si on a pas oublié de resa (voir si c'est vraiment utile)
+        //on va prolonger toutes les resa managées qui n'ont pas de date de retour
         $query = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE date_return is NULL;";
         if ($result = $DB->query($query)) {
             while ($row = $DB->fetch_assoc($result)) {
-                if (!in_array($row['resaid'], $listResaTraitee)) {
-                    $task->log("une reservation a été zappée ! (" . $row['resaid'] . ")");
-                    $newEnd = $temps + 5 * MINUTE_TIMESTAMP;
-                    $query  = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", $newEnd) . "' WHERE `id`='" . $row["resaid"] . "';";
-                    $DB->query($query) or die("error on 'update' into glpi_reservations lors du cron : " . $DB->error());
-                    $valreturn = -1;
-                    
-                }
+              $newEnd = $temps + 5 * MINUTE_TIMESTAMP;
+              $task->log("prolongation de la reservation numero " . $row['resaid']);
+
+              // prolongation de la vrai resa
+              self::verifDisponibiliteAndMailIGS($task, $itemtype, $row['matid'], $row['resaid'], $begin, date("Y-m-d H:i:s", $newEnd));
+              $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", $newEnd) . "' WHERE `id`='" . $row["resaid"] . "';";
+              $DB->query($query) or die("error on 'update' into glpi_reservations lors du cron : " . $DB->error());
+              
+              $valreturn++;                   
+              
             }
-        }
-        
+        }      
         
         return $valreturn;
     }
+
+
+    
     
     static function verifDisponibiliteAndMailIGS($task, $itemtype, $idMat, $currentResa, $datedebut, $datefin)
     {

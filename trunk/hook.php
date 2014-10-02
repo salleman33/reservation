@@ -7,6 +7,7 @@ function plugin_reservation_install() {
     $query = "CREATE TABLE `glpi_plugin_reservation_manageresa` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
       `resaid` int(11) NOT NULL,
+      `matid` int(11) NOT NULL,
       `date_return` datetime,
       `date_theorique` datetime NOT NULL,
       PRIMARY KEY (`id`)
@@ -61,6 +62,13 @@ function plugin_reservation_uninstall() {
   $tables = array("glpi_plugin_reservation_manageresa","glpi_plugin_reservation_config");
   foreach($tables as $table) 
   {$DB->query("DROP TABLE IF EXISTS `$table`;");}
+  return true;
+}
+
+function plugin_item_update_reservation($item) {
+  global $DB;
+  $query = "DELETE FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = '".$item->fields["id"]."';";
+  $DB->query($query) or die("error on 'DELETE' into plugin_item_update_reservation : ". $DB->error());
   return true;
 }
 
