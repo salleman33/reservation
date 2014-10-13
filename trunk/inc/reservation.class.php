@@ -195,7 +195,7 @@ class PluginReservationReservation extends CommonDBTM {
 		  $item->fields["peripheraltypes_id"]);
 	    }
 	  }
-	  echo "<td white-space: nowrap ><a href='/front/".Toolbox::strtolower($itemtype).".form.php?id=".$row['materielid']."&forcetab=Reservation$1"."'>".
+	  echo "<td white-space: nowrap ><a href='/glpi/front/".Toolbox::strtolower($itemtype).".form.php?id=".$row['materielid']."&forcetab=Reservation$1"."'>".
 	    sprintf(__('%1$s'), $row["name"])."</a></td>";
 	  echo "<td>".nl2br($row["comment"])."</td>";
 	  if ($showentity) {
@@ -355,7 +355,7 @@ class PluginReservationReservation extends CommonDBTM {
     }
  
 
-    echo "<div class='center'><form name='form' method='GET' action='reservation.form.php'>";
+    echo "<div class='center'>";
     echo "<table class='tab_cadre'>";
     echo "<thead>";
     echo "<tr><th colspan='".($showentity?"10":"9")."'>"."Matériels empruntés"."</th></tr>\n";
@@ -368,7 +368,7 @@ class PluginReservationReservation extends CommonDBTM {
     echo "<th><a href=\"#\" onclick=\"sortTable(this,4); return false;\">Commentaires</a></th>";
     echo "<th><a href=\"#\" onclick=\"sortTable(this,5); return false;\">Mouvement</a></th>";
     echo "<th>Marquer comme rendu</th>";
-    echo "<th>Editer la reservation</th>";
+    echo "<th>Actions</th>";
 
     echo "</tr></thead>";
     echo "<tbody>";
@@ -419,10 +419,44 @@ class PluginReservationReservation extends CommonDBTM {
         	else
         	  echo "<td><center><a title=\"Marquer comme rendu\" href=\"reservation.php?resareturn=".$resa['resaid']."\"><img title=\"\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
 
-        	// bouton pour editer la reservation (renvoi vers l'interface glpi standard)
-        	echo "<td><center><a title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=".$resa['resaid']."'>".
-        	  "<img title=\"\" alt=\"\" src=\"/glpi/pics/reservation-3.png\"></img></a></center></td>";
 
+
+// boutons action
+          $matDispo = getMatDispo();
+          echo "<td>";   
+          echo "<ul>";
+
+          echo "<li><span class=\"bouton\" id=\"bouton_replace".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('replace".$resa['resaid']."');\">Remplacer le materiel</span>
+          <div id=\"replace".$resa['resaid']."\" style=\"display:none;\">
+          <form method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
+          echo '<select name="matDispoReplace">';          
+          foreach($matDispo as $mat) {
+             echo "\t",'<option value="', key($mat) ,'">', current($mat) ,'</option>';
+          }
+          echo "<input type='hidden' name='ReplaceMatToResa' value='".$resa['resaid']."'>";
+          echo "<input type='submit' class='submit' name='submit' value=Remplacer>";
+          Html::closeForm();
+          echo "</div></li>";
+
+
+          echo "<li><span class=\"bouton\" id=\"bouton_add".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('add".$resa['resaid']."');\">Ajouter un materiel</span>
+          <div id=\"add".$resa['resaid']."\" style=\"display:none;\">
+          <form method='POST' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
+          echo '<select name="matDispoAdd">';          
+          foreach($matDispo as $mat) {
+             echo "\t",'<option value="', key($mat) ,'">', current($mat) ,'</option>';
+          }
+          echo "<input type='hidden' name='AjouterMatToResa' value='".$resa['resaid']."'>";
+          echo "<input type='submit' class='submit' name='submit' value=Ajouter>";
+          Html::closeForm();
+          echo "</div></li>";
+
+
+          echo "<li><a class=\"bouton\" title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=".$resa['resaid']."'>Editer la reservation</a></li>";
+          echo "</ul>";
+          echo "</td>";
+      
+        	
         	echo "</tr>";
         	echo "<tr class='tab_bg_2'>";
           }
@@ -434,11 +468,116 @@ class PluginReservationReservation extends CommonDBTM {
 
   }
 
+
+
+function addToResa($idmat,$idresa) {
+
+  global $DB, $CFG_GLPI;     
+    
+    $query = "SELECT * FROM `glpi_reservations` WHERE `id`='".$idresa."';";
+      $result = $DB->query($query) or die("error on 'select' dans addToResa / hash: ". $DB->error());
+
+
+      $row = $DB->fetch_assoc($result);
+
+      $query = "INSERT INTO  `glpi_reservations` (`begin`, `end`, `reservationitems_id`,`users_id`) VALUES ('".$row['begin']."', '".$row['end']."', '".$idmat ."', '".$row['users_id'] ."');";
+      $DB->query($query) or die("error on 'insert' dans addToResa / hash: ". $DB->error());
+
+    
+       
 }
+
+
+
+function replaceResa($idmat,$idresa) {
+  global $DB, $CFG_GLPI;     
+    
+      $query = "UPDATE `glpi_reservations` SET `reservationitems_id`='". $idmat ."' WHERE `id`='".$idresa."';";
+      $DB->query($query) or die("error on 'update' dans replaceResa / hash: ". $DB->error());  
+
+}
+
+
+}
+
+
+
+
+function getMatDispo() {
+  global $DB, $CFG_GLPI;
+    $showentity = Session::isMultiEntitiesMode();
+
+
+    $begin = $_SESSION['reserve']["begin"];
+    $end   = $_SESSION['reserve']["end"];
+    $left = "";
+    $where = "";
+    $myArray = array();
+    
+    foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
+      if (!($item = getItemForItemtype($itemtype))) {
+  continue;
+      }
+
+      $itemtable = getTableForItemType($itemtype);
+      $otherserial = "'' AS otherserial";
+
+      if ($item->isField('otherserial')) {
+  $otherserial = "`$itemtable`.`otherserial`";
+      }
+
+      if (isset($begin) && isset($end)) {
+  $left = "LEFT JOIN `glpi_reservations`
+    ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
+        AND '". $begin."' < `glpi_reservations`.`end`
+        AND '". $end."' > `glpi_reservations`.`begin`)";
+  $where = " AND `glpi_reservations`.`id` IS NULL ";
+      }
+
+      $query = "SELECT `glpi_reservationitems`.`id`,
+  `glpi_reservationitems`.`comment`,
+  `$itemtable`.`id` AS materielid,
+  `$itemtable`.`name` AS name,
+  `$itemtable`.`entities_id` AS entities_id,
+  $otherserial,
+  `glpi_locations`.`completename` AS location,
+  `glpi_reservationitems`.`items_id` AS items_id
+    FROM `glpi_reservationitems`
+    $left
+    INNER JOIN `$itemtable`
+    ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
+        AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
+    LEFT JOIN `glpi_locations`
+    ON (`$itemtable`.`locations_id` = `glpi_locations`.`id`)
+    WHERE `glpi_reservationitems`.`is_active` = '1'
+    AND `glpi_reservationitems`.`is_deleted` = '0'
+    AND `$itemtable`.`is_deleted` = '0'
+    $where ".
+    getEntitiesRestrictRequest(" AND", $itemtable, '',
+        $_SESSION['glpiactiveentities'],
+        $item->maybeRecursive())."
+    ORDER BY `$itemtable`.`entities_id`,
+  `$itemtable`.`name`";
+
+
+      if ($result = $DB->query($query)) {
+
+
+
+    while ($row = $DB->fetch_assoc($result)) {
+      array_push($myArray, array($row["id"] => $row["name"]));  
+  }
+ }
+}
+return $myArray;
+}
+
 
 
 function compare_date_by_user($a, $b) { return strnatcmp($a['debut'], $b['debut']); }
 function compare_date_by_alluser($a, $b) { return strnatcmp($a[0]['debut'], $b[0]['debut']); }
+
+
 
 
 ?>

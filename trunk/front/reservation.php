@@ -34,18 +34,13 @@ $PluginReservationReservation->showFormDate();
 $_SESSION['reserve']=$_POST['reserve'];
 if(isset($_GET['resareturn']))
   $PluginReservationReservation->resaReturn($_GET['resareturn']);
+if(isset($_POST['AjouterMatToResa']))
+  $PluginReservationReservation->addToResa($_POST['matDispoAdd'],$_POST['AjouterMatToResa']);
+if(isset($_POST['ReplaceMatToResa']))
+  $PluginReservationReservation->replaceResa($_POST['matDispoReplace'], $_POST['ReplaceMatToResa']);
+
 $PluginReservationReservation->show();
 
-
-if (!Session::haveRight("reservation_central","r")) {
-   echo "vue simple"; //ReservationItem::showListSimple();
-} else {
-
-//$myfield = [ "field" => "name" ];
-$myparam = array('completename');
-$myfield = array( "field" => $myparam );
-//   Search::show('ReservationItem');
-}
 
 
 if ($_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {

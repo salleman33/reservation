@@ -1,3 +1,20 @@
+.bouton
+{
+cursor:pointer;
+   font-weight: bold;
+   text-decoration: none;
+   color : #659900;
+   font-size : 11px;
+}
+.bouton:hover
+{
+text-decoration:underline;
+color: black;
+}
+
+
+
+
 .imgClass { 
     background-image: url(../pics/greenbutton.png);
     background-position:  0px 0px;
