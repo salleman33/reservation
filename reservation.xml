@@ -41,6 +41,8 @@ Il apporte également quelques actions simplifiées sur les réservations comme 
    <license><![CDATA[GPL v2+]]></license>
    <tags>
          <fr>
+	    <tag>réservations</tag>
+	    <tag>réservation</tag>
             <tag>reservation</tag>
             <tag>acquittement</tag>
          </fr>
