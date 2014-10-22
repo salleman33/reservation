@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+   <name>Reservation </name>
+   <key>reservation</key>
+   <state>stable</state>
+    <logo>https://forge.indepnet.net/svn/reservation/logo.png</logo>
+   <description>
+      <short>
+         <fr><![CDATA[Apporte une gestion differente des reservations. Permet egalement d'effectuer facilement des actions sur les reservations.]]></fr>
+         <en></en>
+      </short>
+      <long>
+         <fr><![CDATA[Ce plugin propose une gestion différente des réservations de matériel : 
+<ul>
+<li> acquittement des retours de matériel</li>
+<li> prolongation automatique des réservations de matériels non rendu</li>
+<li> envoi de mail aux emprunteurs si la réservation est arrivée à expiration</li>
+</ul>
+Il apporte également quelques actions simplifiées sur les réservations comme : 
+<ul>
+<li> ajouter un matériel à une réservation existante</li>
+<li> remplacer un matériel par un autre.</li>
+</ul> ]]></fr>
+      </long>
+   </description>
+   <homepage>https://forge.indepnet.net/projects/reservation</homepage>
+   <download>https://forge.indepnet.net/projects/reservation/files</download>
+   <authors>
+      <author>Sylvain Allemand</author>
+   </authors>
+   <versions>
+   <version>
+          <num>1.2.0</num>
+          <compatibility>0.84</compatibility>
+      </version>
+
+   </versions>
+   <langs>
+      <lang>fr_FR</lang>
+   </langs>
+   <license><![CDATA[GPL v2+]]></license>
+   <tags>
+         <fr>
+            <tag>Reservation</tag>
+            <tag>Graphique</tag>
+         </fr>
+   </tags>
+</root>
+
