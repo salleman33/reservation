@@ -13,7 +13,7 @@
          <fr><![CDATA[Ce plugin propose une gestion différente des réservations de matériel : 
 <ul>
 <li> acquittement des retours de matériel</li>
-<li> prolongation automatique des réservations de matériels non rendu</li>
+<li> prolongation automatique des réservations de matériels non rendus</li>
 <li> envoi de mail aux emprunteurs si la réservation est arrivée à expiration</li>
 </ul>
 Il apporte également quelques actions simplifiées sur les réservations comme : 
@@ -41,10 +41,9 @@ Il apporte également quelques actions simplifiées sur les réservations comme 
    <license><![CDATA[GPL v2+]]></license>
    <tags>
          <fr>
-	    <tag>réservations</tag>
-	    <tag>réservation</tag>
             <tag>reservation</tag>
             <tag>acquittement</tag>
+			<tag>emprunt</tag>
          </fr>
    </tags>
 </root>
