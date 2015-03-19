@@ -19,28 +19,35 @@ function getAbsolutePath()
 $PluginReservationReservation = new PluginReservationReservation();
 
 
-Session::checkSeveralRightsOr(array("reservation_central"  => "r",
-                                    "reservation_helpdesk" => "1"));
+Session::checkRight("reservation",  array(CREATE, UPDATE,DELETE ));
 
 if ($_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
    Html::helpHeader(__('Simplified interface'), $_SERVER['PHP_SELF'], $_SESSION["glpiname"]);
 } else {
-  // Html::header(Reservation::getTypeName(2), $_SERVER['PHP_SELF'], "utils", "dreservation");
-   Html::header(PluginReservationReservation::getTypeName(2),  $_SERVER['PHP_SELF'], "plugins", "Reservation");
+   Html::header(PluginReservationReservation::getTypeName(2), $_SERVER['PHP_SELF'], "plugins", "reservation");
 }
 
+if(!isset($datesresa))
+  $datesresa = null;
+if(isset($_POST['reserve']))
+  $datesresa = $_POST['reserve'];
 
 $PluginReservationReservation->showFormDate();
-$_SESSION['reserve']=$_POST['reserve'];
+
+
 if(isset($_GET['resareturn']))
   $PluginReservationReservation->resaReturn($_GET['resareturn']);
+
 if(isset($_POST['AjouterMatToResa']))
   $PluginReservationReservation->addToResa($_POST['matDispoAdd'],$_POST['AjouterMatToResa']);
+
 if(isset($_POST['ReplaceMatToResa']))
   $PluginReservationReservation->replaceResa($_POST['matDispoReplace'], $_POST['ReplaceMatToResa']);
 
-$PluginReservationReservation->show();
+$PluginReservationReservation->showCurrentResa();
+$PluginReservationReservation->showDispoAndFormResa();
 
+//$PluginReservationReservation->display();
 
 
 if ($_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {

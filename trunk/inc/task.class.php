@@ -157,7 +157,7 @@ $where " . "ORDER BY username,
                     //on insere la reservation seulement si elle n'est pas deja presente dans la table
                     if ($res = $DB->query($query)) {
                         if (!$DB->numrows($res)) {
-                            $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `matid`, `date_theorique`) VALUES ('" . $row["resaid"] . "','" . $row["items_id"] . "','" .$row['end'] . "');";
+                            $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `matid`, `date_theorique`, `itemtype`) VALUES ('" . $row["resaid"] . "','" . $row["items_id"] . "','" .$row['end'] . "','" .$itemtype. "');";
                             $DB->query($query) or die("error on 'insert' into glpi_plugin_reservation_manageresa  lors du cron/ hash: " . $DB->error());
                           }
                     }
@@ -173,7 +173,7 @@ $where " . "ORDER BY username,
               $task->log("prolongation de la reservation numero " . $row['resaid']);
 
               // prolongation de la vrai resa
-              self::verifDisponibiliteAndMailIGS($task, $itemtype, $row['matid'], $row['resaid'], $begin, date("Y-m-d H:i:s", $newEnd));
+              self::verifDisponibiliteAndMailIGS($task, $row['itemtype'], $row['matid'], $row['resaid'], $begin, date("Y-m-d H:i:s", $newEnd));
               $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", $newEnd) . "' WHERE `id`='" . $row["resaid"] . "';";
               $DB->query($query) or die("error on 'update' into glpi_reservations lors du cron : " . $DB->error());
               

@@ -11,10 +11,9 @@ include (GLPI_ROOT."inc/includes.php");
 $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {
    $PluginReservationConfig = new PluginReservationConfig();
-   Session::checkRight("config", "w");
-   if (isset($_POST["week"])) {
-      
-      $PluginReservationConfig->setConfiguration($_POST["week"]);
+   Session::checkRight("config",  array(CREATE, UPDATE,DELETE ));
+   if (isset($_POST["week"])) {      
+      $PluginReservationConfig->setConfigurationWeek($_POST["week"]);
       Html::back();
    } else {
       Html::header(PluginReservationReservation::getTypeName(2), '', "plugins", "Reservation");
@@ -25,7 +24,7 @@ if ($plugin->isActivated("reservation")) {
    Html::header(__('Setup'), '', "config", "plugins");
    echo "<div class='center'><br><br>".
          "<img src=\"".$CFG_GLPI["root_doc"]."/pics/warning.png\" alt='warning'><br><br>";
-   echo "<b>".__('Please activate the plugin','addressing')."</b></div>";
+   echo "<b>".__('Please activate the plugin','Reservation')."</b></div>";
    Html::footer();
 }
 

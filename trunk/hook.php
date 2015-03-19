@@ -3,30 +3,36 @@
 
 function plugin_reservation_install() {
   global $DB;
-  if (!TableExists("glpi_plugin_reservation_manageresa")) {
+  $migration = new Migration(100);
+  if (!TableExists("glpi_plugin_reservation_manageresa")) { //INSTALL
     $query = "CREATE TABLE `glpi_plugin_reservation_manageresa` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
       `resaid` int(11) NOT NULL,
       `matid` int(11) NOT NULL,
       `date_return` datetime,
       `date_theorique` datetime NOT NULL,
+      `itemtype` VARCHAR(100) NOT NULL,
       PRIMARY KEY (`id`)
 	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci"; 
 
 	$DB->queryOrDie($query, $DB->error());
   }
+  else { // UPDATE
+   $query = "ALTER TABLE `glpi_plugin_reservation_manageresa` ADD itemtype VARCHAR(100) NOT NULL";
+   $DB->queryOrDie($query, $DB->error());
+  }
 
-    if (!TableExists("glpi_plugin_reservation_config")) 
-        {
+    if (!TableExists("glpi_plugin_reservation_configdayforauto")) 
+    {
         // Création de la table config
-        $query = "CREATE TABLE `glpi_plugin_reservation_config` (
+        $query = "CREATE TABLE `glpi_plugin_reservation_configdayforauto` (
         `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
         `jour` char(32) NOT NULL default '',
         `actif` int(1) NOT NULL default '1'
         )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
         $DB->query($query) or die($DB->error());
 
-         $query = "INSERT INTO `glpi_plugin_reservation_config` (`jour` , `actif`)
+         $query = "INSERT INTO `glpi_plugin_reservation_configdayforauto` (`jour` , `actif`)
                 VALUES (\"lundi\",1),
                        (\"mardi\",1),
                        (\"mercredi\",1),
@@ -36,8 +42,28 @@ function plugin_reservation_install() {
                        (\"dimanche\",0)";
                        
       $DB->queryOrDie($query) or die($DB->error());
-        }
+    }
+	else { // UPDATE
+	}
 
+
+    if (!TableExists("glpi_plugin_reservation_configmethode")) 
+    {
+        // Création de la table config
+        $query = "CREATE TABLE `glpi_plugin_reservation_configmethode` (
+        `methode` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        `active` int(1) NOT NULL default '1'
+        )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+        $DB->query($query) or die($DB->error());
+
+         $query = "INSERT INTO `glpi_plugin_reservation_configmethode` (`auto` , `active`)
+                VALUES (\"auto\",1)";
+                       
+      $DB->queryOrDie($query) or die($DB->error());
+    }
+  else { // UPDATE
+  }
+     
 
   $cron = new CronTask;
   if (!$cron->getFromDBbyName('PluginReservationTask','SurveilleResa'))

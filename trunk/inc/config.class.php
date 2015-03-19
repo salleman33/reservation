@@ -9,7 +9,7 @@ if (!defined('GLPI_ROOT')) {
 class PluginReservationConfig extends CommonDBTM {
 
 
-    function getConfiguration()
+    function getConfigurationWeek()
         {
         global $DB;
         
@@ -28,15 +28,15 @@ class PluginReservationConfig extends CommonDBTM {
         }
 
 
-function setConfiguration($week=null)
+function setConfigurationWeek($week=null)
 {
     global $DB;       
 
-    $query = "UPDATE glpi_plugin_reservation_config SET actif=0";
+    $query = "UPDATE glpi_plugin_reservation_configdayforauto SET actif=0";
         $DB->query($query) or die($DB->error());
     foreach($week as $day)
     {
-        $query = "UPDATE glpi_plugin_reservation_config SET actif=1 WHERE jour='$day'";
+        $query = "UPDATE glpi_plugin_reservation_configdayforauto SET actif=1 WHERE jour='$day'";
         $DB->query($query) or die($DB->error());
     }
 }
@@ -45,10 +45,15 @@ function setConfiguration($week=null)
 function showForm() 
 {
 
-$config = $this->getConfiguration();
-echo "<div class='center'>";
+$config = $this->getConfigurationWeek();
+
 echo "<form method='post' action='".$this->getFormURL()."'>";
 
+echo "<div class='center'>";
+
+
+if($config['methode'] == "auto")
+{
 echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
 echo "<th>Mail aux utilisateurs avec reservation depassée</th>";
@@ -74,15 +79,32 @@ echo "<tr>";
 echo "<td> dimanche : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"dimanche\" ".(isset($config['dimanche'])?'checked':'')."> </td>";
 
 echo "</tr>";
+echo "</table>";
+}
+
+
+
+echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
+
+echo "<th>Methode pour gerer l'envoi de mail aux utilisateurs dont la reservation est depassée </th>";
+echo "<tr>";
+echo "<td> <input type=\"radio\" name=\"methode\" value=\"auto\" ".($config['methode'] ? 'checked':'')."> Automatiquement (avec l'action automatique à configurer) </td>";
+echo "</tr>";
+echo "<tr>";
+echo "<td> <input type=\"radio\" name=\"methode\" value=\"manual\" ".($config['methode'] ? 'checked':'')."> Manuellement (à l'aide du bouton sur la vue des reservations en cours)</td>" ;
+echo "</tr>";
+
+echo "</table>";
+
 
 
 echo "<input type=\"submit\" value=\"Valider\">";
-
-
-
-echo "</table>";
-Html::closeForm();
 echo "</div>";
+
+
+
+Html::closeForm();
+
 
 
 

@@ -2,23 +2,40 @@
 
 
 
-//if (!defined('GLPI_ROOT')) {
-//  die("Sorry. You can't access directly to this file");
-//}
+if (!defined('GLPI_ROOT')) {
+  die("Sorry. You can't access directly to this file");
+}
 
+
+
+function getGLPIUrl()
+   {return str_replace("plugins/reservation/front/reservation.php", "", $_SERVER['SCRIPT_NAME']);}    
 
 class PluginReservationReservation extends CommonDBTM {
 
   static function getTypeName($nb=0) {
-    return _n('Reservation', 'Reservation', $nb, 'Reservation');
+	return _n('Réservation', 'Réservation', $nb, 'Réservation');
   }
 
-
-
-  function isNewItem() {
+  function getAbsolutePath()
+   {return str_replace("plugins/reservation/inc/reservation.class.php", "", $_SERVER['SCRIPT_FILENAME']);}
+   
+   
+/*
+   function isNewItem() {
     return false;
   }
+*/
+  
+  static function getMenuName() {
+     return PluginReservationReservation::getTypeName(2);
+   } 
 
+  static function canView() {
+      global $CFG_GLPI;
+      return true;
+      return Session::haveRightsOr(self::$rightname, array(READ, self::RESERVEANITEM));
+   }
 
   /**
    * Définition des onglets
@@ -35,7 +52,7 @@ class PluginReservationReservation extends CommonDBTM {
   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
     $ong = array();
     $ong[1] = 'Réservations en cours';
-    $ong[2] = 'Matériel disponible / faire une réservation';
+    $ong[2] = 'Matériel disponible';
     return $ong;
   }
 
@@ -46,6 +63,7 @@ class PluginReservationReservation extends CommonDBTM {
   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
 
 
+
     $monplugin = new self();
     switch ($tabnum) {
       case 1 : // mon premier onglet
@@ -54,9 +72,10 @@ class PluginReservationReservation extends CommonDBTM {
 
       case 2 : // mon second onglet
 	$monplugin->showDispoAndFormResa();
+	
 	break;
     }
-    return true;
+    return TRUE;
   }
 
 
@@ -64,40 +83,67 @@ class PluginReservationReservation extends CommonDBTM {
    * Affiche le cadre avec la date de debut / date de fin
    **/
   function showFormDate() {
+    GLOBAL $datesresa;
 
-    if(isset($_GET['resareturn'])) {
-      $_POST['reserve'] = $_SESSION['reserve'];
 
-    } else if(!isset($_POST['reserve'])) {
+    /*if(isset($_GET['resareturn'])) {
+      $_POST['reserve'] = $datesresa;
+    } 
+    else */
+    if(!isset($datesresa)) {
+  
       $jour = date("d",time());
       $mois = date("m",time());
       $annee = date("Y",time());
       $begin_time                 = time();
-      //$begin_time                -= ($begin_time%HOUR_TIMESTAMP);
-      $_POST['reserve']["begin"]  = date("Y-m-d H:i:s",$begin_time);
-      //$_POST['reserve']["begin"]  = date("Y-m-d H:i:s",mktime(8,0,0,$mois,$jour,$annee));
-      //$_POST['reserve']["end"]    = date("Y-m-d H:i:s",$begin_time+HOUR_TIMESTAMP);
+
+      $datesresa["begin"]  = date("Y-m-d H:i:s",$begin_time);
+
       if($begin_time > mktime(19,0,0,$mois,$jour,$annee))
-	$_POST['reserve']["end"] = date("Y-m-d H:i:s",$begin_time + 3600);
+	$datesresa["end"] = date("Y-m-d H:i:s",$begin_time + 3600);
       else
-	$_POST['reserve']["end"]    = date("Y-m-d H:i:s",mktime(19,0,0,$mois,$jour,$annee));
+	$datesresa["end"] = date("Y-m-d H:i:s",mktime(19,0,0,$mois,$jour,$annee)); 
+    }
+    if(isset($_POST['nextday'])) {
+      $tmpbegin = $datesresa["begin"];
+      $tmpend = $datesresa["end"];
+
+      $datesresa["begin"] = date("Y-m-d H:i:s", strtotime($datesresa["begin"]) + DAY_TIMESTAMP);
+      $datesresa["end"] = date("Y-m-d H:i:s",strtotime($datesresa["end"]) + DAY_TIMESTAMP);
+    }
+    if(isset($_POST['previousday'])) {
+      $tmpbegin = $datesresa["begin"];
+      $tmpend = $datesresa["end"];
+
+      $datesresa["begin"] = date("Y-m-d H:i:s", strtotime($datesresa["begin"]) - DAY_TIMESTAMP);
+      $datesresa["end"] = date("Y-m-d H:i:s",strtotime($datesresa["end"]) - DAY_TIMESTAMP);
     }
 
     echo "<div id='viewresasearch'  class='center'>";
     echo "<form method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
     echo "<table class='tab_cadre'><tr class='tab_bg_2'>";
-    echo "<th colspan='3'>Choisissez une date</th></tr>";
+    echo "<th colspan='5'>Choisissez une date</th></tr>";
 
+    
 
-    echo "<tr class='tab_bg_2'><td>".__('Start date')."</td><td>";
-    Html::showDateTimeField("reserve[begin]", array('value'      =>  $_POST['reserve']["begin"],
+    echo "<tr class='tab_bg_2'>";
+
+    echo "<td rowspan='3'>";
+    echo "<input type='submit' class='submit' name='previousday' value=\"Jour precedent\">";
+    echo "</td>";
+
+    echo "<td>".__('Start date')."</td><td>";
+    Html::showDateTimeField("reserve[begin]", array('value' =>  $datesresa["begin"], 
 	  'maybeempty' => false));
     echo "</td><td rowspan='3'>";
     echo "<input type='submit' class='submit' name='submit' value=\""._sx('button', 'Search')."\">";
+    echo "</td>";
+    echo "<td rowspan='3'>";
+    echo "<input type='submit' class='submit' name='nextday' value=\"Jour suivant\">";
     echo "</td></tr>";
 
     echo "<tr class='tab_bg_2'><td>".__('End date')."</td><td>";
-    Html::showDateTimeField("reserve[end]", array('value'      =>  $_POST['reserve']["end"],
+    Html::showDateTimeField("reserve[end]", array('value' =>  $datesresa["end"], 
 	  'maybeempty' => false));
     echo "</td></tr>";
 
@@ -116,18 +162,18 @@ class PluginReservationReservation extends CommonDBTM {
    * C'est juste une interface differente de celle de GLPI. Pour les nouvelles reservations, on utilise les fonctions du coeur de GLPI
    **/
   function showDispoAndFormResa(){
-    global $DB, $CFG_GLPI;
+    global $DB, $CFG_GLPI, $datesresa;
     $showentity = Session::isMultiEntitiesMode();
 
 
-    $begin = $_SESSION['reserve']["begin"];
-    $end   = $_SESSION['reserve']["end"];
+    $begin = $datesresa["begin"];
+    $end   = $datesresa["end"];
     $left = "";
     $where = "";
 
     echo "<div class='center'>";
     echo "<form name='form' method='GET' action='../../../front/reservation.form.php'>";
-    echo "<table style=\"border-spacing:20px;\">";
+    echo "<table class='tab_cadre' style=\"border-spacing:20px;\">";
     echo "<tr>";
 
     foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
@@ -195,15 +241,14 @@ class PluginReservationReservation extends CommonDBTM {
 		  $item->fields["peripheraltypes_id"]);
 	    }
 	  }
-	  echo "<td white-space: nowrap ><a href='/glpi/front/".Toolbox::strtolower($itemtype).".form.php?id=".$row['materielid']."&forcetab=Reservation$1"."'>".
-	    sprintf(__('%1$s'), $row["name"])."</a></td>";
+	  echo "<td white-space: nowrap ><a href='".getGLPIUrl()."front/".Toolbox::strtolower($itemtype).".form.php?id=".$row['materielid']."&forcetab=Reservation$1"."'>".sprintf(__('%1$s'), $row["name"])."</a></td>";
 	  echo "<td>".nl2br($row["comment"])."</td>";
 	  if ($showentity) {
 	    echo "<td>".Dropdown::getDropdownName("glpi_entities", $row["entities_id"]).
 	      "</td>";
 	  }
 	  echo "<td><a title=\"Voir le planning\" href='../../../front/reservation.php?reservationitems_id=".$row['id']."'>".
-	    "<img title=\"\" alt=\"\" src=\"/glpi/pics/reservation-3.png\"></img></a></td>";
+	    "<img title=\"\" alt=\"\" src=\"".getGLPIUrl()."/pics/reservation-3.png\"></img></a></td>";
 	  echo "</tr>\n";
 	  
 	}
@@ -273,11 +318,12 @@ class PluginReservationReservation extends CommonDBTM {
    * 
    **/
   function showCurrentResa() {
-    global $DB, $CFG_GLPI;
+    global $DB, $CFG_GLPI, $datesresa;
     $showentity = Session::isMultiEntitiesMode();
-
-    $begin = $_SESSION['reserve']["begin"];
-    $end   = $_SESSION['reserve']["end"];
+	
+	
+    $begin = $datesresa["begin"];
+    $end   = $datesresa["end"];
     $left = "";
     $where = "";
 
@@ -393,6 +439,8 @@ class PluginReservationReservation extends CommonDBTM {
         	// le nom du materiel
         	echo "<td $colorRed>".$resa['name']."</td>";
 
+          
+
         	//date de debut de la resa
         	echo "<td $colorRed>".date("\L\e d-m-Y \à H:i:s",strtotime($resa["debut"]))."</td>";
 
@@ -504,12 +552,14 @@ function replaceResa($idmat,$idresa) {
 
 
 function getMatDispo() {
-  global $DB, $CFG_GLPI;
+  
+  global $DB, $CFG_GLPI, $datesresa;
+  
     $showentity = Session::isMultiEntitiesMode();
 
 
-    $begin = $_SESSION['reserve']["begin"];
-    $end   = $_SESSION['reserve']["end"];
+    $begin = $datesresa["begin"];
+    $end   = $datesresa["end"];
     $left = "";
     $where = "";
     $myArray = array();

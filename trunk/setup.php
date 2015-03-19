@@ -4,11 +4,11 @@ function plugin_version_reservation() {
 
   return array(
       'name'           => _n('Réservation', 'Réservation', 2, 'Réservation'),
-      'version'        => '1.2.0',
+      'version'        => '1.2.3',
       'author'         => 'Sylvain Allemand',
       'license'        => 'GPLv2+',
       'homepage'       => 'https://forge.indepnet.net/projects/reservation',
-      'minGlpiVersion' => '0.84');// For compatibility / no install in version < 0.80
+      'minGlpiVersion' => '0.85');// For compatibility / no install in version < 0.80
 
 }
 
@@ -16,8 +16,8 @@ function plugin_version_reservation() {
 //controle des prerequis
 function plugin_reservation_check_prerequisites() {
 
-  if (version_compare(GLPI_VERSION,'0.84','lt') || version_compare(GLPI_VERSION,'0.85','gt')) {
-    echo "This plugin requires GLPI >= 0.84 and GLPI < 0.85";
+  if (version_compare(GLPI_VERSION,'0.85','lt') || version_compare(GLPI_VERSION,'0.86','gt')) {
+    echo "This plugin requires GLPI >= 0.85 and GLPI < 0.86";
     return false;
   }
   return true;
@@ -46,6 +46,7 @@ function plugin_init_reservation() {
   $PLUGIN_HOOKS['add_javascript']['reservation']= array('scripts/tri.js');
   $PLUGIN_HOOKS['config_page']['reservation'] = 'front/config.form.php';
   $PLUGIN_HOOKS['item_update']['reservation'] = array('Reservation' => 'plugin_item_update_reservation');
+  $PLUGIN_HOOKS['menu_toadd']['reservation'] = array('plugins' => 'PluginReservationReservation');
 
 
   Plugin::registerClass('PluginReservationConfig');
