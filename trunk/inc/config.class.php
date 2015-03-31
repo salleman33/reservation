@@ -8,12 +8,38 @@ if (!defined('GLPI_ROOT')) {
 
 class PluginReservationConfig extends CommonDBTM {
 
+    function getConfigurationMethode()
+        {
+            global $DB;
+            $query = "SELECT * FROM glpi_plugin_reservation_config WHERE name='methode'";
+        if ($result = $DB->query($query))
+            {
+            if ($DB->numrows($result) > 0)
+                {
+                while ($row = $DB->fetch_assoc($result)) 
+                    {
+                        $methode = $row['value'];           
+                    }
+                }  
+            }
+        return $methode;
+
+        }
+
+function setConfigurationMethode($methode="manual")
+{
+    global $DB;       
+
+    $query = "UPDATE glpi_plugin_reservation_config SET value='".$methode."' where name = 'methode'";
+        $DB->query($query) or die($DB->error());
+}        
+    
 
     function getConfigurationWeek()
         {
         global $DB;
         
-        $query = "SELECT * FROM glpi_plugin_reservation_config WHERE actif=1";
+        $query = "SELECT * FROM glpi_plugin_reservation_configdayforauto WHERE actif=1";
         if ($result = $DB->query($query))
             {
             if ($DB->numrows($result) > 0)
@@ -44,7 +70,7 @@ function setConfigurationWeek($week=null)
 
 function showForm() 
 {
-
+$methode = $this->getConfigurationMethode();
 $config = $this->getConfigurationWeek();
 
 echo "<form method='post' action='".$this->getFormURL()."'>";
@@ -52,7 +78,7 @@ echo "<form method='post' action='".$this->getFormURL()."'>";
 echo "<div class='center'>";
 
 
-if($config['methode'] == "auto")
+if($methode == "auto")
 {
 echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
@@ -88,10 +114,10 @@ echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
 echo "<th>Methode pour gerer l'envoi de mail aux utilisateurs dont la reservation est depassée </th>";
 echo "<tr>";
-echo "<td> <input type=\"radio\" name=\"methode\" value=\"auto\" ".($config['methode'] ? 'checked':'')."> Automatiquement (avec l'action automatique à configurer) </td>";
+echo "<td> <input type=\"radio\" name=\"methode\" value=\"auto\" ".($methode == "auto" ? 'checked':'')."> Automatiquement (avec l'action automatique à configurer) </td>";
 echo "</tr>";
 echo "<tr>";
-echo "<td> <input type=\"radio\" name=\"methode\" value=\"manual\" ".($config['methode'] ? 'checked':'')."> Manuellement (à l'aide du bouton sur la vue des reservations en cours)</td>" ;
+echo "<td> <input type=\"radio\" name=\"methode\" value=\"manual\" ".($methode == "manual" ? 'checked':'')."> Manuellement (à l'aide du bouton sur la vue des reservations en cours)</td>" ;
 echo "</tr>";
 
 echo "</table>";

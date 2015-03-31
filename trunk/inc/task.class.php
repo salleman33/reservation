@@ -61,7 +61,7 @@ class PluginReservationTask extends CommonDBTM
       $res = 0;
 
       $config = new PluginReservationConfig();
-      $week = $config->getConfiguration();
+      $week = $config->getConfigurationWeek();
       setlocale (LC_TIME, 'fr_FR.utf8','fra'); 
       $jour = strftime("%A");
       if(isset($week[$jour]))

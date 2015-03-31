@@ -12,15 +12,16 @@ function plugin_reservation_install() {
       `date_return` datetime,
       `date_theorique` datetime NOT NULL,
       `itemtype` VARCHAR(100) NOT NULL,
+      `dernierMail` datetime,
       PRIMARY KEY (`id`)
 	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci"; 
 
 	$DB->queryOrDie($query, $DB->error());
   }
-  else { // UPDATE
+  /*else { // UPDATE
    $query = "ALTER TABLE `glpi_plugin_reservation_manageresa` ADD itemtype VARCHAR(100) NOT NULL";
    $DB->queryOrDie($query, $DB->error());
-  }
+  }*/
 
     if (!TableExists("glpi_plugin_reservation_configdayforauto")) 
     {
@@ -47,17 +48,17 @@ function plugin_reservation_install() {
 	}
 
 
-    if (!TableExists("glpi_plugin_reservation_configmethode")) 
+    if (!TableExists("glpi_plugin_reservation_config")) 
     {
         // Création de la table config
-        $query = "CREATE TABLE `glpi_plugin_reservation_configmethode` (
-        `methode` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-        `active` int(1) NOT NULL default '1'
+        $query = "CREATE TABLE `glpi_plugin_reservation_config` (
+        `name` VARCHAR(10) NOT NULL PRIMARY KEY,
+        `value` VARCHAR(10) NOT NULL
         )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
         $DB->query($query) or die($DB->error());
 
-         $query = "INSERT INTO `glpi_plugin_reservation_configmethode` (`auto` , `active`)
-                VALUES (\"auto\",1)";
+         $query = "INSERT INTO `glpi_plugin_reservation_config` (`name` , `value`)
+                VALUES (\"methode\",\"manual\")";
                        
       $DB->queryOrDie($query) or die($DB->error());
     }
@@ -73,7 +74,7 @@ function plugin_reservation_install() {
 
   if (!$cron->getFromDBbyName('PluginReservationTask','MailUserDelayedResa'))
   {
-    CronTask::Register('PluginReservationTask', 'MailUserDelayedResa', DAY_TIMESTAMP,array('hourmin' => 23, 'hourmax' => 24,  'mode' => 2, 'logs_lifetime'=> 30));
+    CronTask::Register('PluginReservationTask', 'MailUserDelayedResa', DAY_TIMESTAMP,array('hourmin' => 23, 'hourmax' => 24,  'mode' => 2, 'logs_lifetime'=> 30, 'state'=>0));
 
   }
 
@@ -85,7 +86,7 @@ function plugin_reservation_install() {
 
 function plugin_reservation_uninstall() {
   global $DB;
-  $tables = array("glpi_plugin_reservation_manageresa","glpi_plugin_reservation_config");
+  $tables = array("glpi_plugin_reservation_manageresa","glpi_plugin_reservation_config","glpi_plugin_reservation_configdayforauto");
   foreach($tables as $table) 
   {$DB->query("DROP TABLE IF EXISTS `$table`;");}
   return true;

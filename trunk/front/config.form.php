@@ -14,12 +14,17 @@ if ($plugin->isActivated("reservation")) {
    Session::checkRight("config",  array(CREATE, UPDATE,DELETE ));
    if (isset($_POST["week"])) {      
       $PluginReservationConfig->setConfigurationWeek($_POST["week"]);
-      Html::back();
-   } else {
-      Html::header(PluginReservationReservation::getTypeName(2), '', "plugins", "Reservation");
-      $PluginReservationConfig->showForm();
-      Html::footer();
+      //Html::back();
    }
+   if(isset($_POST["methode"])){
+      $PluginReservationConfig->setConfigurationMethode($_POST["methode"]);
+      //Html::back();
+   } 
+
+   Html::header(PluginReservationReservation::getTypeName(2), '', "plugins", "Reservation");
+   $PluginReservationConfig->showForm();
+   Html::footer();
+   
 } else {
    Html::header(__('Setup'), '', "config", "plugins");
    echo "<div class='center'><br><br>".

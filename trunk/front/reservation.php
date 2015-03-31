@@ -38,6 +38,9 @@ $PluginReservationReservation->showFormDate();
 if(isset($_GET['resareturn']))
   $PluginReservationReservation->resaReturn($_GET['resareturn']);
 
+if(isset($_GET['mailuser']))
+  $PluginReservationReservation->mailUser($_GET['mailuser']);
+
 if(isset($_POST['AjouterMatToResa']))
   $PluginReservationReservation->addToResa($_POST['matDispoAdd'],$_POST['AjouterMatToResa']);
 

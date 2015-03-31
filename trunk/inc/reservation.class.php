@@ -271,7 +271,20 @@ class PluginReservationReservation extends CommonDBTM {
     echo "</div>\n";
   }
 
+  function mailUser($resaid)
+  {
+    global $DB, $CFG_GLPI;
+    $reservation = new Reservation();
+    $reservation->getFromDB($resaid);
+    NotificationEvent::raiseEvent('plugin_reservation_expiration', $reservation);
+    $config = new PluginReservationConfig();
 
+    $query = "UPDATE `glpi_plugin_reservation_manageresa` SET `dernierMail`= '".date("Y-m-d H:i:s",time())."' WHERE `resaid` = ".$resaid;
+    $DB->query($query) or die("error on 'update' dans mailUser: ". $DB->error());
+   
+
+
+  }
 
   /**
    * Fonction permettant de marquer une reservation comme rendue 
@@ -320,7 +333,8 @@ class PluginReservationReservation extends CommonDBTM {
   function showCurrentResa() {
     global $DB, $CFG_GLPI, $datesresa;
     $showentity = Session::isMultiEntitiesMode();
-	
+	    $config = new PluginReservationConfig();
+      $methode = $config->getConfigurationMethode();
 	
     $begin = $datesresa["begin"];
     $end   = $datesresa["end"];
@@ -404,33 +418,46 @@ class PluginReservationReservation extends CommonDBTM {
     echo "<div class='center'>";
     echo "<table class='tab_cadre'>";
     echo "<thead>";
-    echo "<tr><th colspan='".($showentity?"10":"9")."'>"."Matériels empruntés"."</th></tr>\n";
+    echo "<tr><th colspan='".($showentity?"11":"10")."'>"."Matériels empruntés"."</th></tr>\n";
     echo "<tr class='tab_bg_2'>";
 
-    echo "<th><a href=\"#\" onclick=\"sortTable(this,0); return false;\">Utilisateur</a></th>";
+    /*echo "<th><a href=\"#\" onclick=\"sortTable(this,0); return false;\">Utilisateur</a></th>";
     echo "<th><a href=\"#\" onclick=\"sortTable(this,1); return false;\">Materiel</a></th>";
     echo "<th><a href=\"#\" onclick=\"sortTable(this,2); return false;\">Debut</a></th>";
     echo "<th><a href=\"#\" onclick=\"sortTable(this,3); return false;\">Fin</a></th>";
     echo "<th><a href=\"#\" onclick=\"sortTable(this,4); return false;\">Commentaires</a></th>";
-    echo "<th><a href=\"#\" onclick=\"sortTable(this,5); return false;\">Mouvement</a></th>";
-    echo "<th>Marquer comme rendu</th>";
-    echo "<th>Actions</th>";
+    echo "<th><a href=\"#\" onclick=\"sortTable(this,5); return false;\">Mouvement</a></th>";*/
+    echo "<th>Utilisateur</a></th>";
+    echo "<th>Materiel</a></th>";
+    echo "<th>Debut</a></th>";
+    echo "<th>Fin</a></th>";
+    echo "<th>Commentaires</a></th>";
+    echo "<th>Mouvement</a></th>";    
+    echo "<th>Acquitter</th>";
+    echo "<th colspan='".($methode == "manual" ? 3 : 2)."'>Actions</th>";
 
     echo "</tr></thead>";
     echo "<tbody>";
 
-
+  
+   
     //on parcourt le tableau pour construire la table à afficher
     foreach($ResaByUser as $User => $arrayResa) {
+      $nbLigne = 1;
+      $limiteLigneNumber = count($arrayResa);
+      $flag = 0;
       echo "<tr class='tab_bg_2'>";
       echo "<td rowspan=".count($arrayResa).">".$User."</td>";
       foreach($arrayResa as $Num => $resa) {
         	$colorRed = "";
         	// on regarde si la reservation actuelle a été prolongée par le plugin
-        	$query = "SELECT `date_return`, `date_theorique` FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = ".$resa["resaid"];
+        	$query = "SELECT `date_return`, `date_theorique`, `dernierMail` FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = ".$resa["resaid"];
         	if ($result = $DB->query($query)) {
         	  $dates = $DB->fetch_row($result);
         	}
+
+         
+          
 
         	if($DB->numrows($result)) 
         	  if($dates[1] < date("Y-m-d H:i:s",time()) && $dates[0] == NULL) // on colore  en rouge seulement si la date de retour theorique est depassée et si le materiel n'est pas marqué comme rendu (avec une date de retour effectif)
@@ -439,31 +466,59 @@ class PluginReservationReservation extends CommonDBTM {
         	// le nom du materiel
         	echo "<td $colorRed>".$resa['name']."</td>";
 
-          
+          if(!$flag)
+          {
+            $i = $Num;
+            
+            while($i < count($arrayResa) - 1 )
+          {
+            if($arrayResa[$i+1]['debut'] == $resa['debut'] && $arrayResa[$Num+1]['fin'] == $resa['fin']) {
+              $nbLigne++;              
+            }
+              
+            else
+              break;
+            $i++;
+          }
+            $limiteLigneNumber = $Num + $nbLigne -1;
+
+          }
+
 
         	//date de debut de la resa
-        	echo "<td $colorRed>".date("\L\e d-m-Y \à H:i:s",strtotime($resa["debut"]))."</td>";
+          if(!$flag) {
+        	  echo "<td rowspan=".$nbLigne." $colorRed>".date("d-m-Y \à H:i:s",strtotime($resa["debut"]))."</td>";
 
         	// si c'est une reservation prolongée, on affiche la date theorique plutot que la date reelle (qui est prolongée jusqu'au retour du materiel)
-        	if($DB->numrows($result) && $dates[0] == NULL) 
-        	  echo "<td $colorRed>".date("\L\e d-m-Y \à H:i:s",strtotime($dates[1]))."</td>";
+          if($DB->numrows($result) && $dates[0] == NULL) 
+        	  echo "<td rowspan=".$nbLigne." $colorRed>".date("d-m-Y \à H:i:s",strtotime($dates[1]))."</td>";
         	else 
-        	  echo "<td $colorRed>".date("\L\e d-m-Y \à H:i:s",strtotime($resa["fin"]))."</td>";
+        	  echo "<td rowspan=".$nbLigne." $colorRed>".date("d-m-Y \à H:i:s",strtotime($resa["fin"]))."</td>";
         	
         	//le commentaire
-        	echo "<td $colorRed>".$resa["comment"]."</td>";
+        	echo "<td rowspan=".$nbLigne." $colorRed>".$resa["comment"]."</td>";
 
         	// les fleches de mouvements	
-        	echo "<td ><center>";
+        	echo "<td rowspan=".$nbLigne." ><center>";
         	if(date("Y-m-d",strtotime($resa["debut"])) == date("Y-m-d",strtotime($begin)))
         	  echo "<img title=\"\" alt=\"\" src=\"../pics/up-icon.png\"></img>";
         	if(date("Y-m-d",strtotime($resa["fin"])) == date("Y-m-d",strtotime($end)))
         	  echo "<img title=\"\" alt=\"\" src=\"../pics/down-icon.png\"></img>";
         	echo "</center></td>";
 
+        }
+        if($nbLigne > 1)
+          $flag = 1;
+
+        if($Num == $limiteLigneNumber ) {
+          $flag = 0;
+          $nbLigne=1;
+        }
+          
+
         	// si la reservation est rendue, on affiche la date du retour, sinon le bouton pour acquitter le retour
         	if($dates[0] != NULL) 
-        	  echo "<td>".date("\L\e d-m-Y \à H:i:s",strtotime($dates[0]))."</td>";
+        	  echo "<td>".date("d-m-Y \à H:i:s",strtotime($dates[0]))."</td>";
         	else
         	  echo "<td><center><a title=\"Marquer comme rendu\" href=\"reservation.php?resareturn=".$resa['resaid']."\"><img title=\"\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
 
@@ -471,22 +526,8 @@ class PluginReservationReservation extends CommonDBTM {
 
 // boutons action
           $matDispo = getMatDispo();
-          echo "<td>";   
+          echo "<td>";
           echo "<ul>";
-
-          echo "<li><span class=\"bouton\" id=\"bouton_replace".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('replace".$resa['resaid']."');\">Remplacer le materiel</span>
-          <div id=\"replace".$resa['resaid']."\" style=\"display:none;\">
-          <form method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
-          echo '<select name="matDispoReplace">';          
-          foreach($matDispo as $mat) {
-             echo "\t",'<option value="', key($mat) ,'">', current($mat) ,'</option>';
-          }
-          echo "<input type='hidden' name='ReplaceMatToResa' value='".$resa['resaid']."'>";
-          echo "<input type='submit' class='submit' name='submit' value=Remplacer>";
-          Html::closeForm();
-          echo "</div></li>";
-
-
           echo "<li><span class=\"bouton\" id=\"bouton_add".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('add".$resa['resaid']."');\">Ajouter un materiel</span>
           <div id=\"add".$resa['resaid']."\" style=\"display:none;\">
           <form method='POST' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
@@ -498,15 +539,48 @@ class PluginReservationReservation extends CommonDBTM {
           echo "<input type='submit' class='submit' name='submit' value=Ajouter>";
           Html::closeForm();
           echo "</div></li>";
+          
+          echo "<li><span class=\"bouton\" id=\"bouton_replace".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('replace".$resa['resaid']."');\">Remplacer le materiel</span>
+          <div id=\"replace".$resa['resaid']."\" style=\"display:none;\">
+          <form method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
+          echo '<select name="matDispoReplace">';          
+          foreach($matDispo as $mat) {
+             echo "\t",'<option value="', key($mat) ,'">', current($mat) ,'</option>';
+          }
+          echo "<input type='hidden' name='ReplaceMatToResa' value='".$resa['resaid']."'>";
+          echo "<input type='submit' class='submit' name='submit' value=Remplacer>";
+          Html::closeForm();
+          echo "</div></li>";
+          echo "</ul>";
+          echo "</td>";
 
 
+          echo "<td>";   
+          echo "<ul>";
           echo "<li><a class=\"bouton\" title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=".$resa['resaid']."'>Editer la reservation</a></li>";
           echo "</ul>";
           echo "</td>";
-      
+        
+
+          if($methode == "manual") {
+            echo "<td>";   
+          echo "<ul>";
+          echo "<li><a class=\"bouton\" title=\"Envoyer un mail de rappel\" href=\"reservation.php?mailuser=".$resa['resaid']."\">Envoyer un mail de rappel</a></li>";
+           
+          if(isset($dates[2])) {
+            echo "<li>Dernier mail envoyé le : </li>";
+            echo "<li>".date("d-m-Y \à H:i:s",strtotime($dates[2]))."</li>";
+          }
+
+          echo "</ul>";
+          echo "</td>";
+          }
+            
+            	
+          echo "</tr>";
+          echo "<tr class='tab_bg_2'>";
+          
         	
-        	echo "</tr>";
-        	echo "<tr class='tab_bg_2'>";
           }
         echo "</tr>\n";
     }
@@ -523,14 +597,41 @@ function addToResa($idmat,$idresa) {
   global $DB, $CFG_GLPI;     
     
     $query = "SELECT * FROM `glpi_reservations` WHERE `id`='".$idresa."';";
-      $result = $DB->query($query) or die("error on 'select' dans addToResa / hash: ". $DB->error());
+      $result = $DB->query($query) or die("error on 'select' dans addToResa / 1: ". $DB->error());
 
 
-      $row = $DB->fetch_assoc($result);
+      $matToAdd = $DB->fetch_assoc($result);
 
-      $query = "INSERT INTO  `glpi_reservations` (`begin`, `end`, `reservationitems_id`,`users_id`) VALUES ('".$row['begin']."', '".$row['end']."', '".$idmat ."', '".$row['users_id'] ."');";
+      $query = "INSERT INTO  `glpi_reservations` (`begin`, `end`, `reservationitems_id`,`users_id`) VALUES ('".$matToAdd['begin']."', '".$matToAdd['end']."', '".$idmat ."', '".$matToAdd['users_id'] ."');";
       $DB->query($query) or die("error on 'insert' dans addToResa / hash: ". $DB->error());
 
+      // pour avoir l'id et l'itemtypede la nouvelle reservation créée
+      $query = "SELECT `glpi_reservations`.`id`, `glpi_reservationitems`.`itemtype` FROM `glpi_reservations`, `glpi_reservationitems`  WHERE `begin` = '".$matToAdd['begin']."' AND `end` = '".$matToAdd['end']."' AND `reservationitems_id` = '".$idmat ."' AND `users_id` ='".$matToAdd['users_id'] ."' AND `glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`";
+      $result = $DB->query($query) or die("error on 'select' dans addToResa / 2: ". $DB->error());
+      $res = $DB->fetch_row($result);
+      $idnewreservation = $res[0];
+      $itemtypenewresa = $res[1];
+
+
+      //on regarde si la reservation à laquelle on ajoute le materiel est deja "surveillée", pour  alors surveiller le nouveau mat
+      $query = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = '".$idresa."';";
+      $result = $DB->query($query) or die("error on 'select' dans addToResa / manageresa: ". $DB->error());
+      
+      if($DB->numrows($result)>0) {
+        $row = $DB->fetch_assoc($result);
+        if($row['date_return'] == NULL)
+         $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `matid`, `itemtype`,  `date_theorique`) VALUES ('".$idnewreservation."', '".$idmat."', '".$itemtypenewresa."', '". $row['date_theorique']."');";
+        else
+          $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `matid`, `itemtype`, `date_return`, `date_theorique`) VALUES ('".$idnewreservation."', '".$idmat."', '".$itemtypenewresa."', ".$row['date_return']."', '". $row['date_theorique']."');";
+
+
+
+
+      $DB->query($query) or die("error on 'insert' dans addToResa / hash: ". $DB->error());
+
+      }
+
+     
     
        
 }
@@ -547,8 +648,6 @@ function replaceResa($idmat,$idresa) {
 
 
 }
-
-
 
 
 function getMatDispo() {
