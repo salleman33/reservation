@@ -450,6 +450,7 @@ class PluginReservationReservation extends CommonDBTM {
       echo "<td rowspan=".count($arrayResa).">".$User."</td>";
       foreach($arrayResa as $Num => $resa) {
         	$colorRed = "";
+          $flagSurveille = 0;
         	// on regarde si la reservation actuelle a été prolongée par le plugin
         	$query = "SELECT `date_return`, `date_theorique`, `dernierMail` FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = ".$resa["resaid"];
         	if ($result = $DB->query($query)) {
@@ -459,9 +460,12 @@ class PluginReservationReservation extends CommonDBTM {
          
           
 
-        	if($DB->numrows($result)) 
+        	if($DB->numrows($result)) {
+            $flagSurveille = 1;
         	  if($dates[1] < date("Y-m-d H:i:s",time()) && $dates[0] == NULL) // on colore  en rouge seulement si la date de retour theorique est depassée et si le materiel n'est pas marqué comme rendu (avec une date de retour effectif)
         	    $colorRed = "bgcolor=\"red\"";
+          }
+      
         	
         	// le nom du materiel
         	echo "<td $colorRed>".$resa['name']."</td>";
@@ -562,16 +566,17 @@ class PluginReservationReservation extends CommonDBTM {
           echo "</td>";
         
 
-          if($methode == "manual") {
+          if($methode == "manual" ) {
             echo "<td>";   
           echo "<ul>";
+          if($flagSurveille) {
           echo "<li><a class=\"bouton\" title=\"Envoyer un mail de rappel\" href=\"reservation.php?mailuser=".$resa['resaid']."\">Envoyer un mail de rappel</a></li>";
            
           if(isset($dates[2])) {
             echo "<li>Dernier mail envoyé le : </li>";
             echo "<li>".date("d-m-Y \à H:i:s",strtotime($dates[2]))."</li>";
           }
-
+  }
           echo "</ul>";
           echo "</td>";
           }
