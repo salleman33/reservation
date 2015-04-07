@@ -30,6 +30,12 @@ function setConfigurationMethode($methode="manual")
 {
     global $DB;       
 
+    
+        $query = "UPDATE `glpi_crontasks` SET state=".($methode == "manual" ? 0 : 1)." WHERE name = 'MailUserDelayedResa'";
+        $DB->query($query) or die($DB->error());
+    
+
+
     $query = "UPDATE glpi_plugin_reservation_config SET value='".$methode."' where name = 'methode'";
         $DB->query($query) or die($DB->error());
 }        
