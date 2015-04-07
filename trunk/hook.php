@@ -18,10 +18,19 @@ function plugin_reservation_install() {
 
 	$DB->queryOrDie($query, $DB->error());
   }
-  /*else { // UPDATE
+  else { // UPDATE
    $query = "ALTER TABLE `glpi_plugin_reservation_manageresa` ADD itemtype VARCHAR(100) NOT NULL";
    $DB->queryOrDie($query, $DB->error());
-  }*/
+   $query = "ALTER TABLE `glpi_plugin_reservation_manageresa` ADD dernierMail datetime";
+   $DB->queryOrDie($query, $DB->error());
+  }
+
+
+    if(TableExists("glpi_plugin_reservation_config"))
+    {
+      $query = "RENAME TABLE `glpi_plugin_reservation_config` TO `glpi_plugin_reservation_configdayforauto`";
+      $DB->query($query) or die($DB->error());
+    }
 
     if (!TableExists("glpi_plugin_reservation_configdayforauto")) 
     {
