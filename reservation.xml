@@ -29,11 +29,14 @@ Il apporte également quelques actions simplifiées sur les réservations comme 
       <author>Sylvain Allemand</author>
    </authors>
    <versions>
-   <version>
+      <version>
+          <num>1.3.0</num>
+          <compatibility>0.85</compatibility>
+      </version>
+      <version>
           <num>1.2.0</num>
           <compatibility>0.84</compatibility>
       </version>
-
    </versions>
    <langs>
       <lang>fr_FR</lang>
