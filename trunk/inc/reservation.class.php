@@ -248,7 +248,7 @@ class PluginReservationReservation extends CommonDBTM {
 	      "</td>";
 	  }
 	  echo "<td><a title=\"Voir le planning\" href='../../../front/reservation.php?reservationitems_id=".$row['id']."'>".
-	    "<img title=\"\" alt=\"\" src=\"".getGLPIUrl()."/pics/reservation-3.png\"></img></a></td>";
+	    "<img title=\"\" alt=\"\" src=\"".getGLPIUrl()."pics/reservation-3.png\"></img></a></td>";
 	  echo "</tr>\n";
 	  
 	}
@@ -297,7 +297,9 @@ class PluginReservationReservation extends CommonDBTM {
     // on cherche dans la table de gestion des resa du plugin
     $query = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = ".$resaid;
     $trouve = 0;
+    $matId;
     if ($result = $DB->query($query)) {
+	   # $matId = 
       if($DB->numrows($result))
 	$trouve = 1;
     }
@@ -312,7 +314,7 @@ class PluginReservationReservation extends CommonDBTM {
     else {
       $temps = time();
       // insertion de la reservation dans la table manageresa
-      $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `date_return`, `date_theorique`) VALUES ('".$resaid."', '". date("Y-m-d H:i:s",$temps)."', '". date("Y-m-d H:i:s",$temps)."');";
+      $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `matid`, `date_return`, `date_theorique`, `itemtype`) VALUES ('".$resaid."', '0',  '". date("Y-m-d H:i:s",$temps)."', '". date("Y-m-d H:i:s",$temps)."','null');";
       $DB->query($query) or die("error on 'insert' into glpi_plugin_reservation_manageresa / hash: ". $DB->error());
       $ok = 1;
     }
@@ -461,9 +463,10 @@ class PluginReservationReservation extends CommonDBTM {
           
 
         	if($DB->numrows($result)) {
-            $flagSurveille = 1;
-        	  if($dates[1] < date("Y-m-d H:i:s",time()) && $dates[0] == NULL) // on colore  en rouge seulement si la date de retour theorique est depassée et si le materiel n'est pas marqué comme rendu (avec une date de retour effectif)
-        	    $colorRed = "bgcolor=\"red\"";
+        	  if($dates[1] < date("Y-m-d H:i:s",time()) && $dates[0] == NULL) {// on colore  en rouge seulement si la date de retour theorique est depassée et si le materiel n'est pas marqué comme rendu (avec une date de retour effectif)
+			  $colorRed = "bgcolor=\"red\"";
+            		  $flagSurveille = 1;
+		  }
           }
       
         	
