@@ -19,10 +19,7 @@ function plugin_reservation_install() {
 	$DB->queryOrDie($query, $DB->error());
   }
   else { // UPDATE
-   $query = "ALTER TABLE `glpi_plugin_reservation_manageresa` ADD itemtype VARCHAR(100) NOT NULL";
-   $DB->queryOrDie($query, $DB->error());
-   $query = "ALTER TABLE `glpi_plugin_reservation_manageresa` ADD dernierMail datetime";
-   $DB->queryOrDie($query, $DB->error());
+   
   }
 
 
