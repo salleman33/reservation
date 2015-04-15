@@ -4,7 +4,7 @@ function plugin_version_reservation() {
 
   return array(
       'name'           => _n('Réservation', 'Réservation', 2, 'Réservation'),
-      'version'        => '1.3.0',
+      'version'        => '1.3.1',
       'author'         => 'Sylvain Allemand',
       'license'        => 'GPLv2+',
       'homepage'       => 'https://forge.indepnet.net/projects/reservation',
