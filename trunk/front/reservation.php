@@ -61,3 +61,4 @@ if ($_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
 
 
 
+?>

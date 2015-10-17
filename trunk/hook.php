@@ -14,12 +14,12 @@ function plugin_reservation_install() {
       `itemtype` VARCHAR(100) NOT NULL,
       `dernierMail` datetime,
       PRIMARY KEY (`id`)
-	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci"; 
+	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 
 	$DB->queryOrDie($query, $DB->error());
   }
   else { // UPDATE
-   
+
   }
 
 
@@ -29,7 +29,7 @@ function plugin_reservation_install() {
       $DB->query($query) or die($DB->error());
     }
 
-    if (!TableExists("glpi_plugin_reservation_configdayforauto")) 
+    if (!TableExists("glpi_plugin_reservation_configdayforauto"))
     {
         // Création de la table config
         $query = "CREATE TABLE `glpi_plugin_reservation_configdayforauto` (
@@ -47,14 +47,14 @@ function plugin_reservation_install() {
                        (\"vendredi\",1),
                        (\"samedi\",0),
                        (\"dimanche\",0)";
-                       
+
       $DB->queryOrDie($query) or die($DB->error());
     }
 	else { // UPDATE
 	}
 
 
-    if (!TableExists("glpi_plugin_reservation_config")) 
+    if (!TableExists("glpi_plugin_reservation_config"))
     {
         // Création de la table config
         $query = "CREATE TABLE `glpi_plugin_reservation_config` (
@@ -65,12 +65,12 @@ function plugin_reservation_install() {
 
          $query = "INSERT INTO `glpi_plugin_reservation_config` (`name` , `value`)
                 VALUES (\"methode\",\"manual\")";
-                       
+
       $DB->queryOrDie($query) or die($DB->error());
     }
   else { // UPDATE
   }
-     
+
 
   $cron = new CronTask;
   if (!$cron->getFromDBbyName('PluginReservationTask','SurveilleResa'))
@@ -93,7 +93,7 @@ function plugin_reservation_install() {
 function plugin_reservation_uninstall() {
   global $DB;
   $tables = array("glpi_plugin_reservation_manageresa","glpi_plugin_reservation_config","glpi_plugin_reservation_configdayforauto");
-  foreach($tables as $table) 
+  foreach($tables as $table)
   {$DB->query("DROP TABLE IF EXISTS `$table`;");}
   return true;
 }
@@ -108,4 +108,3 @@ function plugin_item_update_reservation($item) {
 
 
 ?>
-

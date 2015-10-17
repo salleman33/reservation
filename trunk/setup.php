@@ -67,3 +67,4 @@ function plugin_init_reservation() {
 
 
 }
+?>

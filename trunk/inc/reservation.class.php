@@ -9,7 +9,7 @@ if (!defined('GLPI_ROOT')) {
 
 
 function getGLPIUrl()
-   {return str_replace("plugins/reservation/front/reservation.php", "", $_SERVER['SCRIPT_NAME']);}    
+   {return str_replace("plugins/reservation/front/reservation.php", "", $_SERVER['SCRIPT_NAME']);}
 
 class PluginReservationReservation extends CommonDBTM {
 
@@ -19,17 +19,17 @@ class PluginReservationReservation extends CommonDBTM {
 
   function getAbsolutePath()
    {return str_replace("plugins/reservation/inc/reservation.class.php", "", $_SERVER['SCRIPT_FILENAME']);}
-   
-   
+
+
 /*
    function isNewItem() {
     return false;
   }
 */
-  
+
   static function getMenuName() {
      return PluginReservationReservation::getTypeName(2);
-   } 
+   }
 
   static function canView() {
       global $CFG_GLPI;
@@ -72,7 +72,7 @@ class PluginReservationReservation extends CommonDBTM {
 
       case 2 : // mon second onglet
 	$monplugin->showDispoAndFormResa();
-	
+
 	break;
     }
     return TRUE;
@@ -88,10 +88,10 @@ class PluginReservationReservation extends CommonDBTM {
 
     /*if(isset($_GET['resareturn'])) {
       $_POST['reserve'] = $datesresa;
-    } 
+    }
     else */
     if(!isset($datesresa)) {
-  
+
       $jour = date("d",time());
       $mois = date("m",time());
       $annee = date("Y",time());
@@ -102,7 +102,7 @@ class PluginReservationReservation extends CommonDBTM {
       if($begin_time > mktime(19,0,0,$mois,$jour,$annee))
 	$datesresa["end"] = date("Y-m-d H:i:s",$begin_time + 3600);
       else
-	$datesresa["end"] = date("Y-m-d H:i:s",mktime(19,0,0,$mois,$jour,$annee)); 
+	$datesresa["end"] = date("Y-m-d H:i:s",mktime(19,0,0,$mois,$jour,$annee));
     }
     if(isset($_POST['nextday'])) {
       $tmpbegin = $datesresa["begin"];
@@ -124,7 +124,7 @@ class PluginReservationReservation extends CommonDBTM {
     echo "<table class='tab_cadre'><tr class='tab_bg_2'>";
     echo "<th colspan='5'>Choisissez une date</th></tr>";
 
-    
+
 
     echo "<tr class='tab_bg_2'>";
 
@@ -133,7 +133,7 @@ class PluginReservationReservation extends CommonDBTM {
     echo "</td>";
 
     echo "<td>".__('Start date')."</td><td>";
-    Html::showDateTimeField("reserve[begin]", array('value' =>  $datesresa["begin"], 
+    Html::showDateTimeField("reserve[begin]", array('value' =>  $datesresa["begin"],
 	  'maybeempty' => false));
     echo "</td><td rowspan='3'>";
     echo "<input type='submit' class='submit' name='submit' value=\""._sx('button', 'Search')."\">";
@@ -143,7 +143,7 @@ class PluginReservationReservation extends CommonDBTM {
     echo "</td></tr>";
 
     echo "<tr class='tab_bg_2'><td>".__('End date')."</td><td>";
-    Html::showDateTimeField("reserve[end]", array('value' =>  $datesresa["end"], 
+    Html::showDateTimeField("reserve[end]", array('value' =>  $datesresa["end"],
 	  'maybeempty' => false));
     echo "</td></tr>";
 
@@ -227,7 +227,7 @@ class PluginReservationReservation extends CommonDBTM {
 	if($DB->numrows($result)) {
 	  echo "<td>";
 	  echo "<table class='tab_cadre'>";
-	  echo "<tr><th colspan='".($showentity?"6":"5")."'>".$item->getTypeName()."</th></tr>\n"; 
+	  echo "<tr><th colspan='".($showentity?"6":"5")."'>".$item->getTypeName()."</th></tr>\n";
 	}
 	while ($row = $DB->fetch_assoc($result)) {
 	  echo "<tr class='tab_bg_2'><td>";
@@ -250,24 +250,24 @@ class PluginReservationReservation extends CommonDBTM {
 	  echo "<td><a title=\"Voir le planning\" href='../../../front/reservation.php?reservationitems_id=".$row['id']."'>".
 	    "<img title=\"\" alt=\"\" src=\"".getGLPIUrl()."pics/reservation-3.png\"></img></a></td>";
 	  echo "</tr>\n";
-	  
+
 	}
       }
       if($DB->numrows($result)) {
 	echo "</td>";
-	echo "</table>\n"; 
+	echo "</table>\n";
       }
-    }     
+    }
 
     echo "</tr>";
     echo "<tr class='tab_bg_1 center'><td colspan='".($showentity?"5":"4")."'>";
     echo "<input type='submit' value=\"Réserver\" class='submit'></td></tr>\n";
-    
+
 
     echo "</table>\n";
 
     echo "<input type='hidden' name='id' value=''>";
-    Html::closeForm(); 
+    Html::closeForm();
     echo "</div>\n";
   }
 
@@ -281,13 +281,13 @@ class PluginReservationReservation extends CommonDBTM {
 
     $query = "UPDATE `glpi_plugin_reservation_manageresa` SET `dernierMail`= '".date("Y-m-d H:i:s",time())."' WHERE `resaid` = ".$resaid;
     $DB->query($query) or die("error on 'update' dans mailUser: ". $DB->error());
-   
+
 
 
   }
 
   /**
-   * Fonction permettant de marquer une reservation comme rendue 
+   * Fonction permettant de marquer une reservation comme rendue
    * Si elle etait dans la table glpi_plugin_reservation_manageresa (c'etait donc une reservation prolongée), on insert la date de retour à l'heure actuelle ET on met à jour la date de fin de la vraie reservation.
    * Sinon, on insert une nouvelle entree dans la table pour avoir un historique du retour de la reservation ET on met à jour la date de fin de la vraie reservation
    **/
@@ -299,7 +299,7 @@ class PluginReservationReservation extends CommonDBTM {
     $trouve = 0;
     $matId;
     if ($result = $DB->query($query)) {
-	   # $matId = 
+	   # $matId =
       if($DB->numrows($result))
 	$trouve = 1;
     }
@@ -323,21 +323,21 @@ class PluginReservationReservation extends CommonDBTM {
     //update de la vrai reservation
     if($ok) {
       $query = "UPDATE `glpi_reservations` SET `end`='". date("Y-m-d H:i:s",time())."' WHERE `id`='".$resaid."';";
-      $DB->query($query) or die("error on 'update' into glpi_reservations / hash: ". $DB->error()); 
+      $DB->query($query) or die("error on 'update' into glpi_reservations / hash: ". $DB->error());
     }
   }
 
 
   /**
    * Fonction permettant d'afficher les reservations actuelles
-   * 
+   *
    **/
   function showCurrentResa() {
     global $DB, $CFG_GLPI, $datesresa;
     $showentity = Session::isMultiEntitiesMode();
 	    $config = new PluginReservationConfig();
       $methode = $config->getConfigurationMethode();
-	
+
     $begin = $datesresa["begin"];
     $end   = $datesresa["end"];
     $left = "";
@@ -385,7 +385,7 @@ class PluginReservationReservation extends CommonDBTM {
 	  INNER JOIN `$itemtable`
 	  ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
 	      AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
-	  LEFT JOIN `glpi_users` 
+	  LEFT JOIN `glpi_users`
 	  ON (`glpi_reservations`.`users_id` = `glpi_users`.`id`)
 	  WHERE `glpi_reservationitems`.`is_active` = '1'
 	  AND `glpi_reservationitems`.`is_deleted` = '0'
@@ -410,12 +410,12 @@ class PluginReservationReservation extends CommonDBTM {
 	      "fin" => $row["end"],
 	      "comment" => nl2br($row["comment"]));
 	  $ResaByUser[$row["username"]][] = $tmp;
-	  //on trie par date 
+	  //on trie par date
 	  usort($ResaByUser[$row["username"]], 'compare_date_by_user');
 	}
       }
     }
- 
+
 
     echo "<div class='center'>";
     echo "<table class='tab_cadre'>";
@@ -434,15 +434,15 @@ class PluginReservationReservation extends CommonDBTM {
     echo "<th>Debut</a></th>";
     echo "<th>Fin</a></th>";
     echo "<th>Commentaires</a></th>";
-    echo "<th>Mouvement</a></th>";    
+    echo "<th>Mouvement</a></th>";
     echo "<th>Acquitter</th>";
     echo "<th colspan='".($methode == "manual" ? 3 : 2)."'>Actions</th>";
 
     echo "</tr></thead>";
     echo "<tbody>";
 
-  
-   
+
+
     //on parcourt le tableau pour construire la table à afficher
     foreach($ResaByUser as $User => $arrayResa) {
       $nbLigne = 1;
@@ -459,8 +459,8 @@ class PluginReservationReservation extends CommonDBTM {
         	  $dates = $DB->fetch_row($result);
         	}
 
-         
-          
+
+
 
         	if($DB->numrows($result)) {
         	  if($dates[1] < date("Y-m-d H:i:s",time()) && $dates[0] == NULL) {// on colore  en rouge seulement si la date de retour theorique est depassée et si le materiel n'est pas marqué comme rendu (avec une date de retour effectif)
@@ -468,21 +468,21 @@ class PluginReservationReservation extends CommonDBTM {
             		  $flagSurveille = 1;
 		  }
           }
-      
-        	
+
+
         	// le nom du materiel
         	echo "<td $colorRed>".$resa['name']."</td>";
 
           if(!$flag)
           {
             $i = $Num;
-            
+
             while($i < count($arrayResa) - 1 )
           {
             if($arrayResa[$i+1]['debut'] == $resa['debut'] && $arrayResa[$Num+1]['fin'] == $resa['fin']) {
-              $nbLigne++;              
+              $nbLigne++;
             }
-              
+
             else
               break;
             $i++;
@@ -497,15 +497,15 @@ class PluginReservationReservation extends CommonDBTM {
         	  echo "<td rowspan=".$nbLigne." $colorRed>".date("d-m-Y \à H:i:s",strtotime($resa["debut"]))."</td>";
 
         	// si c'est une reservation prolongée, on affiche la date theorique plutot que la date reelle (qui est prolongée jusqu'au retour du materiel)
-          if($DB->numrows($result) && $dates[0] == NULL) 
+          if($DB->numrows($result) && $dates[0] == NULL)
         	  echo "<td rowspan=".$nbLigne." $colorRed>".date("d-m-Y \à H:i:s",strtotime($dates[1]))."</td>";
-        	else 
+        	else
         	  echo "<td rowspan=".$nbLigne." $colorRed>".date("d-m-Y \à H:i:s",strtotime($resa["fin"]))."</td>";
-        	
+
         	//le commentaire
         	echo "<td rowspan=".$nbLigne." $colorRed>".$resa["comment"]."</td>";
 
-        	// les fleches de mouvements	
+        	// les fleches de mouvements
         	echo "<td rowspan=".$nbLigne." ><center>";
         	if(date("Y-m-d",strtotime($resa["debut"])) == date("Y-m-d",strtotime($begin)))
         	  echo "<img title=\"\" alt=\"\" src=\"../pics/up-icon.png\"></img>";
@@ -521,10 +521,10 @@ class PluginReservationReservation extends CommonDBTM {
           $flag = 0;
           $nbLigne=1;
         }
-          
+
 
         	// si la reservation est rendue, on affiche la date du retour, sinon le bouton pour acquitter le retour
-        	if($dates[0] != NULL) 
+        	if($dates[0] != NULL)
         	  echo "<td>".date("d-m-Y \à H:i:s",strtotime($dates[0]))."</td>";
         	else
         	  echo "<td><center><a title=\"Marquer comme rendu\" href=\"reservation.php?resareturn=".$resa['resaid']."\"><img title=\"\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
@@ -538,7 +538,7 @@ class PluginReservationReservation extends CommonDBTM {
           echo "<li><span class=\"bouton\" id=\"bouton_add".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('add".$resa['resaid']."');\">Ajouter un materiel</span>
           <div id=\"add".$resa['resaid']."\" style=\"display:none;\">
           <form method='POST' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
-          echo '<select name="matDispoAdd">';          
+          echo '<select name="matDispoAdd">';
           foreach($matDispo as $mat) {
              echo "\t",'<option value="', key($mat) ,'">', current($mat) ,'</option>';
           }
@@ -546,11 +546,11 @@ class PluginReservationReservation extends CommonDBTM {
           echo "<input type='submit' class='submit' name='submit' value=Ajouter>";
           Html::closeForm();
           echo "</div></li>";
-          
+
           echo "<li><span class=\"bouton\" id=\"bouton_replace".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('replace".$resa['resaid']."');\">Remplacer le materiel</span>
           <div id=\"replace".$resa['resaid']."\" style=\"display:none;\">
           <form method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
-          echo '<select name="matDispoReplace">';          
+          echo '<select name="matDispoReplace">';
           foreach($matDispo as $mat) {
              echo "\t",'<option value="', key($mat) ,'">', current($mat) ,'</option>';
           }
@@ -562,19 +562,19 @@ class PluginReservationReservation extends CommonDBTM {
           echo "</td>";
 
 
-          echo "<td>";   
+          echo "<td>";
           echo "<ul>";
           echo "<li><a class=\"bouton\" title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=".$resa['resaid']."'>Editer la reservation</a></li>";
           echo "</ul>";
           echo "</td>";
-        
+
 
           if($methode == "manual" ) {
-            echo "<td>";   
+            echo "<td>";
           echo "<ul>";
           if($flagSurveille) {
           echo "<li><a class=\"bouton\" title=\"Envoyer un mail de rappel\" href=\"reservation.php?mailuser=".$resa['resaid']."\">Envoyer un mail de rappel</a></li>";
-           
+
           if(isset($dates[2])) {
             echo "<li>Dernier mail envoyé le : </li>";
             echo "<li>".date("d-m-Y \à H:i:s",strtotime($dates[2]))."</li>";
@@ -583,12 +583,12 @@ class PluginReservationReservation extends CommonDBTM {
           echo "</ul>";
           echo "</td>";
           }
-            
-            	
+
+
           echo "</tr>";
           echo "<tr class='tab_bg_2'>";
-          
-        	
+
+
           }
         echo "</tr>\n";
     }
@@ -602,8 +602,8 @@ class PluginReservationReservation extends CommonDBTM {
 
 function addToResa($idmat,$idresa) {
 
-  global $DB, $CFG_GLPI;     
-    
+  global $DB, $CFG_GLPI;
+
     $query = "SELECT * FROM `glpi_reservations` WHERE `id`='".$idresa."';";
       $result = $DB->query($query) or die("error on 'select' dans addToResa / 1: ". $DB->error());
 
@@ -624,7 +624,7 @@ function addToResa($idmat,$idresa) {
       //on regarde si la reservation à laquelle on ajoute le materiel est deja "surveillée", pour  alors surveiller le nouveau mat
       $query = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = '".$idresa."';";
       $result = $DB->query($query) or die("error on 'select' dans addToResa / manageresa: ". $DB->error());
-      
+
       if($DB->numrows($result)>0) {
         $row = $DB->fetch_assoc($result);
         if($row['date_return'] == NULL)
@@ -639,18 +639,18 @@ function addToResa($idmat,$idresa) {
 
       }
 
-     
-    
-       
+
+
+
 }
 
 
 
 function replaceResa($idmat,$idresa) {
-  global $DB, $CFG_GLPI;     
-    
+  global $DB, $CFG_GLPI;
+
       $query = "UPDATE `glpi_reservations` SET `reservationitems_id`='". $idmat ."' WHERE `id`='".$idresa."';";
-      $DB->query($query) or die("error on 'update' dans replaceResa / hash: ". $DB->error());  
+      $DB->query($query) or die("error on 'update' dans replaceResa / hash: ". $DB->error());
 
 }
 
@@ -659,9 +659,9 @@ function replaceResa($idmat,$idresa) {
 
 
 function getMatDispo() {
-  
+
   global $DB, $CFG_GLPI, $datesresa;
-  
+
     $showentity = Session::isMultiEntitiesMode();
 
 
@@ -670,7 +670,7 @@ function getMatDispo() {
     $left = "";
     $where = "";
     $myArray = array();
-    
+
     foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
       if (!($item = getItemForItemtype($itemtype))) {
   continue;
@@ -722,7 +722,7 @@ function getMatDispo() {
 
 
     while ($row = $DB->fetch_assoc($result)) {
-      array_push($myArray, array($row["id"] => $row["name"]));  
+      array_push($myArray, array($row["id"] => $row["name"]));
   }
  }
 }
