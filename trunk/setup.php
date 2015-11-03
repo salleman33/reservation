@@ -46,6 +46,7 @@ function plugin_init_reservation() {
   $PLUGIN_HOOKS['add_javascript']['reservation']= array('scripts/tri.js');
   $PLUGIN_HOOKS['config_page']['reservation'] = 'front/config.form.php';
   $PLUGIN_HOOKS['item_update']['reservation'] = array('Reservation' => 'plugin_item_update_reservation');
+  $PLUGIN_HOOKS['item_delete']['reservation'] = array('Reservation' => 'plugin_item_update_reservation');
   $PLUGIN_HOOKS['menu_toadd']['reservation'] = array('plugins' => 'PluginReservationReservation');
 
 
