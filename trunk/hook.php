@@ -3,7 +3,7 @@
 
 function plugin_reservation_install() {
   global $DB;
-  $migration = new Migration(100);
+  //$migration = new Migration(100);
   if (!TableExists("glpi_plugin_reservation_manageresa")) { //INSTALL
     $query = "CREATE TABLE `glpi_plugin_reservation_manageresa` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -14,60 +14,60 @@ function plugin_reservation_install() {
       `itemtype` VARCHAR(100) NOT NULL,
       `dernierMail` datetime,
       PRIMARY KEY (`id`)
-	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+    ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 
-	$DB->queryOrDie($query, $DB->error());
+    $DB->queryOrDie($query, $DB->error());
   }
   else { // UPDATE
 
   }
 
 
-    if(TableExists("glpi_plugin_reservation_config"))
-    {
-      $query = "RENAME TABLE `glpi_plugin_reservation_config` TO `glpi_plugin_reservation_configdayforauto`";
-      $DB->query($query) or die($DB->error());
-    }
+  if(TableExists("glpi_plugin_reservation_config") && !TableExists("glpi_plugin_reservation_configdayforauto"))
+  {
+    $query = "RENAME TABLE `glpi_plugin_reservation_config` TO `glpi_plugin_reservation_configdayforauto`";
+    $DB->query($query) or die($DB->error());
+  }
 
-    if (!TableExists("glpi_plugin_reservation_configdayforauto"))
-    {
-        // Création de la table config
-        $query = "CREATE TABLE `glpi_plugin_reservation_configdayforauto` (
-        `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-        `jour` char(32) NOT NULL default '',
-        `actif` int(1) NOT NULL default '1'
-        )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-        $DB->query($query) or die($DB->error());
+  if(!TableExists("glpi_plugin_reservation_configdayforauto"))
+  {
+    // Création de la table config
+    $query = "CREATE TABLE `glpi_plugin_reservation_configdayforauto` (
+      `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+      `jour` char(32) NOT NULL default '',
+      `actif` int(1) NOT NULL default '1'
+    )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+    $DB->query($query) or die($DB->error());
 
-         $query = "INSERT INTO `glpi_plugin_reservation_configdayforauto` (`jour` , `actif`)
-                VALUES (\"lundi\",1),
-                       (\"mardi\",1),
-                       (\"mercredi\",1),
-                       (\"jeudi\",1),
-                       (\"vendredi\",1),
-                       (\"samedi\",0),
-                       (\"dimanche\",0)";
+    $query = "INSERT INTO `glpi_plugin_reservation_configdayforauto` (`jour` , `actif`)
+      VALUES (\"lundi\",1),
+	(\"mardi\",1),
+		       (\"mercredi\",1),
+		       (\"jeudi\",1),
+		       (\"vendredi\",1),
+		       (\"samedi\",0),
+		       (\"dimanche\",0)";
 
-      $DB->queryOrDie($query) or die($DB->error());
-    }
-	else { // UPDATE
-	}
+    $DB->queryOrDie($query) or die($DB->error());
+  }
+  else { // UPDATE
+  }
 
 
-    if (!TableExists("glpi_plugin_reservation_config"))
-    {
-        // Création de la table config
-        $query = "CREATE TABLE `glpi_plugin_reservation_config` (
-        `name` VARCHAR(10) NOT NULL PRIMARY KEY,
-        `value` VARCHAR(10) NOT NULL
-        )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-        $DB->query($query) or die($DB->error());
+  if (!TableExists("glpi_plugin_reservation_config"))
+  {
+    // Création de la table config
+    $query = "CREATE TABLE `glpi_plugin_reservation_config` (
+      `name` VARCHAR(10) NOT NULL PRIMARY KEY,
+      `value` VARCHAR(10) NOT NULL
+    )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+    $DB->query($query) or die($DB->error());
 
-         $query = "INSERT INTO `glpi_plugin_reservation_config` (`name` , `value`)
-                VALUES (\"methode\",\"manual\")";
+    $query = "INSERT INTO `glpi_plugin_reservation_config` (`name` , `value`)
+      VALUES (\"methode\",\"manual\")";
 
-      $DB->queryOrDie($query) or die($DB->error());
-    }
+    $DB->queryOrDie($query) or die($DB->error());
+  }
   else { // UPDATE
   }
 
