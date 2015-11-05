@@ -4,7 +4,7 @@ function plugin_version_reservation() {
 
   return array(
       'name'           => _n('Réservation', 'Réservation', 2, 'Réservation'),
-      'version'        => '1.3.1',
+      'version'        => '1.3.2',
       'author'         => 'Sylvain Allemand',
       'license'        => 'GPLv2+',
       'homepage'       => 'https://forge.indepnet.net/projects/reservation',
@@ -16,8 +16,8 @@ function plugin_version_reservation() {
 //controle des prerequis
 function plugin_reservation_check_prerequisites() {
 
-  if (version_compare(GLPI_VERSION,'0.85','lt') || version_compare(GLPI_VERSION,'0.86','gt')) {
-    echo "This plugin requires GLPI >= 0.85 and GLPI < 0.86";
+  if (version_compare(GLPI_VERSION,'0.85','lt') || version_compare(GLPI_VERSION,'0.90','gt')) {
+	  echo "This plugin requires GLPI >= 0.85 and GLPI <= 0.90";
     return false;
   }
   return true;
