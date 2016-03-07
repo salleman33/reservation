@@ -2,9 +2,9 @@
 
 
 // Définition de la variable GLPI_ROOT obligatoire pour l'instanciation des class
-define('GLPI_ROOT', getAbsolutePath());
+//define('GLPI_ROOT', getAbsolutePath());
 // Récupération du fichier includes de GLPI, permet l'accès au cœur
-include (GLPI_ROOT."inc/includes.php");
+include ("../../../inc/includes.php");
 
 
 
