@@ -411,8 +411,9 @@ class PluginReservationReservation extends CommonDBTM {
 	      "comment" => nl2br($row["comment"]));
 	  $ResaByUser[$row["username"]][] = $tmp;
 	  //on trie par date
-	  usort($ResaByUser[$row["username"]], 'compare_date_by_user');
+	  uasort($ResaByUser[$row["username"]], 'compare_date_by_user');
 	}
+	ksort($ResaByUser);
       }
     }
 

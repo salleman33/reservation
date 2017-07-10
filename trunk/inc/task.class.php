@@ -173,9 +173,14 @@ $where " . "ORDER BY username,
               $task->log("prolongation de la reservation numero " . $row['resaid']);
 
               // prolongation de la vrai resa
-              self::verifDisponibiliteAndMailIGS($task, $row['itemtype'], $row['matid'], $row['resaid'], $begin, date("Y-m-d H:i:s", $newEnd));
-              $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", $newEnd) . "' WHERE `id`='" . $row["resaid"] . "';";
-              $DB->query($query) or die("error on 'update' into glpi_reservations lors du cron : " . $DB->error());
+	      $current_user_id = self::find_user_from_resa($row['resaid']);
+	      $res=0;
+              $res = self::verifDisponibiliteAndMailIGS($task, $row['itemtype'], $row['matid'], $row['resaid'], $begin, date("Y-m-d H:i:s", $newEnd), $current_user_id);
+	      if($res == 0) {
+        	$query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", $newEnd) . "' WHERE `id`='" . $row["resaid"] . "';";
+              	$DB->query($query) or die("error on 'update' into glpi_reservations lors du cron : " . $DB->error());
+	
+	      }
 
               $valreturn++;
 
@@ -188,7 +193,7 @@ $where " . "ORDER BY username,
 
 
 
-    static function verifDisponibiliteAndMailIGS($task, $itemtype, $idMat, $currentResa, $datedebut, $datefin)
+    static function verifDisponibiliteAndMailIGS($task, $itemtype, $idMat, $currentResa, $datedebut, $datefin, $current_user_id)
     {
         global $DB, $CFG_GLPI;
 
@@ -217,6 +222,7 @@ $where " . "ORDER BY username,
                   `glpi_reservations`.`comment`,
                   `glpi_reservations`.`begin`,
                   `glpi_reservations`.`end`,
+		  `glpi_reservations`.`comment`,
                   `glpi_users`.`name` AS username,
                   `glpi_reservationitems`.`items_id` AS items_id
                   FROM `glpi_reservationitems`
@@ -234,7 +240,20 @@ $where " . "ORDER BY username,
 
         if ($result = $DB->query($query)) {
             while ($row = $DB->fetch_assoc($result)) {
-
+	
+		$user_id = self::find_user_from_resa($row['resaid']);
+		if ($user_id == $current_user_id) {
+                	$task->log(" l'utilisateur a reservé de nouveau le matos, on supprime la nouvelle reservation numero ".$row['resaid'] );
+                	$query = "UPDATE `glpi_reservations` SET `end` = '". $row['end']."' WHERE `id`='" . $currentResa . "';";
+                	$DB->query($query) or die("error on 'update date end' into glpi_reservations lors du cron : " . $DB->error());
+                	$query = "UPDATE `glpi_reservations` SET `comment` = concat(comment,' //// ". $row['comment']. "') WHERE `id`='" . $currentResa. "';";
+                	$DB->query($query) or die("error on 'update comment' into glpi_reservations lors du cron : " . $DB->error());
+                	$query = "DELETE FROM `glpi_reservations` WHERE `id`='" . $row['resaid'] . "';";
+                	$DB->query($query) or die("error on 'delete' into glpi_reservations lors du cron : " . $DB->error());
+              		$query = "DELETE FROM `glpi_plugin_reservation_manageresa` WHERE `resaid`='" . $currentResa . "';";
+              		$DB->query($query) or die("error on 'delete' into glpi_plugin_reservation_manageresa lors du cron : " . $DB->error());
+			return 1;
+		}
 
                 $task->log("CONFLIT avec la reservation du materiel " . $row['name'] . " par " . $row['username'] . " (du " . date("\L\e d-m-Y \à H:i:s", strtotime($row['begin'])) . " au " . date("\L\e d-m-Y \à H:i:s", strtotime($row['end'])));
                 $task->log("on supprime la resa numero : " . $row['resaid']);
@@ -250,8 +269,20 @@ $where " . "ORDER BY username,
         }
     }
 
+    static function find_user_from_resa($resaid)
+    {
+        global $DB, $CFG_GLPI;
 
+	$query = "SELECT `glpi_reservations`.`users_id`
+		FROM `glpi_reservations`, `glpi_plugin_reservation_manageresa` 
+		WHERE `glpi_reservations`.`id` = `glpi_plugin_reservation_manageresa`.`resaid`";
 
+        if ($result = $DB->query($query)) {
+            while ($row = $DB->fetch_assoc($result)) {
+		return $row["users_id"];
+	    }
+	}
+    }
 }
 
 
