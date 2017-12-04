@@ -243,7 +243,7 @@ $where " . "ORDER BY username,
 	
 		$user_id = self::find_user_from_resa($row['resaid']);
 		if ($user_id == $current_user_id) {
-                	$task->log(" l'utilisateur a reservé de nouveau le matos, on supprime la nouvelle reservation numero ".$row['resaid'] );
+                	$task->log(" l'utilisateur ".$user_id." (current : ".$current_user_id.") a reservé de nouveau le matos ".$row['id'].", on supprime la nouvelle reservation numero ".$row['resaid'] );
                 	$query = "UPDATE `glpi_reservations` SET `end` = '". $row['end']."' WHERE `id`='" . $currentResa . "';";
                 	$DB->query($query) or die("error on 'update date end' into glpi_reservations lors du cron : " . $DB->error());
                 	$query = "UPDATE `glpi_reservations` SET `comment` = concat(comment,' //// ". $row['comment']. "') WHERE `id`='" . $currentResa. "';";
@@ -275,7 +275,8 @@ $where " . "ORDER BY username,
 
 	$query = "SELECT `glpi_reservations`.`users_id`
 		FROM `glpi_reservations`, `glpi_plugin_reservation_manageresa` 
-		WHERE `glpi_reservations`.`id` = `glpi_plugin_reservation_manageresa`.`resaid`";
+		WHERE `glpi_reservations`.`id` = `glpi_plugin_reservation_manageresa`.`resaid`
+		AND glpi_reservations.`id` = ".$resaid;
 
         if ($result = $DB->query($query)) {
             while ($row = $DB->fetch_assoc($result)) {

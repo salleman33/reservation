@@ -16,8 +16,8 @@ function plugin_version_reservation() {
 //controle des prerequis
 function plugin_reservation_check_prerequisites() {
 
-  if (version_compare(GLPI_VERSION,'9.1','lt') || version_compare(GLPI_VERSION,'9.2','gt')) {
-	  echo "This plugin requires GLPI >= 9.1 and GLPI <= 9.2";
+  if (version_compare(GLPI_VERSION,'9.1','lt') || version_compare(GLPI_VERSION,'9.9','gt')) {
+	  echo "This plugin requires GLPI >= 9.1 and GLPI <= 9.9";
     return false;
   }
   return true;
