@@ -34,7 +34,6 @@ if(isset($_POST['reserve']))
 
 $PluginReservationReservation->showFormDate();
 
-
 if(isset($_GET['resareturn']))
   $PluginReservationReservation->resaReturn($_GET['resareturn']);
 

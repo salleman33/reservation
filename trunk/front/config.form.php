@@ -7,6 +7,7 @@ define('GLPI_ROOT', getAbsolutePath());
 // Récupération du fichier includes de GLPI, permet l'accès au cœur
 include (GLPI_ROOT."inc/includes.php");
 
+include (GLPI_ROOT."plugins/reservation/inc/includes.php");
 
 $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {
@@ -16,10 +17,19 @@ if ($plugin->isActivated("reservation")) {
       $PluginReservationConfig->setConfigurationWeek($_POST["week"]);
       //Html::back();
    }
-   if(isset($_POST["methode"])){
-      $PluginReservationConfig->setConfigurationMethode($_POST["methode"]);
+   if(isset($_POST["late_mail"])){
+      $PluginReservationConfig->setMailAutomaticAction($_POST["late_mail"]);
+      $PluginReservationConfig->setConfigurationValue("late_mail",$_POST["late_mail"]);
       //Html::back();
-   } 
+   }
+   
+   foreach ($toolTipConfig as $config)
+   {
+     if(isset($_POST[$config])){
+        $PluginReservationConfig->setConfigurationValue($config,$_POST[$config]);
+        //Html::back();
+     }
+   }
 
    Html::header(PluginReservationReservation::getTypeName(2), '', "plugins", "Reservation");
    $PluginReservationConfig->showForm();

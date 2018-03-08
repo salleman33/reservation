@@ -5,38 +5,42 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
+include (GLPI_ROOT."/plugins/reservation/inc/includes.php");
 
 class PluginReservationConfig extends CommonDBTM {
 
-    function getConfigurationMethode()
+    function getConfigurationValue($name)
         {
             global $DB;
-            $query = "SELECT * FROM glpi_plugin_reservation_config WHERE name='methode'";
+            $query = "SELECT * FROM glpi_plugin_reservation_config WHERE name='".$name."'";
         if ($result = $DB->query($query))
             {
             if ($DB->numrows($result) > 0)
                 {
                 while ($row = $DB->fetch_assoc($result)) 
                     {
-                        $methode = $row['value'];           
+                        $value = $row['value'];           
                     }
                 }  
             }
-        return $methode;
+        return $value;
 
         }
 
-function setConfigurationMethode($methode="manual")
+function setConfigurationValue($name,$value=1)
 {
     global $DB;       
 
-    
-        $query = "UPDATE `glpi_crontasks` SET state=".($methode == "manual" ? 0 : 1)." WHERE name = 'MailUserDelayedResa'";
+    $query = "INSERT INTO glpi_plugin_reservation_config (name,value) VALUES('".$name."','".$value."') ON DUPLICATE KEY UPDATE value=Values(value)";
         $DB->query($query) or die($DB->error());
+}        
+
+
+function setMailAutomaticAction($value=1)
+{
+    global $DB;       
     
-
-
-    $query = "UPDATE glpi_plugin_reservation_config SET value='".$methode."' where name = 'methode'";
+        $query = "UPDATE `glpi_crontasks` SET state='".$value."' WHERE name = 'MailUserDelayedResa'";
         $DB->query($query) or die($DB->error());
 }        
     
@@ -76,67 +80,124 @@ function setConfigurationWeek($week=null)
 
 function showForm() 
 {
-$methode = $this->getConfigurationMethode();
+$late_mail = $this->getConfigurationValue("late_mail");
 $config = $this->getConfigurationWeek();
+
+//$_POST["late_mail"] = isset($_POST["late_mail"]) ? $_POST["late_mail"] : 0;
+
+//print_r($_POST);
+
+
 
 echo "<form method='post' action='".$this->getFormURL()."'>";
 
 echo "<div class='center'>";
 
+echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
-if($methode == "auto")
+echo "<th>Methode pour gerer l'envoi de mail aux utilisateurs dont la reservation est depassée </th>";
+echo "<tr>";
+echo "<td>";
+echo "<input type=\"hidden\" name=\"late_mail\" value=\"0\">";
+echo "<input type=\"checkbox\" name=\"late_mail\" value=\"1\" ".($late_mail? 'checked':'')."> ".__('Automatic')." (avec l'action automatique à configurer) </td>";
+//echo "<input type=\"checkbox\" name=\"late_mail\" value=".($late_mail? 'checked':'')."> ".__('Automatic')." (avec l'action automatique à configurer) </td>";
+echo "</tr>";
+
+echo "</table>";
+
+if($late_mail)
 {
 echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
-echo "<th>Mail aux utilisateurs avec reservation depassée</th>";
+echo "<th colspan=2>Mail aux utilisateurs avec reservation depassée</th>";
 echo "<tr>";
-echo "<td> lundi : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" ".(isset($config['lundi'])?'checked':'')." > </td>";
+echo "<td> ".__('Monday')." : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" ".(isset($config['lundi'])?'checked':'')." > </td>";
 echo "</tr>";
 echo "<tr>";
-echo "<td> mardi : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mardi\"".(isset($config['mardi'])?'checked':'')."> </td>";
+echo "<td> ".__('Tuesday')." : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mardi\" ".(isset($config['mardi'])?'checked':'')."> </td>";
 echo "</tr>";
 echo "<tr>";
-echo "<td> mercredi : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mercredi\" ".(isset($config['mercredi'])?'checked':'')."> </td>";
+echo "<td> ".__('Wednesday')." : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mercredi\" ".(isset($config['mercredi'])?'checked':'')."> </td>";
 echo "</tr>";
 echo "<tr>";
-echo "<td> jeudi : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"jeudi\" ".(isset($config['jeudi'])?'checked':'')."> </td>";
+echo "<td> ".__('Thursday')." : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"jeudi\" ".(isset($config['jeudi'])?'checked':'')."> </td>";
 echo "</tr>";
 echo "<tr>";
-echo "<td> vendredi : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"vendredi\" ".(isset($config['vendredi'])?'checked':'')." ></td>";
+echo "<td> ".__('Friday')." : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"vendredi\" ".(isset($config['vendredi'])?'checked':'')." ></td>";
 echo "</tr>";
 echo "<tr>";
-echo "<td> samedi : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"samedi\" ".(isset($config['samedi'])?'checked':'')." ></td>";
+echo "<td> ".__('Saturday')." : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"samedi\" ".(isset($config['samedi'])?'checked':'')." ></td>";
 echo "</tr>";
 echo "<tr>";
-echo "<td> dimanche : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"dimanche\" ".(isset($config['dimanche'])?'checked':'')."> </td>";
+echo "<td> ".__('Sunday')." : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"dimanche\" ".(isset($config['dimanche'])?'checked':'')."> </td>";
 
 echo "</tr>";
 echo "</table>";
 }
 
-
-
 echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
-echo "<th>Methode pour gerer l'envoi de mail aux utilisateurs dont la reservation est depassée </th>";
+echo "<th>ToolTip Configuration </th>";
+
+$tooltip = $this->getConfigurationValue("tooltip");
 echo "<tr>";
-echo "<td> <input type=\"radio\" name=\"methode\" value=\"auto\" ".($methode == "auto" ? 'checked':'')."> Automatiquement (avec l'action automatique à configurer) </td>";
+echo "<input type=\"hidden\" name=\"tooltip\" value=\"0\">";
+echo "<td> <input type=\"checkbox\" name=\"tooltip\" value=\"1\" ".($tooltip? 'checked':'')."> ".__('ToolTip')."</td>";
 echo "</tr>";
-echo "<tr>";
-echo "<td> <input type=\"radio\" name=\"methode\" value=\"manual\" ".($methode == "manual" ? 'checked':'')."> Manuellement (à l'aide du bouton sur la vue des reservations en cours)</td>" ;
-echo "</tr>";
+
+if ($tooltip)
+{
+
+  $comment = $this->getConfigurationValue("comment");
+  echo "<tr>";
+  echo "<input type=\"hidden\" name=\"comment\" value=\"0\">";
+  echo "<td> <input type=\"checkbox\" name=\"comment\" value=\"1\" ".($comment? 'checked':'')."> ".__('Comment')."</td>";
+  echo "</tr>";
+
+  $location = $this->getConfigurationValue("location");
+  echo "<tr>";
+  echo "<input type=\"hidden\" name=\"location\" value=\"0\">";
+  echo "<td> <input type=\"checkbox\" name=\"location\" value=\"1\" ".($location? 'checked':'')."> ".__('Location')."</td>";
+  echo "</tr>";
+
+  $serial = $this->getConfigurationValue("serial");
+  echo "<tr>";
+  echo "<input type=\"hidden\" name=\"serial\" value=\"0\">";
+  echo "<td> <input type=\"checkbox\" name=\"serial\" value=\"1\" ".($serial? 'checked':'')."> ".__('Serial number')."</td>";
+  echo "</tr>";
+
+  $inventory = $this->getConfigurationValue("inventory");
+  echo "<tr>";
+  echo "<input type=\"hidden\" name=\"inventory\" value=\"0\">";
+  echo "<td> <input type=\"checkbox\" name=\"inventory\" value=\"1\" ".($inventory? 'checked':'')."> ".__('Inventory number')."</td>";
+  echo "</tr>";
+
+  $group = $this->getConfigurationValue("group");
+  echo "<tr>";
+  echo "<input type=\"hidden\" name=\"group\" value=\"0\">";
+  echo "<td> <input type=\"checkbox\" name=\"group\" value=\"1\" ".($group? 'checked':'')."> ".__('Group')."</td>";
+  echo "</tr>";
+
+  $man_model = $this->getConfigurationValue("man_model");
+  echo "<tr>";
+  echo "<input type=\"hidden\" name=\"man_model\" value=\"0\">";
+  echo "<td> <input type=\"checkbox\" name=\"man_model\" value=\"1\" ".($man_model? 'checked':'')."> ".__('Manufacturer') ." & ".__('Model')."</td>";
+  echo "</tr>";
+
+  $status = $this->getConfigurationValue("status");
+  echo "<tr>";
+  echo "<input type=\"hidden\" name=\"status\" value=\"0\">";
+//  echo "<td> <input type=\"checkbox\" name=\"status\" value=\"1\" ".($status? 'checked':'')."> ".__('Status')."</td>";
+  echo "</tr>";
+}
 
 echo "</table>";
 
-
-
-echo "<input type=\"submit\" value=\"Valider\">";
+echo "<input type=\"submit\" value='"._sx('button','Update')."'>";
 echo "</div>";
 
 
-
 Html::closeForm();
-
 
 
 

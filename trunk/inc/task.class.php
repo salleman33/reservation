@@ -8,8 +8,8 @@ class PluginReservationTask extends CommonDBTM
 
     static function addEvents(NotificationTargetReservation $target)
     {
-        $target->events['plugin_reservation_conflit']    = "Conflit pour la prolongation d'une reservation";
-        $target->events['plugin_reservation_expiration'] = "Expiration d'une reservation d'un utilisateur";
+        $target->events['plugin_reservation_conflit']    = "Reservation Conflict When Extended (plugin)";
+        $target->events['plugin_reservation_expiration'] = "User Reservation Expired (plugin)";
     }
 
     static function cronInfo($name)
@@ -19,12 +19,12 @@ class PluginReservationTask extends CommonDBTM
         switch ($name) {
             case "SurveilleResa":
                 return array(
-                    'description' => "Surveille les reservations"
+                    'description' => "Watch Reservations (plugin)"
                 );
             case "MailUserDelayedResa":
                 return array(
-                    'description' => "Envoie un mail aux utilisateurs dont la reservation est depassée"
-                );
+                    'description' => "Send an e-mail to users with late reservations (plugin)"
+		);
         }
     }
 
@@ -60,24 +60,50 @@ class PluginReservationTask extends CommonDBTM
       global $DB, $CFG_GLPI;
       $res = 0;
 
+        $temps = time();
+        $temps -= ($temps % MINUTE_TIMESTAMP);
+        $now   = date("Y-m-d H:i:s", $temps);
+
       $config = new PluginReservationConfig();
       $week = $config->getConfigurationWeek();
-      setlocale (LC_TIME, 'fr_FR.utf8','fra');
-      $jour = strftime("%A");
-      if(isset($week[$jour]))
+      $errlocale = setlocale (LC_TIME, 'fr_FR.utf8','fra');
+      if (!$errlocale){
+	      $task->log("setlocale failed");
+      }
+      $jour = strftime("%u");
+	$dayOk = false;
+	if (($jour == 1 && $week['lundi']) || 
+		($jour == 2 && $week['mardi']) ||
+		($jour == 3 && $week['mercredi']) ||
+		($jour == 4 && $week['jeudi']) ||
+		($jour == 5 && $week['vendredi'])  ||
+		($jour == 6 && $week['samedi']) ||
+		($jour == 7 && $week['dimanche'])) 
+	{
+		$dayOk = true;
+	}
+
+      if($dayOk)
       {
 
         $query = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE `date_return` is NULL";
 
         if ($result = $DB->query($query)) {
           while ($row = $DB->fetch_assoc($result)) {
-            $task->log("envoie d'un mail pour la reservation du materiel depassée numero " . $row['resaid']);
+            if ($now > $row['date_theorique'])
+	    {
 
-            $reservation = new Reservation();
-            $reservation->getFromDB($row['resaid']);
-            NotificationEvent::raiseEvent('plugin_reservation_expiration', $reservation);
-            $res++;
-
+              $reservation = new Reservation();
+              $reservation->getFromDB($row['resaid']);
+              if (NotificationEvent::raiseEvent('plugin_reservation_expiration', $reservation))
+              {
+	        $task->setVolume($res++);
+                $task->log("Sending e-mail for reservation ".$row['resaid'].". Expected return time was : ".$row['date_theorique']);
+              } else
+              {
+                $task->log("Could not send notification");
+              }
+            }
 
           }
         }
@@ -85,7 +111,7 @@ class PluginReservationTask extends CommonDBTM
       }
       else
       {
-        $task->log("jour sauté");
+        $task->log("e-mails not enabled for this week day");
       }
     }
 
@@ -99,12 +125,22 @@ class PluginReservationTask extends CommonDBTM
         $temps -= ($temps % MINUTE_TIMESTAMP);
         $begin = date("Y-m-d H:i:s", $temps);
         $end   = date("Y-m-d H:i:s", $temps + 5 * MINUTE_TIMESTAMP);
+        $task->log("Temps : " .$temps." Begin : ".$begin." End : ".$end);
         $left  = "";
         $where = "";
 
-        $listResaTraitee = array();
+        $reservationsIds = array();
 
-        foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
+	$queryUsedTypes = "SELECT itemtype from glpi_reservationitems GROUP BY itemtype";
+
+        if ($resultUsedTypes = $DB->query($queryUsedTypes)) {
+        while ($row = $DB->fetch_assoc($resultUsedTypes)) {
+           $itemtype = $row["itemtype"];
+	
+	// this only returns original GLPI types in CLI mode. Not compatible with genericobject plugin
+	//        foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
+            $task->log("Checking Type : " .$itemtype);
+
             if (!($item = getItemForItemtype($itemtype))) {
                 continue;
             }
@@ -115,12 +151,18 @@ class PluginReservationTask extends CommonDBTM
             if ($item->isField('otherserial')) {
                 $otherserial = "`$itemtable`.`otherserial`";
             }
+            // reservation qui vont finir
+//       AND '" . $end . "' >= `glpi_reservations`.`end`)";
 
+// on enlève que�"qui ne sont pas finies" car on en loupe du coup si la tache n'est pas lancée toutes les 5 minutes en permanence
+//	       AND '" . $begin . "' <= `glpi_reservations`.`end`
+
+// on sélectionne les réservations qui ne sont pas finies et qui ont déjà démarré
             if (isset($begin) && isset($end)) {
                 $left  = "LEFT JOIN `glpi_reservations`
       ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
-       AND '" . $begin . "' <= `glpi_reservations`.`end`
-       AND '" . $end . "' >= `glpi_reservations`.`end`)";
+       AND '" . $begin . "' >= `glpi_reservations`.`begin`)";
+
                 $where = " AND `glpi_reservations`.`id` IS NOT NULL ";
             }
 
@@ -149,42 +191,61 @@ $where " . "ORDER BY username,
 `$itemtable`.`entities_id`,
 `$itemtable`.`name`";
 
+//error_log($query);
 
-
-            if ($result = $DB->query($query)) {
-                while ($row = $DB->fetch_assoc($result)) {
+         // ajout des nouvelles reservations
+            if ($resultReservations = $DB->query($query)) {
+                while ($row = $DB->fetch_assoc($resultReservations)) {
+                    // store it for future use
+	            $task->log("Checking reservation " . $row['resaid']);
+                    $reservationsIds[] = $row["resaid"];
                     $query  = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = " . $row["resaid"];
                     //on insere la reservation seulement si elle n'est pas deja presente dans la table
                     if ($res = $DB->query($query)) {
                         if (!$DB->numrows($res)) {
+             		    $task->setVolume($valreturn++);
+		            $task->log("Adding reservation " . $row['resaid']." to the watch table");
                             $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `matid`, `date_theorique`, `itemtype`) VALUES ('" . $row["resaid"] . "','" . $row["items_id"] . "','" .$row['end'] . "','" .$itemtype. "');";
                             $DB->query($query) or die("error on 'insert' into glpi_plugin_reservation_manageresa  lors du cron/ hash: " . $DB->error());
                           }
-                    }
+                    } 
                 }
             }
         }
-
-        //on va prolonger toutes les resa managées qui n'ont pas de date de retour
+}
+        //on va prolonger toutes les resa managées qui n'ont pas de date de retour et qui sont en retard
         $query = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE date_return is NULL;";
-        if ($result = $DB->query($query)) {
-            while ($row = $DB->fetch_assoc($result)) {
-              $newEnd = $temps + 5 * MINUTE_TIMESTAMP;
-              $task->log("prolongation de la reservation numero " . $row['resaid']);
+        if ($resultWatchedReservations = $DB->query($query)) {
+            while ($row = $DB->fetch_assoc($resultWatchedReservations)) {
+            // is the reservation still exists
+            if (in_array($row['resaid'], $reservationsIds))
+            {
+		        if ($end >= $row['date_theorique'])
+		        {
+   	              $newEnd = $temps + 5 * MINUTE_TIMESTAMP;
+                      $task->setVolume($valreturn++);
 
-              // prolongation de la vrai resa
-	      $current_user_id = self::find_user_from_resa($row['resaid']);
-	      $res=0;
-              $res = self::verifDisponibiliteAndMailIGS($task, $row['itemtype'], $row['matid'], $row['resaid'], $begin, date("Y-m-d H:i:s", $newEnd), $current_user_id);
-	      if($res == 0) {
-        	$query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", $newEnd) . "' WHERE `id`='" . $row["resaid"] . "';";
-              	$DB->query($query) or die("error on 'update' into glpi_reservations lors du cron : " . $DB->error());
+        	      $task->log("Extending reservation ".$row['resaid']);
+
+	              // prolongation de la vrai resa
+		          $current_user_id = self::find_user_from_resa($row['resaid']);
+		          $res=0;
+	              $res = self::verifDisponibiliteAndMailIGS($task, $row['itemtype'], $row['matid'], $row['resaid'], $begin, date("Y-m-d H:i:s", $newEnd), $current_user_id);
+		          if($res == 0) {
+	        	    $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", $newEnd) . "' WHERE `id`='" . $row["resaid"] . "';";
+	              	$DB->query($query) or die("error on 'update' into glpi_reservations lors du cron : " . $DB->error());
 	
-	      }
-
-              $valreturn++;
-
+                  }
+                }
+            } else // if the reservation is not here anymore, delete it
+            {
+                $task->setVolume($valreturn++);
+                $task->log("Removing reservation ".$row['resaid']." from watch table as it was deleted");
+                $query = "DELETE FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = " . $row["resaid"];
+                $DB->query($query) or die("error on 'delete' into glpi_plugin_reservation_manageresa  lors du cron/ hash: " . $DB->error());
             }
+            
+		}
         }
 
         return $valreturn;

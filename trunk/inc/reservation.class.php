@@ -78,6 +78,32 @@ class PluginReservationReservation extends CommonDBTM {
     return TRUE;
   }
 
+/**
+ * Link with current month reservations
+ */
+  function showCurrentMonthForAllLink() {
+    global $CFG_GLPI;
+    if (!Session::haveRight("reservation", "1")) {
+       return false;
+    }
+    $mois_courant = intval(strftime("%m"));
+    $annee_courante = strftime("%Y");
+
+    $mois_courant     = intval($mois_courant);
+
+    $all = "<a class='vsubmit' href='../../../front/reservation.php?reservationitems_id=&amp;mois_courant="."$mois_courant&amp;annee_courante=$annee_courante'>".__('Show all')."</a>";
+
+    echo "<div class='center'>";
+    echo "<table class='tab_cadre'>";
+    echo "<tr><th colspan='2'>"."Reservations This Month"."</th></tr>\n";
+	  echo "<td>";
+    echo "<img src='".$CFG_GLPI["root_doc"]."/pics/reservation.png' alt=''>";
+	  echo "</td>";
+    echo "<td >$all</td>\n";
+    echo "</table>";
+	  echo "</div>";
+
+  }
 
   /**
    * Affiche le cadre avec la date de debut / date de fin
@@ -120,16 +146,24 @@ class PluginReservationReservation extends CommonDBTM {
     }
 
     echo "<div id='viewresasearch'  class='center'>";
+    echo "<table class='tab_cadre' style='background-color:transparent;box-shadow:none'>";
+
+echo "<tr>";
+echo "<td>";
+    $this->showCurrentMonthForAllLink();
+echo "</td>";
+echo "<td>";
+
     echo "<form method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
     echo "<table class='tab_cadre'><tr class='tab_bg_2'>";
-    echo "<th colspan='5'>Choisissez une date</th></tr>";
-
+    echo "<th colspan='5'>".__('Date')."</th>";
+	echo "</tr>";
 
 
     echo "<tr class='tab_bg_2'>";
 
     echo "<td rowspan='3'>";
-    echo "<input type='submit' class='submit' name='previousday' value=\"Jour precedent\">";
+    echo "<input type='submit' class='submit' name='previousday' value='".__('Previous')."'>";
     echo "</td>";
 
     echo "<td>".__('Start date')."</td><td>";
@@ -139,7 +173,7 @@ class PluginReservationReservation extends CommonDBTM {
     echo "<input type='submit' class='submit' name='submit' value=\""._sx('button', 'Search')."\">";
     echo "</td>";
     echo "<td rowspan='3'>";
-    echo "<input type='submit' class='submit' name='nextday' value=\"Jour suivant\">";
+    echo "<input type='submit' class='submit' name='nextday' value='".__('Next')."'>";
     echo "</td></tr>";
 
     echo "<tr class='tab_bg_2'><td>".__('End date')."</td><td>";
@@ -151,12 +185,16 @@ class PluginReservationReservation extends CommonDBTM {
 
     echo "</table>";
     Html::closeForm();
+
+echo "</td>";
+echo "</tr>";
+echo "</table>";
+
     echo "</div>";
 
   }
 
-
-
+  
   /**
    * Fonction permettant d'afficher les materiels disponibles et de faire une nouvelle reservation
    * C'est juste une interface differente de celle de GLPI. Pour les nouvelles reservations, on utilise les fonctions du coeur de GLPI
@@ -164,104 +202,161 @@ class PluginReservationReservation extends CommonDBTM {
   function showDispoAndFormResa(){
     global $DB, $CFG_GLPI, $datesresa;
     $showentity = Session::isMultiEntitiesMode();
-
+    $config = new PluginReservationConfig();
 
     $begin = $datesresa["begin"];
     $end   = $datesresa["end"];
     $left = "";
     $where = "";
 
-    echo "<div class='center'>";
-    echo "<form name='form' method='GET' action='../../../front/reservation.form.php'>";
-    echo "<table class='tab_cadre' style=\"border-spacing:20px;\">";
+    echo "<div class='center'>\n";
+    echo "<form name='form' method='GET' action='../../../front/reservation.form.php'>\n";
+    echo "<table class='tab_cadre' style=\"border-spacing:20px;\">\n";
     echo "<tr>";
+
+
+    #get max number of item in a category
+    $query = "SELECT itemtype, count(itemtype) as count FROM glpi_reservationitems WHERE glpi_reservationitems.is_active=1 AND glpi_reservationitems.is_deleted=0 GROUP BY itemtype";
+    if ($result = $DB->query($query)) {
+	    while ($row = $DB->fetch_assoc($result)) {
+		    $typesNb_array[$row["itemtype"]] = $row["count"];
+	    }
+	    $maxNbItems = max(array_values($typesNb_array));
+    }
+    $currentItemRowSize = 0;
+	  $changeRow = false;
+
+    $reservations = $CFG_GLPI["reservation_types"];
+	  echo "<td>";
 
     foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
       if (!($item = getItemForItemtype($itemtype))) {
-	continue;
+	      continue;
       }
 
       $itemtable = getTableForItemType($itemtype);
+
       $otherserial = "'' AS otherserial";
 
       if ($item->isField('otherserial')) {
-	$otherserial = "`$itemtable`.`otherserial`";
+	      $otherserial = "`$itemtable`.`otherserial`";
       }
 
+
       if (isset($begin) && isset($end)) {
-	$left = "LEFT JOIN `glpi_reservations`
-	  ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
-	      AND '". $begin."' < `glpi_reservations`.`end`
-	      AND '". $end."' > `glpi_reservations`.`begin`)";
-	$where = " AND `glpi_reservations`.`id` IS NULL ";
+	      $left = "LEFT JOIN `glpi_reservations`
+	        ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
+	        AND '". $begin."' < `glpi_reservations`.`end`
+	        AND '". $end."' > `glpi_reservations`.`begin`)";
+	      $where = " AND `glpi_reservations`.`id` IS NULL ";
       }
 
       $query = "SELECT `glpi_reservationitems`.`id`,
-	`glpi_reservationitems`.`comment`,
-	`$itemtable`.`id` AS materielid,
-	`$itemtable`.`name` AS name,
-	`$itemtable`.`entities_id` AS entities_id,
-	$otherserial,
-	`glpi_locations`.`completename` AS location,
-	`glpi_reservationitems`.`items_id` AS items_id
-	  FROM `glpi_reservationitems`
-	  $left
-	  INNER JOIN `$itemtable`
-	  ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
-	      AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
-	  LEFT JOIN `glpi_locations`
-	  ON (`$itemtable`.`locations_id` = `glpi_locations`.`id`)
-	  WHERE `glpi_reservationitems`.`is_active` = '1'
-	  AND `glpi_reservationitems`.`is_deleted` = '0'
-	  AND `$itemtable`.`is_deleted` = '0'
-	  $where ".
-	  getEntitiesRestrictRequest(" AND", $itemtable, '',
+	      `glpi_reservationitems`.`comment`,
+	      `$itemtable`.`id` AS materielid,
+	      `$itemtable`.`name` AS name,
+	      `$itemtable`.`entities_id` AS entities_id,
+	      $otherserial,
+	      `glpi_locations`.`completename` AS location,
+	      `glpi_reservationitems`.`items_id` AS items_id,
+	      `glpi_manufacturers`.`name` AS manufacturer
+	      FROM `glpi_reservationitems`
+	        $left
+	        INNER JOIN `$itemtable`
+	        ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
+	        AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
+	        LEFT JOIN `glpi_locations`
+	        ON (`$itemtable`.`locations_id` = `glpi_locations`.`id`)
+		#Left join produce null value when value does not exist
+		LEFT JOIN `glpi_manufacturers`
+		ON (`$itemtable`.`manufacturers_id` = `glpi_manufacturers`.`id`)
+	        WHERE `glpi_reservationitems`.`is_active` = '1'
+	          AND `glpi_reservationitems`.`is_deleted` = '0'
+	          AND `$itemtable`.`is_deleted` = '0'
+	        $where ".
+	    getEntitiesRestrictRequest(" AND", $itemtable, '',
 	      $_SESSION['glpiactiveentities'],
 	      $item->maybeRecursive())."
-	  ORDER BY `$itemtable`.`entities_id`,
-	`$itemtable`.`name`";
+	      ORDER BY `$itemtable`.`entities_id`,
+        `$itemtable`.`name`";
+
 
 
       if ($result = $DB->query($query)) {
 
-	if($DB->numrows($result)) {
-	  echo "<td>";
-	  echo "<table class='tab_cadre'>";
-	  echo "<tr><th colspan='".($showentity?"6":"5")."'>".$item->getTypeName()."</th></tr>\n";
-	}
-	while ($row = $DB->fetch_assoc($result)) {
-	  echo "<tr class='tab_bg_2'><td>";
-	  echo "<input type='checkbox' name='item[".$row["id"]."]' value='".$row["id"]."'>".
-	    "</td>";
-	  $typename = $item->getTypeName();
-	  if ($itemtype == 'Peripheral') {
-	    $item->getFromDB($row['items_id']);
-	    if (isset($item->fields["peripheraltypes_id"]) && ($item->fields["peripheraltypes_id"] != 0)) {
-	      $typename = Dropdown::getDropdownName("glpi_peripheraltypes",
-		  $item->fields["peripheraltypes_id"]);
-	    }
-	  }
-	  echo "<td white-space: nowrap ><a href='".getGLPIUrl()."front/".Toolbox::strtolower($itemtype).".form.php?id=".$row['materielid']."&forcetab=Reservation$1"."'>".sprintf(__('%1$s'), $row["name"])."</a></td>";
-	  echo "<td>".nl2br($row["comment"])."</td>";
-	  if ($showentity) {
-	    echo "<td>".Dropdown::getDropdownName("glpi_entities", $row["entities_id"]).
-	      "</td>";
-	  }
-	  echo "<td><a title=\"Voir le planning\" href='../../../front/reservation.php?reservationitems_id=".$row['id']."'>".
-	    "<img title=\"\" alt=\"\" src=\"".getGLPIUrl()."pics/reservation-3.png\"></img></a></td>";
-	  echo "</tr>\n";
+        # If there is at least one item, prepare the table header for the type
+	      if($DB->numrows($result)) {
+        
+          $currentItemRowSize += $typesNb_array[$itemtype];
+          if ($currentItemRowSize < $maxNbItems)
+          {
+	          $changeRow = false;
+          } else
+          {
 
-	}
-      }
+	          $changeRow = true;
+	          $currentItemRowSize = $typesNb_array[$itemtype];
+          }
+          if($changeRow)
+          {
+	          echo "</td><td>";
+          } else
+{
+
+	echo "<div style='padding: 10px;'></div>";
+}
+	 echo "\n\t<table class='tab_cadre'>";
+          echo "<tr><th colspan='".($showentity?"6":"5")."'>".$item->getTypeName()."</th></tr>\n";
+        }
+        
+
+        # Display all items entries for the current type
+	      while ($row = $DB->fetch_assoc($result)) {
+	          $item->getFromDB($row['items_id']);
+	        echo "<tr class='tab_bg_2'><td>";
+	        echo "<input type='checkbox' name='item[".$row["id"]."]' value='".$row["id"]."'>"."</td>";
+	        $typename = $item->getTypeName();
+	        if ($itemtype == 'Peripheral') {
+            // TODO isn't that already done ?
+	          $item->getFromDB($row['items_id']);
+	          if (isset($item->fields["peripheraltypes_id"]) && ($item->fields["peripheraltypes_id"] != 0)) {
+	            $typename = Dropdown::getDropdownName("glpi_peripheraltypes",
+		          $item->fields["peripheraltypes_id"]);
+	          }
+          }
+
+          echo "<td>";
+          getLinkforItem($item);
+          echo "</td>";
+
+	        echo "<td>".nl2br($row["comment"])."</td>";
+	        if ($showentity) {
+	          echo "<td>".Dropdown::getDropdownName("glpi_entities", $row["entities_id"])."</td>";
+	        }
+
+          echo "<td>";
+          getToolTipforItem($item);
+          echo "</td>";
+          
+	        echo "<td><a title=\"Show Calendar\" href='../../../front/reservation.php?reservationitems_id=".$row['id']."'>"."<img title=\"\" alt=\"\" src=\"".getGLPIUrl()."pics/reservation-3.png\"></a></td>";
+	        echo "</tr>\n";
+  	    }
+      # if there is at least one entry for the current type
       if($DB->numrows($result)) {
-	echo "</td>";
-	echo "</table>\n";
+      	echo  "</table>";
+
       }
+
+      }
+
+      
+      
     }
+	  echo "</td>";
 
     echo "</tr>";
     echo "<tr class='tab_bg_1 center'><td colspan='".($showentity?"5":"4")."'>";
-    echo "<input type='submit' value=\"Réserver\" class='submit'></td></tr>\n";
+    echo "<input type='submit' value='".__('Create')."' class='submit'></td></tr>\n";
 
 
     echo "</table>\n";
@@ -285,6 +380,7 @@ class PluginReservationReservation extends CommonDBTM {
 
 
   }
+
 
   /**
    * Fonction permettant de marquer une reservation comme rendue
@@ -336,7 +432,7 @@ class PluginReservationReservation extends CommonDBTM {
     global $DB, $CFG_GLPI, $datesresa;
     $showentity = Session::isMultiEntitiesMode();
 	    $config = new PluginReservationConfig();
-      $methode = $config->getConfigurationMethode();
+      $methode = $config->getConfigurationValue("late_mail");
 
     $begin = $datesresa["begin"];
     $end   = $datesresa["end"];
@@ -379,7 +475,8 @@ class PluginReservationReservation extends CommonDBTM {
 	`glpi_reservations`.`begin`,
 	`glpi_reservations`.`end`,
 	`glpi_users`.`name` AS username,
-	`glpi_reservationitems`.`items_id` AS items_id
+	`glpi_reservationitems`.`items_id` AS items_id,
+	`glpi_reservationitems`.`itemtype` AS itemtype
 	  FROM `glpi_reservationitems`
 	  $left
 	  INNER JOIN `$itemtable`
@@ -405,7 +502,9 @@ class PluginReservationReservation extends CommonDBTM {
 	    $ResaByUser[$row["username"]] = array();
 	  }
 	  $tmp = array ("resaid" => $row["resaid"],
-	      "name" => $row['name'],
+        "name" => $row['name'],
+        "items_id" => $row['items_id'],
+        "itemtype" => $row['itemtype'],
 	      "debut" => $row["begin"],
 	      "fin" => $row["end"],
 	      "comment" => nl2br($row["comment"]));
@@ -421,23 +520,17 @@ class PluginReservationReservation extends CommonDBTM {
     echo "<div class='center'>";
     echo "<table class='tab_cadre'>";
     echo "<thead>";
-    echo "<tr><th colspan='".($showentity?"11":"10")."'>"."Matériels empruntés"."</th></tr>\n";
+    echo "<tr><th colspan='".($showentity?"11":"10")."'>".__('Current Reservations in the selected timeline')."</th></tr>\n";
     echo "<tr class='tab_bg_2'>";
 
-    /*echo "<th><a href=\"#\" onclick=\"sortTable(this,0); return false;\">Utilisateur</a></th>";
-    echo "<th><a href=\"#\" onclick=\"sortTable(this,1); return false;\">Materiel</a></th>";
-    echo "<th><a href=\"#\" onclick=\"sortTable(this,2); return false;\">Debut</a></th>";
-    echo "<th><a href=\"#\" onclick=\"sortTable(this,3); return false;\">Fin</a></th>";
-    echo "<th><a href=\"#\" onclick=\"sortTable(this,4); return false;\">Commentaires</a></th>";
-    echo "<th><a href=\"#\" onclick=\"sortTable(this,5); return false;\">Mouvement</a></th>";*/
-    echo "<th>Utilisateur</a></th>";
-    echo "<th>Materiel</a></th>";
-    echo "<th>Debut</a></th>";
-    echo "<th>Fin</a></th>";
-    echo "<th>Commentaires</a></th>";
-    echo "<th>Mouvement</a></th>";
-    echo "<th>Acquitter</th>";
-    echo "<th colspan='".($methode == "manual" ? 3 : 2)."'>Actions</th>";
+    echo "<th>".__('User')."</a></th>";
+    echo "<th colspan='2'>".__('Item')."</a></th>";
+    echo "<th>".__('Begin')."</a></th>";
+    echo "<th>".__('End')."</a></th>";
+    echo "<th>".__('Comment')."</a></th>";
+    echo "<th>".__('Move')."</a></th>";
+    echo "<th>Checkout</th>";
+    echo "<th colspan='".($methode == "manual" ? 3 : 2)."'>".__('Action')."</th>";
 
     echo "</tr></thead>";
     echo "<tbody>";
@@ -472,7 +565,18 @@ class PluginReservationReservation extends CommonDBTM {
 
 
         	// le nom du materiel
-        	echo "<td $colorRed>".$resa['name']."</td>";
+	        $items_id = $resa['items_id'];
+          $itemtype = $resa['itemtype'];
+	        $item  = getItemForItemType($itemtype);
+          $item->getFromDB($resa['items_id']);
+
+          echo "<td  $colorRed>";
+          getLinkforItem($item);
+          echo "</td>";
+          
+          echo "<td $colorRed>";
+          getToolTipforItem($item);
+          echo "</td>";
 
           if(!$flag)
           {
@@ -528,7 +632,7 @@ class PluginReservationReservation extends CommonDBTM {
         	if($dates[0] != NULL)
         	  echo "<td>".date("d-m-Y \à H:i:s",strtotime($dates[0]))."</td>";
         	else
-        	  echo "<td><center><a title=\"Marquer comme rendu\" href=\"reservation.php?resareturn=".$resa['resaid']."\"><img title=\"\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
+        	  echo "<td><center><a href=\"reservation.php?resareturn=".$resa['resaid']."\"><img title=\"Set As Returned\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
 
 
 
@@ -536,7 +640,7 @@ class PluginReservationReservation extends CommonDBTM {
           $matDispo = getMatDispo();
           echo "<td>";
           echo "<ul>";
-          echo "<li><span class=\"bouton\" id=\"bouton_add".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('add".$resa['resaid']."');\">Ajouter un materiel</span>
+          echo "<li><span class=\"bouton\" id=\"bouton_add".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('add".$resa['resaid']."');\">".__('Add an item')."</span>
           <div id=\"add".$resa['resaid']."\" style=\"display:none;\">
           <form method='POST' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
           echo '<select name="matDispoAdd">';
@@ -544,11 +648,11 @@ class PluginReservationReservation extends CommonDBTM {
              echo "\t",'<option value="', key($mat) ,'">', current($mat) ,'</option>';
           }
           echo "<input type='hidden' name='AjouterMatToResa' value='".$resa['resaid']."'>";
-          echo "<input type='submit' class='submit' name='submit' value=Ajouter>";
+          echo "<input type='submit' class='submit' name='submit' value="._sx('button','Add').">";
           Html::closeForm();
           echo "</div></li>";
 
-          echo "<li><span class=\"bouton\" id=\"bouton_replace".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('replace".$resa['resaid']."');\">Remplacer le materiel</span>
+          echo "<li><span class=\"bouton\" id=\"bouton_replace".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('replace".$resa['resaid']."');\">".__('Replace')."</span>
           <div id=\"replace".$resa['resaid']."\" style=\"display:none;\">
           <form method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
           echo '<select name="matDispoReplace">';
@@ -556,16 +660,15 @@ class PluginReservationReservation extends CommonDBTM {
              echo "\t",'<option value="', key($mat) ,'">', current($mat) ,'</option>';
           }
           echo "<input type='hidden' name='ReplaceMatToResa' value='".$resa['resaid']."'>";
-          echo "<input type='submit' class='submit' name='submit' value=Remplacer>";
+          echo "<input type='submit' class='submit' name='submit' value="._sx('button','Save').">";
           Html::closeForm();
           echo "</div></li>";
           echo "</ul>";
           echo "</td>";
 
-
           echo "<td>";
           echo "<ul>";
-          echo "<li><a class=\"bouton\" title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=".$resa['resaid']."'>Editer la reservation</a></li>";
+          echo "<li><a class=\"bouton\" title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=".$resa['resaid']."'>".__('Edit')."</a></li>";
           echo "</ul>";
           echo "</td>";
 
@@ -641,8 +744,6 @@ function addToResa($idmat,$idresa) {
       }
 
 
-
-
 }
 
 
@@ -657,6 +758,127 @@ function replaceResa($idmat,$idresa) {
 
 
 }
+
+  function getLinkforItem($item)
+  {
+    $itemLink = $item->getFormUrl();
+	  $argConcatenator = "?";
+	  if (strpos($itemLink, '?') !== FALSE) {
+		  $argConcatenator = "&amp;";
+	  }
+    
+    echo "<a target='_blank' href='".$itemLink.$argConcatenator."id=".$item->fields["id"]."'>".sprintf(__('%1$s'), $item->fields["name"])."</a>";
+
+  }
+
+  function getToolTipforItem($item)
+  {
+    $config = new PluginReservationConfig();
+
+    $show_toolTip = $config->getConfigurationValue("tooltip");
+    if (!$show_toolTip)
+    {
+      return;
+    }
+
+
+    $show_comment = $config->getConfigurationValue("comment");
+    $show_location = $config->getConfigurationValue("location");
+    $show_serial = $config->getConfigurationValue("serial");
+    $show_inventory = $config->getConfigurationValue("inventory");
+    $show_group = $config->getConfigurationValue("group");
+    $show_man_model = $config->getConfigurationValue("man_model");
+    $show_status = $config->getConfigurationValue("status");
+    $toolTip = "";
+    if ($show_comment && array_key_exists("comment",$item->fields))
+    {
+       $toolTip .= $item->fields["comment"];
+    }
+    if ($show_location && array_key_exists("locations_id",$item->fields))
+    {
+      $location = getLocationFromItem($item);
+      $toolTip .= "<br><b>".__('Location')." : </b>".$location;
+    }
+    if ($show_group && array_key_exists("groups_id",$item->fields))
+    {
+      $group_name = getGroupFromItem($item);
+      $toolTip .= "<br><b>".__('Group')." : </b>".$group_name;
+    }
+    if ($show_inventory && array_key_exists("otherserial",$item->fields))
+    {
+      $toolTip .= "<br><b>".__('Inventory number')." : </b>".$item->fields["otherserial"];
+    }
+    if ($show_serial && array_key_exists("serial",$item->fields))
+    {
+      $toolTip .= "<br><b>".__('Serial number')." : </b>".$item->fields["serial"];
+    }
+    if ($show_man_model)
+    {
+      $typemodel = getModelFromItem($item);
+      $manufacturer = getManufacturerFromItem($item);
+      $toolTip .= "<br><b>".__('Manufacturer')." & ".__('Model')." : </b>".$manufacturer." | ".$typemodel;
+    }
+    $tooltip = nl2br($toolTip);
+    Html::showToolTip($tooltip,null);
+  }
+
+  function getGroupFromItem($item)
+  {
+    $group_id = $item->fields["groups_id"];
+    $group_tmp = new Group();
+    $group_tmp->getFromDB($group_id);
+    return $group_tmp->getName();
+  }
+
+  function getLocationFromItem($item)
+  {
+    $location_id = $item->fields["locations_id"];
+    $location_tmp = new Location();
+    $location_tmp->getFromDB($location_id);
+    return $location_tmp->getName();
+  }
+
+  function getManufacturerFromItem($item)
+  {
+    $manufacturer_id = $item->fields["manufacturers_id"];
+    $manufacturer_tmp = new Manufacturer();
+    $manufacturer_tmp->getFromDB($manufacturer_id);
+    return $manufacturer_tmp->getName();
+  }
+
+  function getModelFromItem($item)
+  {
+    global $DB;
+    $typemodel = "N/A";
+    $modeltable = getSingular($item->getTable())."models";
+    if ($modeltable)
+    {
+      $modelfield = getForeignKeyFieldForTable($modeltable);
+      if ($modelfield)
+      {	
+        if (!$item->isField($modelfield)) {
+          # field not found, trying other method
+          $modeltable = substr($item->getTable(),0,-1)."models";
+          $modelfield = getForeignKeyFieldForTable($modeltable);
+        }
+        if ($DB->tableExists($modeltable))
+        {
+          $query = "SELECT `$modeltable`.`name` AS model 
+            FROM `$modeltable` WHERE
+            `$modeltable`.`id` = ".$item->fields[$modelfield];
+          if ($resmodel = $DB->query($query)) {
+            while ($rowModel = $DB->fetch_assoc($resmodel)) {
+              $typemodel = $rowModel["model"];
+            }
+          }
+        }
+      }
+
+    }
+    return $typemodel;
+  }
+
+
 
 
 function getMatDispo() {
