@@ -349,8 +349,6 @@ echo "</table>";
 
       }
 
-      
-      
     }
 	  echo "</td>";
 
@@ -362,6 +360,8 @@ echo "</table>";
     echo "</table>\n";
 
     echo "<input type='hidden' name='id' value=''>";
+    echo "<input type='hidden' name='begin' value='".$begin."'>";
+    echo "<input type='hidden' name='end' value='".$end."'>";
     Html::closeForm();
     echo "</div>\n";
   }
@@ -542,6 +542,9 @@ echo "</table>";
       $nbLigne = 1;
       $limiteLigneNumber = count($arrayResa);
       $flag = 0;
+      echo "<tr class='tab_bg_2'>";
+      echo "<td colspan='100%' bgcolor='lightgrey' style='padding:1px;'/>";
+      echo "</tr>";
       echo "<tr class='tab_bg_2'>";
       echo "<td rowspan=".count($arrayResa).">".$User."</td>";
       foreach($arrayResa as $Num => $resa) {
