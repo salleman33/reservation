@@ -99,6 +99,7 @@ class PluginReservationTask extends CommonDBTM
               {
 	        $task->setVolume($res++);
                 $task->log("Sending e-mail for reservation ".$row['resaid'].". Expected return time was : ".$row['date_theorique']);
+		Event::log($row['resaid'],"Reservation",4,"inventory",sprintf(__('will send and e-mail')));
               } else
               {
                 $task->log("Could not send notification");
