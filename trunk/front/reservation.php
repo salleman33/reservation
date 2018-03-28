@@ -32,7 +32,6 @@ if(!isset($datesresa))
 if(isset($_POST['reserve']))
   $datesresa = $_POST['reserve'];
 
-$PluginReservationReservation->showFormDate();
 
 if(isset($_GET['resareturn']))
   $PluginReservationReservation->resaReturn($_GET['resareturn']);
@@ -46,10 +45,9 @@ if(isset($_POST['AjouterMatToResa']))
 if(isset($_POST['ReplaceMatToResa']))
   $PluginReservationReservation->replaceResa($_POST['matDispoReplace'], $_POST['ReplaceMatToResa']);
 
-$PluginReservationReservation->showCurrentResa();
-$PluginReservationReservation->showDispoAndFormResa();
-
-//$PluginReservationReservation->display();
+$PluginReservationReservation->display($_POST);
+//$PluginReservationReservation->showCurrentResa();
+//$PluginReservationReservation->showDispoAndFormResa();
 
 
 if ($_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {

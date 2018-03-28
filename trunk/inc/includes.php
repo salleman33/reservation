@@ -5,5 +5,6 @@ if (!defined('GLPI_ROOT')) {
 }
 
 $toolTipConfig = array("tooltip","comment","location","serial","inventory","group","man_model","status");
+$tabConfig = array("tabcurrent","tabcoming");
 
 ?>

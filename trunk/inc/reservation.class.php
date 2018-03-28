@@ -13,6 +13,24 @@ function getGLPIUrl()
 
 class PluginReservationReservation extends CommonDBTM {
 
+  protected $tabs = array();
+  protected $tabsNames = array();
+
+  function __construct() {
+    $config = new PluginReservationConfig();
+    $i = 1;
+    if ($config->getConfigurationValue("tabcurrent",1)) {
+        $this->tabs[$i] = function(){$this->showCurrentResa();};
+        $this->tabsNames[$i++] = __('Current Reservations');
+    }
+    if ($config->getConfigurationValue("tabcoming")) {
+	$this->tabs[$i] = function(){$this->showCurrentResa(true);};
+        $this->tabsNames[$i++] = __('Current and Incoming Reservations');
+    }
+    $this->tabs[$i] = function(){$this->showDispoAndFormResa();};
+    $this->tabsNames[$i++] = __('Available Hardware');
+  }
+
   static function getTypeName($nb=0) {
 	return _n('Réservation', 'Réservation', $nb, 'Réservation');
   }
@@ -20,12 +38,6 @@ class PluginReservationReservation extends CommonDBTM {
   function getAbsolutePath()
    {return str_replace("plugins/reservation/inc/reservation.class.php", "", $_SERVER['SCRIPT_FILENAME']);}
 
-
-/*
-   function isNewItem() {
-    return false;
-  }
-*/
 
   static function getMenuName() {
      return PluginReservationReservation::getTypeName(2);
@@ -36,6 +48,23 @@ class PluginReservationReservation extends CommonDBTM {
       return true;
       return Session::haveRightsOr(self::$rightname, array(READ, self::RESERVEANITEM));
    }
+
+  static function canCreate() {
+      global $CFG_GLPI;
+      return Reservation::canCreate();
+   }
+
+  function canViewItem() {
+      global $CFG_GLPI;
+	return true;
+   }
+
+// =====================================
+
+function isNewItem()
+{
+  return false;
+}
 
   /**
    * Définition des onglets
@@ -50,10 +79,7 @@ class PluginReservationReservation extends CommonDBTM {
    * Définition du nom de l'onglet
    **/
   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
-    $ong = array();
-    $ong[1] = 'Réservations en cours';
-    $ong[2] = 'Matériel disponible';
-    return $ong;
+    return $item->tabsNames;
   }
 
 
@@ -61,22 +87,70 @@ class PluginReservationReservation extends CommonDBTM {
    * Définition du contenu de l'onglet
    **/
   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
-
-
-
-    $monplugin = new self();
-    switch ($tabnum) {
-      case 1 : // mon premier onglet
-	$monplugin->showCurrentResa();
-	break;
-
-      case 2 : // mon second onglet
-	$monplugin->showDispoAndFormResa();
-
-	break;
-    }
-    return TRUE;
+    $item->getDatesResa();
+    call_user_func($item->tabs[$tabnum]);
+    return true;
   }
+
+//=================
+
+
+function showForm($id, $options = array())
+{
+    global $CFG_GLPI,$datesresa;
+
+    $this->getDatesResa();
+
+    $this->showFormDate();
+
+}
+
+function getDatesResa()
+{
+	global $datesresa;
+    if(!isset($datesresa)) {
+
+      $jour = date("d",time());
+      $mois = date("m",time());
+      $annee = date("Y",time());
+      $begin_time                 = time();
+
+      $datesresa["begin"]  = date("Y-m-d H:i:s",$begin_time);
+
+      if($begin_time > mktime(19,0,0,$mois,$jour,$annee))
+	$datesresa["end"] = date("Y-m-d H:i:s",$begin_time + 3600);
+      else
+	$datesresa["end"] = date("Y-m-d H:i:s",mktime(19,0,0,$mois,$jour,$annee));
+    }
+    if(isset($_POST['reserve_begin'])){
+      $datesresa["begin"] = $_POST['reserve_begin'];
+    }
+    if(isset($_GET['reserve_begin'])){
+      $datesresa["begin"] = $_GET['reserve_begin'];
+    }
+
+    if(isset($_POST['reserve_end'])){
+      $datesresa["end"] = $_POST['reserve_end'];
+    }
+    if(isset($_GET['reserve_end'])){
+      $datesresa["end"] = $_GET['reserve_end'];
+    }
+    if(isset($_POST['nextday']) || isset($_GET['nextday'])) {
+      $tmpbegin = $datesresa["begin"];
+      $tmpend = $datesresa["end"];
+
+      $datesresa["begin"] = date("Y-m-d H:i:s", strtotime($datesresa["begin"]) + DAY_TIMESTAMP);
+      $datesresa["end"] = date("Y-m-d H:i:s",strtotime($datesresa["end"]) + DAY_TIMESTAMP);
+    }
+    if(isset($_POST['previousday']) || isset($_GET['previousday'])) {
+      $tmpbegin = $datesresa["begin"];
+      $tmpend = $datesresa["end"];
+
+      $datesresa["begin"] = date("Y-m-d H:i:s", strtotime($datesresa["begin"]) - DAY_TIMESTAMP);
+      $datesresa["end"] = date("Y-m-d H:i:s",strtotime($datesresa["end"]) - DAY_TIMESTAMP);
+    }
+//    printf(implode($datesresa));
+}
 
 /**
  * Link with current month reservations
@@ -109,41 +183,13 @@ class PluginReservationReservation extends CommonDBTM {
    * Affiche le cadre avec la date de debut / date de fin
    **/
   function showFormDate() {
-    GLOBAL $datesresa;
+    global $datesresa;
 
 
-    /*if(isset($_GET['resareturn'])) {
+/*    if(isset($_GET['resareturn'])) {
       $_POST['reserve'] = $datesresa;
     }
     else */
-    if(!isset($datesresa)) {
-
-      $jour = date("d",time());
-      $mois = date("m",time());
-      $annee = date("Y",time());
-      $begin_time                 = time();
-
-      $datesresa["begin"]  = date("Y-m-d H:i:s",$begin_time);
-
-      if($begin_time > mktime(19,0,0,$mois,$jour,$annee))
-	$datesresa["end"] = date("Y-m-d H:i:s",$begin_time + 3600);
-      else
-	$datesresa["end"] = date("Y-m-d H:i:s",mktime(19,0,0,$mois,$jour,$annee));
-    }
-    if(isset($_POST['nextday'])) {
-      $tmpbegin = $datesresa["begin"];
-      $tmpend = $datesresa["end"];
-
-      $datesresa["begin"] = date("Y-m-d H:i:s", strtotime($datesresa["begin"]) + DAY_TIMESTAMP);
-      $datesresa["end"] = date("Y-m-d H:i:s",strtotime($datesresa["end"]) + DAY_TIMESTAMP);
-    }
-    if(isset($_POST['previousday'])) {
-      $tmpbegin = $datesresa["begin"];
-      $tmpend = $datesresa["end"];
-
-      $datesresa["begin"] = date("Y-m-d H:i:s", strtotime($datesresa["begin"]) - DAY_TIMESTAMP);
-      $datesresa["end"] = date("Y-m-d H:i:s",strtotime($datesresa["end"]) - DAY_TIMESTAMP);
-    }
 
     echo "<div id='viewresasearch'  class='center'>";
     echo "<table class='tab_cadre' style='background-color:transparent;box-shadow:none'>";
@@ -167,8 +213,19 @@ echo "<td>";
     echo "</td>";
 
     echo "<td>".__('Start date')."</td><td>";
-    Html::showDateTimeField("reserve[begin]", array('value' =>  $datesresa["begin"],
-	  'maybeempty' => false));
+$rand = mt_rand();
+//    Html::showDateTimeField("reserve[begin]", array('value' =>  $datesresa["begin"], 'maybeempty' => false));
+Html::showDateTimeField('reserve_begin', array('value' => $datesresa["begin"], 'rand' => $rand, 'maybeempty' => false));
+echo '<script type="text/javascript">
+              jQuery(document).ready(function($) {
+                 $( "#showdate' . $rand . '" ).on("change", function() {
+                    formcreatorChangeValueOf('.$datesresa['begin'].', this.value);
+                 });
+                 $( "#resetdate' . $rand . '" ).on("click", function() {
+                    formcreatorChangeValueOf('.$datesresa['begin'].', "");
+                 });
+              });
+           </script>';
     echo "</td><td rowspan='3'>";
     echo "<input type='submit' class='submit' name='submit' value=\""._sx('button', 'Search')."\">";
     echo "</td>";
@@ -177,13 +234,27 @@ echo "<td>";
     echo "</td></tr>";
 
     echo "<tr class='tab_bg_2'><td>".__('End date')."</td><td>";
-    Html::showDateTimeField("reserve[end]", array('value' =>  $datesresa["end"],
-	  'maybeempty' => false));
+
+$rand2 = mt_rand();
+//    Html::showDateTimeField("reserve[end]", array('value' =>  $datesresa["end"],'maybeempty' => false));
+Html::showDateTimeField('reserve_end', array('value' => $datesresa["end"], 'rand' => $rand2, 'maybeempty' => false));
+echo '<script type="text/javascript">
+              jQuery(document).ready(function($) {
+                 $( "#showdate' . $rand2 . '" ).on("change", function() {
+                    formcreatorChangeValueOf('.$datesresa['end'].', this.value);
+                 });
+                 $( "#resetdate' . $rand2 . '" ).on("click", function() {
+                    formcreatorChangeValueOf('.$datesresa['end'].', "");
+                 });
+              });
+           </script>';
     echo "</td></tr>";
 
     echo "</td></tr>";
 
     echo "</table>";
+//    echo "<input type='hidden' name='dateEnd' value='".$datesresa['end']."'>";
+
     Html::closeForm();
 
 echo "</td>";
@@ -428,11 +499,11 @@ echo "</table>";
    * Fonction permettant d'afficher les reservations actuelles
    *
    **/
-  function showCurrentResa() {
+  function showCurrentResa($includeFuture = 0) {
     global $DB, $CFG_GLPI, $datesresa;
     $showentity = Session::isMultiEntitiesMode();
-	    $config = new PluginReservationConfig();
-      $methode = $config->getConfigurationValue("late_mail");
+    $config = new PluginReservationConfig();
+    $methode = $config->getConfigurationValue("late_mail");
 
     $begin = $datesresa["begin"];
     $end   = $datesresa["end"];
@@ -455,13 +526,19 @@ echo "</table>";
       if ($item->isField('otherserial')) {
 	$otherserial = "`$itemtable`.`otherserial`";
       }
-
-      if (isset($begin) && isset($end)) {
-	$left = "LEFT JOIN `glpi_reservations`
+      if (isset($begin)) {
+	if ($includeFuture) {
+	  $left = "LEFT JOIN `glpi_reservations`
 	  ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
+	      AND '". $begin."' < `glpi_reservations`.`end`)";
+        } else {
+          if (isset($end)) {
+	    $left = "LEFT JOIN `glpi_reservations`
+  	    ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
 	      AND '". $begin."' < `glpi_reservations`.`end`
 	      AND '". $end."' > `glpi_reservations`.`begin`)";
-
+          }
+        }
 	$where = " AND `glpi_reservations`.`id` IS NOT NULL ";
       }
 
@@ -494,7 +571,6 @@ echo "</table>";
 	  ORDER BY username,
 	`$itemtable`.`entities_id`,
 	`$itemtable`.`name`";
-
       if ($result = $DB->query($query)) {
 	// on regroupe toutes les reservations d'un meme user dans un tableau.
 	while ($row = $DB->fetch_assoc($result)) {
@@ -520,7 +596,7 @@ echo "</table>";
     echo "<div class='center'>";
     echo "<table class='tab_cadre'>";
     echo "<thead>";
-    echo "<tr><th colspan='".($showentity?"11":"10")."'>".__('Current Reservations in the selected timeline')."</th></tr>\n";
+    echo "<tr><th colspan='".($showentity?"11":"10")."'>".($includeFuture?__('Reservation and future reservations in the selected timeline'):__('Reservations in the selected timeline'))."</th></tr>\n";
     echo "<tr class='tab_bg_2'>";
 
     echo "<th>".__('User')."</a></th>";
@@ -548,7 +624,10 @@ echo "</table>";
       echo "<tr class='tab_bg_2'>";
       echo "<td rowspan=".count($arrayResa).">".$User."</td>";
       foreach($arrayResa as $Num => $resa) {
-        	$colorRed = "";
+        	$color = "";
+        	  if($resa["debut"] > date("Y-m-d H:i:s",time())) {// on colore  en rouge seulement si la date de retour theorique est depassée et si le materiel n'est pas marqué comme rendu (avec une date de retour effectif)
+			  $color = "bgcolor=\"lightgrey\"";
+		  }
           $flagSurveille = 0;
         	// on regarde si la reservation actuelle a été prolongée par le plugin
         	$query = "SELECT `date_return`, `date_theorique`, `dernierMail` FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = ".$resa["resaid"];
@@ -561,10 +640,10 @@ echo "</table>";
 
         	if($DB->numrows($result)) {
         	  if($dates[1] < date("Y-m-d H:i:s",time()) && $dates[0] == NULL) {// on colore  en rouge seulement si la date de retour theorique est depassée et si le materiel n'est pas marqué comme rendu (avec une date de retour effectif)
-			  $colorRed = "bgcolor=\"red\"";
+			  $color = "bgcolor=\"red\"";
             		  $flagSurveille = 1;
 		  }
-          }
+                }
 
 
         	// le nom du materiel
@@ -573,11 +652,11 @@ echo "</table>";
 	        $item  = getItemForItemType($itemtype);
           $item->getFromDB($resa['items_id']);
 
-          echo "<td  $colorRed>";
+          echo "<td $color>";
           getLinkforItem($item);
           echo "</td>";
           
-          echo "<td $colorRed>";
+          echo "<td $color>";
           getToolTipforItem($item);
           echo "</td>";
 
@@ -602,16 +681,16 @@ echo "</table>";
 
         	//date de debut de la resa
           if(!$flag) {
-        	  echo "<td rowspan=".$nbLigne." $colorRed>".date("d-m-Y \à H:i:s",strtotime($resa["debut"]))."</td>";
+        	  echo "<td rowspan=".$nbLigne." $color>".date("d-m-Y \à H:i:s",strtotime($resa["debut"]))."</td>";
 
         	// si c'est une reservation prolongée, on affiche la date theorique plutot que la date reelle (qui est prolongée jusqu'au retour du materiel)
           if($DB->numrows($result) && $dates[0] == NULL)
-        	  echo "<td rowspan=".$nbLigne." $colorRed>".date("d-m-Y \à H:i:s",strtotime($dates[1]))."</td>";
+        	  echo "<td rowspan=".$nbLigne." $color>".date("d-m-Y \à H:i:s",strtotime($dates[1]))."</td>";
         	else
-        	  echo "<td rowspan=".$nbLigne." $colorRed>".date("d-m-Y \à H:i:s",strtotime($resa["fin"]))."</td>";
+        	  echo "<td rowspan=".$nbLigne." $color>".date("d-m-Y \à H:i:s",strtotime($resa["fin"]))."</td>";
 
         	//le commentaire
-        	echo "<td rowspan=".$nbLigne." $colorRed>".$resa["comment"]."</td>";
+        	echo "<td rowspan=".$nbLigne." $color>".$resa["comment"]."</td>";
 
         	// les fleches de mouvements
         	echo "<td rowspan=".$nbLigne." ><center>";

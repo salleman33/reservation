@@ -9,10 +9,11 @@ include (GLPI_ROOT."/plugins/reservation/inc/includes.php");
 
 class PluginReservationConfig extends CommonDBTM {
 
-    function getConfigurationValue($name)
+    function getConfigurationValue($name, $defaultValue = 0)
         {
             global $DB;
             $query = "SELECT * FROM glpi_plugin_reservation_config WHERE name='".$name."'";
+        $value = $defaultValue;
         if ($result = $DB->query($query))
             {
             if ($DB->numrows($result) > 0)
@@ -137,6 +138,35 @@ echo "</table>";
 
 echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
+echo "<th>Tab Configuration</th>",
+/*$usetab = $this->getConfigurationValue("usetab");
+echo "<tr>";
+echo "<input type=\"hidden\" name=\"usetab\" value=\"0\">";
+echo "<td> <input type=\"checkbox\" name=\"usetab\" value=\"1\" ".($usetab? 'checked':'')."> ".__('Tab')."</td>";
+echo "</tr>";
+
+if ($usetab)
+{*/
+  $tabcurrent = $this->getConfigurationValue("tabcurrent",1);
+  echo "<tr>";
+  echo "<input type=\"hidden\" name=\"tabcurrent\" value=\"0\">";
+  echo "<td style=\"padding-left:20px;\">";
+  echo "<input type=\"checkbox\" name=\"tabcurrent\" value=\"1\" ".($tabcurrent? 'checked':'')."> ".__('Current Reservation tab')."</td>";
+  echo "</tr>";
+
+  $tabcoming = $this->getConfigurationValue("tabcoming");
+  echo "<tr>";
+  echo "<input type=\"hidden\" name=\"tabcoming\" value=\"0\">";
+  echo "<td style=\"padding-left:20px;\">";
+  echo "<input type=\"checkbox\" name=\"tabcoming\" value=\"1\" ".($tabcoming? 'checked':'')."> ".__('Incoming Reservation tab')."</td>";
+  echo "</tr>";
+/*}
+*/
+echo "</table>";
+
+
+echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
+
 echo "<th>ToolTip Configuration </th>";
 
 $tooltip = $this->getConfigurationValue("tooltip");
@@ -151,37 +181,43 @@ if ($tooltip)
   $comment = $this->getConfigurationValue("comment");
   echo "<tr>";
   echo "<input type=\"hidden\" name=\"comment\" value=\"0\">";
-  echo "<td> <input type=\"checkbox\" name=\"comment\" value=\"1\" ".($comment? 'checked':'')."> ".__('Comment')."</td>";
+  echo "<td style=\"padding-left:20px;\">";
+  echo "<input type=\"checkbox\" name=\"comment\" value=\"1\" ".($comment? 'checked':'')."> ".__('Comment')."</td>";
   echo "</tr>";
 
   $location = $this->getConfigurationValue("location");
   echo "<tr>";
   echo "<input type=\"hidden\" name=\"location\" value=\"0\">";
-  echo "<td> <input type=\"checkbox\" name=\"location\" value=\"1\" ".($location? 'checked':'')."> ".__('Location')."</td>";
+  echo "<td style=\"padding-left:20px;\">";
+  echo "<input type=\"checkbox\" name=\"location\" value=\"1\" ".($location? 'checked':'')."> ".__('Location')."</td>";
   echo "</tr>";
 
   $serial = $this->getConfigurationValue("serial");
   echo "<tr>";
   echo "<input type=\"hidden\" name=\"serial\" value=\"0\">";
-  echo "<td> <input type=\"checkbox\" name=\"serial\" value=\"1\" ".($serial? 'checked':'')."> ".__('Serial number')."</td>";
+  echo "<td style=\"padding-left:20px;\">";
+  echo "<input type=\"checkbox\" name=\"serial\" value=\"1\" ".($serial? 'checked':'')."> ".__('Serial number')."</td>";
   echo "</tr>";
 
   $inventory = $this->getConfigurationValue("inventory");
   echo "<tr>";
   echo "<input type=\"hidden\" name=\"inventory\" value=\"0\">";
-  echo "<td> <input type=\"checkbox\" name=\"inventory\" value=\"1\" ".($inventory? 'checked':'')."> ".__('Inventory number')."</td>";
+  echo "<td style=\"padding-left:20px;\">";
+  echo "<input type=\"checkbox\" name=\"inventory\" value=\"1\" ".($inventory? 'checked':'')."> ".__('Inventory number')."</td>";
   echo "</tr>";
 
   $group = $this->getConfigurationValue("group");
   echo "<tr>";
   echo "<input type=\"hidden\" name=\"group\" value=\"0\">";
-  echo "<td> <input type=\"checkbox\" name=\"group\" value=\"1\" ".($group? 'checked':'')."> ".__('Group')."</td>";
+  echo "<td style=\"padding-left:20px;\">";
+  echo "<input type=\"checkbox\" name=\"group\" value=\"1\" ".($group? 'checked':'')."> ".__('Group')."</td>";
   echo "</tr>";
 
   $man_model = $this->getConfigurationValue("man_model");
   echo "<tr>";
   echo "<input type=\"hidden\" name=\"man_model\" value=\"0\">";
-  echo "<td> <input type=\"checkbox\" name=\"man_model\" value=\"1\" ".($man_model? 'checked':'')."> ".__('Manufacturer') ." & ".__('Model')."</td>";
+  echo "<td style=\"padding-left:20px;\">";
+  echo "<input type=\"checkbox\" name=\"man_model\" value=\"1\" ".($man_model? 'checked':'')."> ".__('Manufacturer') ." & ".__('Model')."</td>";
   echo "</tr>";
 
   $status = $this->getConfigurationValue("status");

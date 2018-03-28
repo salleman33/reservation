@@ -31,6 +31,14 @@ if ($plugin->isActivated("reservation")) {
      }
    }
 
+   foreach ($tabConfig as $config)
+   {
+     if(isset($_POST[$config])){
+        $PluginReservationConfig->setConfigurationValue($config,$_POST[$config]);
+        //Html::back();
+     }
+   }
+
    Html::header(PluginReservationReservation::getTypeName(2), '', "plugins", "Reservation");
    $PluginReservationConfig->showForm();
    Html::footer();
