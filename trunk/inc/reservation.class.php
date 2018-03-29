@@ -214,18 +214,7 @@ echo "<td>";
 
     echo "<td>".__('Start date')."</td><td>";
 $rand = mt_rand();
-//    Html::showDateTimeField("reserve[begin]", array('value' =>  $datesresa["begin"], 'maybeempty' => false));
 Html::showDateTimeField('reserve_begin', array('value' => $datesresa["begin"], 'rand' => $rand, 'maybeempty' => false));
-echo '<script type="text/javascript">
-              jQuery(document).ready(function($) {
-                 $( "#showdate' . $rand . '" ).on("change", function() {
-                    formcreatorChangeValueOf('.$datesresa['begin'].', this.value);
-                 });
-                 $( "#resetdate' . $rand . '" ).on("click", function() {
-                    formcreatorChangeValueOf('.$datesresa['begin'].', "");
-                 });
-              });
-           </script>';
     echo "</td><td rowspan='3'>";
     echo "<input type='submit' class='submit' name='submit' value=\""._sx('button', 'Search')."\">";
     echo "</td>";
@@ -236,18 +225,7 @@ echo '<script type="text/javascript">
     echo "<tr class='tab_bg_2'><td>".__('End date')."</td><td>";
 
 $rand2 = mt_rand();
-//    Html::showDateTimeField("reserve[end]", array('value' =>  $datesresa["end"],'maybeempty' => false));
 Html::showDateTimeField('reserve_end', array('value' => $datesresa["end"], 'rand' => $rand2, 'maybeempty' => false));
-echo '<script type="text/javascript">
-              jQuery(document).ready(function($) {
-                 $( "#showdate' . $rand2 . '" ).on("change", function() {
-                    formcreatorChangeValueOf('.$datesresa['end'].', this.value);
-                 });
-                 $( "#resetdate' . $rand2 . '" ).on("click", function() {
-                    formcreatorChangeValueOf('.$datesresa['end'].', "");
-                 });
-              });
-           </script>';
     echo "</td></tr>";
 
     echo "</td></tr>";
