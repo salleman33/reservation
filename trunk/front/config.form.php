@@ -13,7 +13,7 @@ $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {
    $PluginReservationConfig = new PluginReservationConfig();
    Session::checkRight("config",  array(CREATE, UPDATE,DELETE ));
-   if (isset($_POST["week"])) {      
+   if (isset($_POST["week"])) {
       $PluginReservationConfig->setConfigurationWeek($_POST["week"]);
       //Html::back();
    }
@@ -22,7 +22,7 @@ if ($plugin->isActivated("reservation")) {
       $PluginReservationConfig->setConfigurationValue("late_mail",$_POST["late_mail"]);
       //Html::back();
    }
-   
+
    foreach ($toolTipConfig as $config)
    {
      if(isset($_POST[$config])){
@@ -42,7 +42,7 @@ if ($plugin->isActivated("reservation")) {
    Html::header(PluginReservationReservation::getTypeName(2), '', "plugins", "Reservation");
    $PluginReservationConfig->showForm();
    Html::footer();
-   
+
 } else {
    Html::header(__('Setup'), '', "config", "plugins");
    echo "<div class='center'><br><br>".

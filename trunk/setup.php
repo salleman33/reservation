@@ -3,7 +3,7 @@
 function plugin_version_reservation() {
 
   return array(
-      'name'           => _n('Réservation', 'Réservation', 2, 'Réservation'),
+      'name'           => _n('Reservation', 'Reservations', 2, 'Reservation'),
       'version'        => '1.4.1',
       'author'         => 'Sylvain Allemand',
       'license'        => 'GPLv2+',

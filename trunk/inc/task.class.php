@@ -19,11 +19,11 @@ class PluginReservationTask extends CommonDBTM
         switch ($name) {
             case "SurveilleResa":
                 return array(
-                    'description' => "Watch Reservations (plugin)"
+                    'description' => __('Watch Reservations')." (".__('plugin').")"
                 );
             case "MailUserDelayedResa":
                 return array(
-                    'description' => "Send an e-mail to users with late reservations (plugin)"
+                    'description' => __('Send an e-mail to users with late reservations')." (".__('plugin').")"
 		);
         }
     }
@@ -98,11 +98,13 @@ class PluginReservationTask extends CommonDBTM
               if (NotificationEvent::raiseEvent('plugin_reservation_expiration', $reservation))
               {
 	        $task->setVolume($res++);
-                $task->log("Sending e-mail for reservation ".$row['resaid'].". Expected return time was : ".$row['date_theorique']);
-		Event::log($row['resaid'],"Reservation",4,"inventory",sprintf(__('will send and e-mail')));
+                $logtext = sprintf(__('Sending e-mail for reservation %1$s'),$row['resaid']);
+		$logtext = $logtext.sprintf(__('Expected return time was : %1$s'),$row['date_theorique']);
+                $task->log($logtext);
+		Event::log($row['resaid'],"Reservation",4,"inventory",__('Sending an e-mail'));
               } else
               {
-                $task->log("Could not send notification");
+                $task->log(__('Could not send notification'));
               }
             }
 
@@ -137,10 +139,10 @@ class PluginReservationTask extends CommonDBTM
         if ($resultUsedTypes = $DB->query($queryUsedTypes)) {
         while ($row = $DB->fetch_assoc($resultUsedTypes)) {
            $itemtype = $row["itemtype"];
-	
+
 	// this only returns original GLPI types in CLI mode. Not compatible with genericobject plugin
 	//        foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
-            $task->log("Checking Type : " .$itemtype);
+//            $task->log("Checking Type : " .$itemtype);
 
             if (!($item = getItemForItemtype($itemtype))) {
                 continue;
@@ -226,7 +228,7 @@ $where " . "ORDER BY username,
    	              $newEnd = $temps + 5 * MINUTE_TIMESTAMP;
                       $task->setVolume($valreturn++);
 
-        	      $task->log("Extending reservation ".$row['resaid']);
+        	      $task->log(__('Extending reservation')." : ".$row['resaid']);
 
 	              // prolongation de la vrai resa
 		          $current_user_id = self::find_user_from_resa($row['resaid']);
@@ -234,7 +236,7 @@ $where " . "ORDER BY username,
 	              $res = self::verifDisponibiliteAndMailIGS($task, $row['itemtype'], $row['matid'], $row['resaid'], $begin, date("Y-m-d H:i:s", $newEnd), $current_user_id);
 		          if($res == 0) {
 	        	    $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", $newEnd) . "' WHERE `id`='" . $row["resaid"] . "';";
-	              	$DB->query($query) or die("error on 'update' into glpi_reservations lors du cron : " . $DB->error());
+	              	$DB->query($query) or die("error on 'update' into glpi_reservations while cron : " . $DB->error());
 	
                   }
                 }
@@ -243,7 +245,7 @@ $where " . "ORDER BY username,
                 $task->setVolume($valreturn++);
                 $task->log("Removing reservation ".$row['resaid']." from watch table as it was deleted");
                 $query = "DELETE FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = " . $row["resaid"];
-                $DB->query($query) or die("error on 'delete' into glpi_plugin_reservation_manageresa  lors du cron/ hash: " . $DB->error());
+                $DB->query($query) or die("error on 'delete' into glpi_plugin_reservation_manageresa  while cron/ hash: " . $DB->error());
             }
             
 		}
@@ -347,9 +349,4 @@ $where " . "ORDER BY username,
 	}
     }
 }
-
-
-
-
-
 ?>

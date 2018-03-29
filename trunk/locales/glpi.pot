@@ -1,0 +1,289 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-03-29 15:06+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: setup.php:6
+msgid "Reservation"
+msgid_plural "Reservations"
+msgstr[0] ""
+msgstr[1] ""
+
+#: front/config.form.php:47
+msgid "Setup"
+msgstr ""
+
+#: front/config.form.php:50
+msgid "Please activate the plugin"
+msgstr ""
+
+#: front/reservation.php:25
+msgid "Simplified interface"
+msgstr ""
+
+#: inc/config.class.php:99
+msgid "Method used to send e-mails to users with late reservations"
+msgstr ""
+
+#: inc/config.class.php:103
+msgid "Automatic"
+msgstr ""
+
+#: inc/config.class.php:103
+msgid "Using the configurable automatic action"
+msgstr ""
+
+#: inc/config.class.php:112
+msgid "Days when e-mails for late reservations are sent"
+msgstr ""
+
+#: inc/config.class.php:114
+msgid "Monday"
+msgstr ""
+
+#: inc/config.class.php:117
+msgid "Tuesday"
+msgstr ""
+
+#: inc/config.class.php:120
+msgid "Wednesday"
+msgstr ""
+
+#: inc/config.class.php:123
+msgid "Thursday"
+msgstr ""
+
+#: inc/config.class.php:126
+msgid "Friday"
+msgstr ""
+
+#: inc/config.class.php:129
+msgid "Saturday"
+msgstr ""
+
+#: inc/config.class.php:132
+msgid "Sunday"
+msgstr ""
+
+#: inc/config.class.php:153
+msgid "Current Reservation tab"
+msgstr ""
+
+#: inc/config.class.php:160
+msgid "Incoming Reservation tab"
+msgstr ""
+
+#: inc/config.class.php:169
+msgid "ToolTip Configuration"
+msgstr ""
+
+#: inc/config.class.php:174
+msgid "ToolTip"
+msgstr ""
+
+#: inc/config.class.php:184 inc/reservation.class.php:584
+msgid "Comment"
+msgstr ""
+
+#: inc/config.class.php:191 inc/reservation.class.php:860
+msgid "Location"
+msgstr ""
+
+#: inc/config.class.php:198 inc/reservation.class.php:873
+msgid "Serial number"
+msgstr ""
+
+#: inc/config.class.php:205 inc/reservation.class.php:869
+msgid "Inventory number"
+msgstr ""
+
+#: inc/config.class.php:212 inc/reservation.class.php:865
+msgid "Group"
+msgstr ""
+
+#: inc/config.class.php:219 inc/reservation.class.php:879
+msgid "Manufacturer"
+msgstr ""
+
+#: inc/config.class.php:219 inc/reservation.class.php:879
+msgid "Model"
+msgstr ""
+
+#: inc/config.class.php:231 inc/reservation.class.php:723
+msgctxt "button"
+msgid "Save"
+msgstr ""
+
+#: inc/reservation.class.php:24
+msgid "Current Reservations"
+msgstr ""
+
+#: inc/reservation.class.php:28
+msgid "Current and Incoming Reservations"
+msgstr ""
+
+#: inc/reservation.class.php:31
+msgid "Available Hardware"
+msgstr ""
+
+#: inc/reservation.class.php:35
+msgid "Resservation"
+msgid_plural "Reservations"
+msgstr[0] ""
+msgstr[1] ""
+
+#: inc/reservation.class.php:168
+msgid "Show all"
+msgstr ""
+
+#: inc/reservation.class.php:172
+msgid "Reservations This Month"
+msgstr ""
+
+#: inc/reservation.class.php:205
+msgid "Date"
+msgstr ""
+
+#: inc/reservation.class.php:212
+msgid "Previous"
+msgstr ""
+
+#: inc/reservation.class.php:215
+msgid "Start date"
+msgstr ""
+
+#: inc/reservation.class.php:219
+msgctxt "button"
+msgid "Search"
+msgstr ""
+
+#: inc/reservation.class.php:222
+msgid "Next"
+msgstr ""
+
+#: inc/reservation.class.php:225
+msgid "End date"
+msgstr ""
+
+#: inc/reservation.class.php:406
+msgid "Create new reservation"
+msgstr ""
+
+#: inc/reservation.class.php:577
+msgid "Current and future reservations in the selected timeline"
+msgstr ""
+
+#: inc/reservation.class.php:577
+msgid "Reservations in the selected timeline"
+msgstr ""
+
+#: inc/reservation.class.php:580
+msgid "User"
+msgstr ""
+
+#: inc/reservation.class.php:581
+msgid "Item"
+msgstr ""
+
+#: inc/reservation.class.php:582
+msgid "Begin"
+msgstr ""
+
+#: inc/reservation.class.php:583
+msgid "End"
+msgstr ""
+
+#: inc/reservation.class.php:585
+msgid "Move"
+msgstr ""
+
+#: inc/reservation.class.php:586
+msgid "Checkout"
+msgstr ""
+
+#: inc/reservation.class.php:587
+msgid "Action"
+msgstr ""
+
+#: inc/reservation.class.php:703
+msgctxt "button"
+msgid "Add an item"
+msgstr ""
+
+#: inc/reservation.class.php:711
+msgctxt "button"
+msgid "Add"
+msgstr ""
+
+#: inc/reservation.class.php:715
+msgctxt "button"
+msgid "Replace an item"
+msgstr ""
+
+#: inc/reservation.class.php:731
+msgctxt "button"
+msgid "Edit"
+msgstr ""
+
+#: inc/reservation.class.php:740
+msgctxt "tooltip"
+msgid "Send an e-mail for the late reservation"
+msgstr ""
+
+#: inc/reservation.class.php:740
+msgctxt "button"
+msgid "Send an e-mail"
+msgstr ""
+
+#: inc/reservation.class.php:743
+msgid "Last e-mail sent on"
+msgstr ""
+
+#: inc/task.class.php:22
+msgid "Watch Reservations"
+msgstr ""
+
+#: inc/task.class.php:22 inc/task.class.php:26
+msgid "plugin"
+msgstr ""
+
+#: inc/task.class.php:26
+msgid "Send an e-mail to users with late reservations"
+msgstr ""
+
+#: inc/task.class.php:101
+#, php-format
+msgid "Sending e-mail for reservation %1$s"
+msgstr ""
+
+#: inc/task.class.php:102
+#, php-format
+msgid "Expected return time was : %1$s"
+msgstr ""
+
+#: inc/task.class.php:104
+msgid "Sending an e-mail"
+msgstr ""
+
+#: inc/task.class.php:107
+msgid "Could not send notification"
+msgstr ""
+
+#: inc/task.class.php:231
+msgid "Extending reservation"
+msgstr ""

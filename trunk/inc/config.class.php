@@ -20,9 +20,9 @@ class PluginReservationConfig extends CommonDBTM {
                 {
                 while ($row = $DB->fetch_assoc($result)) 
                     {
-                        $value = $row['value'];           
+                        $value = $row['value'];
                     }
-                }  
+                }
             }
         return $value;
 
@@ -30,44 +30,44 @@ class PluginReservationConfig extends CommonDBTM {
 
 function setConfigurationValue($name,$value=1)
 {
-    global $DB;       
+    global $DB;
 
     $query = "INSERT INTO glpi_plugin_reservation_config (name,value) VALUES('".$name."','".$value."') ON DUPLICATE KEY UPDATE value=Values(value)";
         $DB->query($query) or die($DB->error());
-}        
+}
 
 
 function setMailAutomaticAction($value=1)
 {
-    global $DB;       
-    
+    global $DB;
+
         $query = "UPDATE `glpi_crontasks` SET state='".$value."' WHERE name = 'MailUserDelayedResa'";
         $DB->query($query) or die($DB->error());
-}        
-    
+}
 
-    function getConfigurationWeek()
-        {
+
+function getConfigurationWeek()
+{
         global $DB;
-        
+
         $query = "SELECT * FROM glpi_plugin_reservation_configdayforauto WHERE actif=1";
         if ($result = $DB->query($query))
             {
             if ($DB->numrows($result) > 0)
                 {
-                while ($row = $DB->fetch_assoc($result)) 
+                while ($row = $DB->fetch_assoc($result))
                     {
-                        $config[$row['jour']] = $row['actif'];           
+                        $config[$row['jour']] = $row['actif'];
                     }
-                }  
+                }
             }
         return $config;
-        }
+}
 
 
 function setConfigurationWeek($week=null)
 {
-    global $DB;       
+    global $DB;
 
     $query = "UPDATE glpi_plugin_reservation_configdayforauto SET actif=0";
         $DB->query($query) or die($DB->error());
@@ -96,12 +96,11 @@ echo "<div class='center'>";
 
 echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
-echo "<th>Methode pour gerer l'envoi de mail aux utilisateurs dont la reservation est depassée </th>";
+echo "<th>".__('Method used to send e-mails to users with late reservations')."</th>";
 echo "<tr>";
 echo "<td>";
 echo "<input type=\"hidden\" name=\"late_mail\" value=\"0\">";
-echo "<input type=\"checkbox\" name=\"late_mail\" value=\"1\" ".($late_mail? 'checked':'')."> ".__('Automatic')." (avec l'action automatique à configurer) </td>";
-//echo "<input type=\"checkbox\" name=\"late_mail\" value=".($late_mail? 'checked':'')."> ".__('Automatic')." (avec l'action automatique à configurer) </td>";
+echo "<input type=\"checkbox\" name=\"late_mail\" value=\"1\" ".($late_mail? 'checked':'')."> ".__('Automatic')." (".__('Using the configurable automatic action').") </td>";
 echo "</tr>";
 
 echo "</table>";
@@ -110,7 +109,7 @@ if($late_mail)
 {
 echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
-echo "<th colspan=2>Mail aux utilisateurs avec reservation depassée</th>";
+echo "<th colspan=2>".__('Days when e-mails for late reservations are sent')."</th>";
 echo "<tr>";
 echo "<td> ".__('Monday')." : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" ".(isset($config['lundi'])?'checked':'')." > </td>";
 echo "</tr>";
@@ -138,7 +137,7 @@ echo "</table>";
 
 echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
-echo "<th>Tab Configuration</th>",
+echo "<th>".('Tab Configuration')."</th>",
 /*$usetab = $this->getConfigurationValue("usetab");
 echo "<tr>";
 echo "<input type=\"hidden\" name=\"usetab\" value=\"0\">";
@@ -167,7 +166,7 @@ echo "</table>";
 
 echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
-echo "<th>ToolTip Configuration </th>";
+echo "<th>".__('ToolTip Configuration')."</th>";
 
 $tooltip = $this->getConfigurationValue("tooltip");
 echo "<tr>";
@@ -229,7 +228,7 @@ if ($tooltip)
 
 echo "</table>";
 
-echo "<input type=\"submit\" value='"._sx('button','Update')."'>";
+echo "<input type=\"submit\" value='"._sx('button','Save')."'>";
 echo "</div>";
 
 

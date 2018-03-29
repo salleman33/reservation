@@ -32,7 +32,7 @@ class PluginReservationReservation extends CommonDBTM {
   }
 
   static function getTypeName($nb=0) {
-	return _n('Réservation', 'Réservation', $nb, 'Réservation');
+	return _n('Resservation', 'Reservations', $nb, 'Reservation');
   }
 
   function getAbsolutePath()
@@ -169,7 +169,7 @@ function getDatesResa()
 
     echo "<div class='center'>";
     echo "<table class='tab_cadre'>";
-    echo "<tr><th colspan='2'>"."Reservations This Month"."</th></tr>\n";
+    echo "<tr><th colspan='2'>".__('Reservations This Month')."</th></tr>\n";
 	  echo "<td>";
     echo "<img src='".$CFG_GLPI["root_doc"]."/pics/reservation.png' alt=''>";
 	  echo "</td>";
@@ -403,7 +403,7 @@ echo "</table>";
 
     echo "</tr>";
     echo "<tr class='tab_bg_1 center'><td colspan='".($showentity?"5":"4")."'>";
-    echo "<input type='submit' value='".__('Create')."' class='submit'></td></tr>\n";
+    echo "<input type='submit' value='".__('Create new reservation')."' class='submit'></td></tr>\n";
 
 
     echo "</table>\n";
@@ -424,7 +424,7 @@ echo "</table>";
     $config = new PluginReservationConfig();
 
     $query = "UPDATE `glpi_plugin_reservation_manageresa` SET `dernierMail`= '".date("Y-m-d H:i:s",time())."' WHERE `resaid` = ".$resaid;
-    $DB->query($query) or die("error on 'update' dans mailUser: ". $DB->error());
+    $DB->query($query) or die("error on 'update' in mailUser: ". $DB->error());
 
 
 
@@ -574,7 +574,7 @@ echo "</table>";
     echo "<div class='center'>";
     echo "<table class='tab_cadre'>";
     echo "<thead>";
-    echo "<tr><th colspan='".($showentity?"11":"10")."'>".($includeFuture?__('Reservation and future reservations in the selected timeline'):__('Reservations in the selected timeline'))."</th></tr>\n";
+    echo "<tr><th colspan='".($showentity?"11":"10")."'>".($includeFuture?__('Current and future reservations in the selected timeline'):__('Reservations in the selected timeline'))."</th></tr>\n";
     echo "<tr class='tab_bg_2'>";
 
     echo "<th>".__('User')."</a></th>";
@@ -583,7 +583,7 @@ echo "</table>";
     echo "<th>".__('End')."</a></th>";
     echo "<th>".__('Comment')."</a></th>";
     echo "<th>".__('Move')."</a></th>";
-    echo "<th>Checkout</th>";
+    echo "<th>".__('Checkout')."</th>";
     echo "<th colspan='".($methode == "manual" ? 3 : 2)."'>".__('Action')."</th>";
 
     echo "</tr></thead>";
@@ -692,7 +692,7 @@ echo "</table>";
         	if($dates[0] != NULL)
         	  echo "<td>".date("d-m-Y \à H:i:s",strtotime($dates[0]))."</td>";
         	else
-        	  echo "<td><center><a href=\"reservation.php?resareturn=".$resa['resaid']."\"><img title=\"Set As Returned\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
+        	  echo "<td><center><a href=\"reservation.php?resareturn=".$resa['resaid']."\"><img title=\""._x('tooltip','Set As Returned')."\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
 
 
 
@@ -700,7 +700,7 @@ echo "</table>";
           $matDispo = getMatDispo();
           echo "<td>";
           echo "<ul>";
-          echo "<li><span class=\"bouton\" id=\"bouton_add".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('add".$resa['resaid']."');\">".__('Add an item')."</span>
+          echo "<li><span class=\"bouton\" id=\"bouton_add".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('add".$resa['resaid']."');\">"._sx('button','Add an item')."</span>
           <div id=\"add".$resa['resaid']."\" style=\"display:none;\">
           <form method='POST' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
           echo '<select name="matDispoAdd">';
@@ -712,7 +712,7 @@ echo "</table>";
           Html::closeForm();
           echo "</div></li>";
 
-          echo "<li><span class=\"bouton\" id=\"bouton_replace".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('replace".$resa['resaid']."');\">".__('Replace')."</span>
+          echo "<li><span class=\"bouton\" id=\"bouton_replace".$resa['resaid']."\" onclick=\"javascript:afficher_cacher('replace".$resa['resaid']."');\">"._sx('button','Replace an item')."</span>
           <div id=\"replace".$resa['resaid']."\" style=\"display:none;\">
           <form method='post' name='form' action='".Toolbox::getItemTypeSearchURL(__CLASS__)."'>";
           echo '<select name="matDispoReplace">';
@@ -728,22 +728,22 @@ echo "</table>";
 
           echo "<td>";
           echo "<ul>";
-          echo "<li><a class=\"bouton\" title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=".$resa['resaid']."'>".__('Edit')."</a></li>";
+          echo "<li><a class=\"bouton\" title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=".$resa['resaid']."'>"._sx('button','Edit')."</a></li>";
           echo "</ul>";
           echo "</td>";
 
 
           if($methode == "manual" ) {
             echo "<td>";
-          echo "<ul>";
-          if($flagSurveille) {
-          echo "<li><a class=\"bouton\" title=\"Envoyer un mail de rappel\" href=\"reservation.php?mailuser=".$resa['resaid']."\">Envoyer un mail de rappel</a></li>";
+            echo "<ul>";
+            if($flagSurveille) {
+            echo "<li><a class=\"bouton\" title=\""._sx('tooltip','Send an e-mail for the late reservation')."\" href=\"reservation.php?mailuser=".$resa['resaid']."\">"._sx('button','Send an e-mail')."</a></li>";
 
-          if(isset($dates[2])) {
-            echo "<li>Dernier mail envoyé le : </li>";
-            echo "<li>".date("d-m-Y \à H:i:s",strtotime($dates[2]))."</li>";
+            if(isset($dates[2])) {
+              echo "<li>".__('Last e-mail sent on')." </li>";
+              echo "<li>".date("d-m-Y  H:i:s",strtotime($dates[2]))."</li>";
+            }
           }
-  }
           echo "</ul>";
           echo "</td>";
           }
@@ -799,7 +799,7 @@ function addToResa($idmat,$idresa) {
 
 
 
-      $DB->query($query) or die("error on 'insert' dans addToResa / hash: ". $DB->error());
+      $DB->query($query) or die("error on 'insert' in addToResa / hash: ". $DB->error());
 
       }
 
@@ -812,7 +812,7 @@ function replaceResa($idmat,$idresa) {
   global $DB, $CFG_GLPI;
 
       $query = "UPDATE `glpi_reservations` SET `reservationitems_id`='". $idmat ."' WHERE `id`='".$idresa."';";
-      $DB->query($query) or die("error on 'update' dans replaceResa / hash: ". $DB->error());
+      $DB->query($query) or die("error on 'update' in replaceResa / hash: ". $DB->error());
 
 }
 
@@ -827,7 +827,7 @@ function replaceResa($idmat,$idresa) {
 		  $argConcatenator = "&amp;";
 	  }
     
-    echo "<a target='_blank' href='".$itemLink.$argConcatenator."id=".$item->fields["id"]."'>".sprintf(__('%1$s'), $item->fields["name"])."</a>";
+    echo "<a target='_blank' href='".$itemLink.$argConcatenator."id=".$item->fields["id"]."'>".$item->fields["name"]."</a>";
 
   }
 
