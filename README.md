@@ -1,12 +1,17 @@
+# Reservations #
+
 Ce plugin propose une gestion différente des réservations de matériel :
+
 - acquittement des retours de matériel
 - prolongation automatique des réservations de matériels non rendu
 - envoi de mail aux emprunteurs si la réservation est arrivée à expiration
+
 Il apporte également quelques actions simplifiées sur les réservations comme :
+
 - ajouter un matériel à une réservation existante
 - remplacer un matériel par un autre.
 
-Pourquoi ce plugin ?
+## Pourquoi ce plugin ##
 
 Avec le système des réservations de GLPI, si le matériel emprunté n'est pas rendu à la fin de la réservation, il n'y a aucune trace et lorsque l'emprunteur suivant vient chercher le matériel on se rend compte qu'il n'est pas là ! Pour eviter ce genre de probleme, j'ai écris ce plugin pour mieux suivre les matériels empruntés.
 Description du plugin Réservation
@@ -14,6 +19,8 @@ Description du plugin Réservation
 Le plugin Réservation offre une nouvelle fonctionnalité pour mieux gérer les réservations : L'acquittement des retours.
 Ce plugin s'adresse aux responsables des réservations/administrateurs de GLPI. Il leur propose une vision synthétique des réservations en cours en mettant en exergue les matériels qui sont empruntés dans la journée et ceux qui vont être rendus.
 Il permet d'acquitter le retour d'un matériel. Si jamais la réservation d'un matériel touche à sa fin mais que le matériel n'a pas été marqué comme étant rendu, la réservation est prolongée automatiquement. Les réservations dont la date de retour théorique de retour est dépassée apparaissent en rouge !
+
+## Fonctionnement ##
 
 La colonne "Mouvement" permet d'identifier rapidement les flux des matériels réservés. Une flèche rouge indique que le matériel sera emprunté aujourd'hui. une flèche verte indique qu'un matériel sera retourné aujourd'hui.
 Comment ça marche ?
@@ -32,5 +39,7 @@ On peut choisir les jours de la semaine où le mail sera envoyé. Par défaut, l
 Modification rapide d'une réservation
 
 Le plugin permet aussi d'ajouter ou remplacer un matériel dans une réservation existante.
-ATTENTION
-pour les taches automatiques, pensez à augmenter le nombre limite de tache pouvant etre executées en meme temps (par defaut à 2).¶
+
+<aside class="warning">
+pour les taches automatiques, pensez à augmenter le nombre limite de tache pouvant etre executées en meme temps (par defaut à 2).
+</aside>
