@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "glpi-project/coding-standard": "^0.7.0"
+    }
+}

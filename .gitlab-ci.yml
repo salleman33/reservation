@@ -1,0 +1,15 @@
+stages:
+  - coding-standards-compliance
+
+coding-standards-compliance:
+ stage: coding-standards-compliance
+ tags: 
+   - ubuntu-gun
+ script:
+   - vendor/bin/phpcs -p --ignore=vendor --standard=vendor/glpi-project/coding-standard/GlpiStandard/ .
+
+
+  
+
+   
+
