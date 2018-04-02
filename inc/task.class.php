@@ -17,11 +17,11 @@ class PluginReservationTask extends CommonDBTM
         global $LANG;
 
         switch ($name) {
-            case "SurveilleResa":
+            case "CheckReservations":
                 return array(
                     'description' => __('Watch Reservations')." (".__('plugin').")"
                 );
-            case "MailUserDelayedResa":
+            case "SendMailLateReservations":
                 return array(
                     'description' => __('Send an e-mail to users with late reservations')." (".__('plugin').")"
 		);
@@ -157,7 +157,7 @@ class PluginReservationTask extends CommonDBTM
             // reservation qui vont finir
 //       AND '" . $end . "' >= `glpi_reservations`.`end`)";
 
-// on enlève que�"qui ne sont pas finies" car on en loupe du coup si la tache n'est pas lancée toutes les 5 minutes en permanence
+// on enlève que�"qui ne sont pas finies" car on en loupe du coup si la tache n'est pas lancée toutes les 5 minutes en permanence
 //	       AND '" . $begin . "' <= `glpi_reservations`.`end`
 
 // on sélectionne les réservations qui ne sont pas finies et qui ont déjà démarré

@@ -40,8 +40,8 @@ $DB->queryOrDie($query, $DB->error());
 if (!TableExists("glpi_plugin_reservation_configs")) //INSTALL >= 1.5.0
   {
     $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-      `key` VARCHAR(10) NOT NULL PRIMARY KEY,
+      `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+      `key` VARCHAR(10) NOT NULL,
       `value` VARCHAR(10) NOT NULL
     )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
     $DB->queryOrDie($query, $DB->error());
@@ -50,6 +50,18 @@ if (!TableExists("glpi_plugin_reservation_configs")) //INSTALL >= 1.5.0
       VALUES (\"mode\",\"manual\")";
 
 $DB->queryOrDie($query, $DB->error());
+
+$query = "INSERT INTO `glpi_plugin_reservation_configs` (`key` , `value`)
+      VALUES (\"lundi\",1),
+	(\"mardi\",1),
+		       (\"mercredi\",1),
+		       (\"jeudi\",1),
+		       (\"vendredi\",1),
+		       (\"samedi\",0),
+		       (\"dimanche\",0)";
+
+$DB->queryOrDie($query, $DB->error());
+
 }
 
   if (TableExists("glpi_plugin_reservation_config")) //UPDATE plugin < 1.5.0
@@ -60,38 +72,41 @@ $DB->queryOrDie($query, $DB->error());
                 FROM `glpi_plugin_reservation_config`
                 WHERE `name` = \"methode\"
               )
-              WHERE `key` = \"mode\"
-              ";
+              WHERE `key` = \"mode\"";
 
 $DB->queryOrDie($query, $DB->error());
 
-    // Création de la table config
     $query = "DROP TABLE `glpi_plugin_reservation_config`";
     $DB->queryOrDie($query, $DB->error());
 
 
     $query = "INSERT INTO `glpi_plugin_reservation_configs` (`key` , `value`)
-              VALUES (\"lundi\", (SELECT `actif` 
+              VALUES  (\"lundi\", CAST(
+                                        (
+                                          SELECT `actif` 
+                                          FROM `glpi_plugin_reservation_configdayforauto`
+                                          WHERE `jour` = \"lundi\"
+                                        ) as CHAR(10)
+                                      )
+                      ),
+                                (\"mardi\", CAST((SELECT `actif` 
                                 FROM `glpi_plugin_reservation_configdayforauto`
-                                WHERE `jour` = \"lundi\")),
-                                (\"mardi\", (SELECT `actif` 
+                                WHERE `jour` = \"mardi\") as CHAR(10))),
+                                (\"mercredi\", CAST((SELECT `actif` 
                                 FROM `glpi_plugin_reservation_configdayforauto`
-                                WHERE `jour` = \"mardi\")),
-                                (\"mercredi\", (SELECT `actif` 
+                                WHERE `jour` = \"mercredi\") as CHAR(10))),
+                                (\"jeudi\", CAST((SELECT `actif` 
                                 FROM `glpi_plugin_reservation_configdayforauto`
-                                WHERE `jour` = \"mercredi\")),
-                                (\"jeudi\", (SELECT `actif` 
+                                WHERE `jour` = \"jeudi\") as CHAR(10))),
+                                (\"vendredi\", CAST((SELECT `actif` 
                                 FROM `glpi_plugin_reservation_configdayforauto`
-                                WHERE `jour` = \"jeudi\")),
-                                (\"vendredi\", (SELECT `actif` 
+                                WHERE `jour` = \"vendredi\") as CHAR(10))),
+                                (\"samedi\", CAST((SELECT `actif` 
                                 FROM `glpi_plugin_reservation_configdayforauto`
-                                WHERE `jour` = \"vendredi\")),
-                                (\"samedi\", (SELECT `actif` 
+                                WHERE `jour` = \"samedi\") as CHAR(10))),
+                                (\"dimanche\", CAST((SELECT `actif` 
                                 FROM `glpi_plugin_reservation_configdayforauto`
-                                WHERE `jour` = \"samedi\")),
-                                (\"dimanche\", (SELECT `actif` 
-                                FROM `glpi_plugin_reservation_configdayforauto`
-                                WHERE `jour` = \"dimanche\"))";
+                                WHERE `jour` = \"dimanche\") as CHAR(10)))";
 
 $DB->queryOrDie($query, $DB->error());
 $query = "DROP TABLE `glpi_plugin_reservation_configdayforauto`";
@@ -100,51 +115,25 @@ $query = "DROP TABLE `glpi_plugin_reservation_configdayforauto`";
   }
  
 
-
-
-  if(TableExists("glpi_plugin_reservation_config") && !TableExists("glpi_plugin_reservation_configdayforauto"))
-  {
-    $query = "RENAME TABLE `glpi_plugin_reservation_config` TO `glpi_plugin_reservation_configdayforauto`";
-    $DB->queryOrDie($query, $DB->error());
-  }
-
-  if(!TableExists("glpi_plugin_reservation_configdayforauto"))
-  {
-    // Création de la table config
-    $query = "CREATE TABLE `glpi_plugin_reservation_configdayforauto` (
-      `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-      `jour` char(32) NOT NULL default '',
-      `actif` int(1) NOT NULL default '1'
-    )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-    $DB->queryOrDie($query, $DB->error());
-
-    $query = "INSERT INTO `glpi_plugin_reservation_configdayforauto` (`jour` , `actif`)
-      VALUES (\"lundi\",1),
-	(\"mardi\",1),
-		       (\"mercredi\",1),
-		       (\"jeudi\",1),
-		       (\"vendredi\",1),
-		       (\"samedi\",0),
-		       (\"dimanche\",0)";
-
-$DB->queryOrDie($query, $DB->error());
-}
-  else { // UPDATE
-  }
-
-
-
-
   $cron = new CronTask;
-  if (!$cron->getFromDBbyName('PluginReservationTask','SurveilleResa'))
+
+
+  if ($cron->getFromDBbyName('PluginReservationTask','SurveilleResa')) // plugin < 1.5.0
   {
-    CronTask::Register('PluginReservationTask', 'SurveilleResa', 5*MINUTE_TIMESTAMP,array('param' => 24, 'mode' => 2, 'logs_lifetime'=> 10));
+    CronTask::unregister("Reservation"); 
   }
 
-  if (!$cron->getFromDBbyName('PluginReservationTask','MailUserDelayedResa'))
+  if (!$cron->getFromDBbyName('PluginReservationTask','CheckReservations'))
   {
-    CronTask::Register('PluginReservationTask', 'MailUserDelayedResa', DAY_TIMESTAMP,array('hourmin' => 23, 'hourmax' => 24,  'mode' => 2, 'logs_lifetime'=> 30, 'state'=>0));
+    CronTask::Register('PluginReservationTask', 'CheckReservations', 5*MINUTE_TIMESTAMP,array('param' => 24, 'mode' => 2, 'logs_lifetime'=> 10));
   }
+
+  if (!$cron->getFromDBbyName('PluginReservationTask','SendMailLateReservations'))
+  {
+    CronTask::Register('PluginReservationTask', 'SendMailLateReservations', DAY_TIMESTAMP,array('hourmin' => 23, 'hourmax' => 24,  'mode' => 2, 'logs_lifetime'=> 30, 'state'=>0));
+  }
+
+
 
 
 
@@ -159,11 +148,12 @@ $DB->queryOrDie($query, $DB->error());
  */
 function plugin_reservation_uninstall() {
   global $DB;
-  $tables = array("glpi_plugin_reservation_reservations","glpi_plugin_reservation_config","glpi_plugin_reservation_configdayforauto");
+  $tables = array("glpi_plugin_reservation_reservations","glpi_plugin_reservation_configs");
   foreach($tables as $table)
   {
     $DB->query("DROP TABLE IF EXISTS `$table`;");
   }
+  CronTask::unregister("Reservation");
   return true;
 }
 
