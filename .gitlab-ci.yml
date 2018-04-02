@@ -6,7 +6,9 @@ coding-standards-compliance:
  tags: 
    - ubuntu-gun
  script:
-   - vendor/bin/phpcs -p --ignore=vendor --standard=vendor/glpi-project/coding-standard/GlpiStandard/ .
+   - id
+   - ls -l vendor/squizlabs/php_codesniffer/bin
+   - ./vendor/bin/phpcs -p --ignore=vendor --standard=vendor/glpi-project/coding-standard/GlpiStandard/ .
 
 
   
