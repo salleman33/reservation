@@ -9,7 +9,7 @@ stages:
   - cleanup
 
 variables:
-  OPENSHIFT_SERVER: plmshift.math.cnrs.fr
+  OPENSHIFT_SERVER: https://plmshift.math.cnrs.fr:8443
   OPENSHIFT_DOMAIN: http://reservation-reservation.apps.math.cnrs.fr/
 
 test1:
