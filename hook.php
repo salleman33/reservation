@@ -133,11 +133,6 @@ $query = "DROP TABLE `glpi_plugin_reservation_configdayforauto`";
     CronTask::Register('PluginReservationTask', 'SendMailLateReservations', DAY_TIMESTAMP,array('hourmin' => 23, 'hourmax' => 24,  'mode' => 2, 'logs_lifetime'=> 30, 'state'=>0));
   }
 
-
-
-
-
-
   return true;
 }
 
