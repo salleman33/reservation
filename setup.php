@@ -6,28 +6,27 @@
  * @return void
  */
 function plugin_init_reservation() {
-  global $PLUGIN_HOOKS;
+   global $PLUGIN_HOOKS;
 
-  $PLUGIN_HOOKS['csrf_compliant']['reservation'] = true;
-  $PLUGIN_HOOKS['add_css']['reservation'][]="css/views.css";
-  $PLUGIN_HOOKS['add_javascript']['reservation']= array('scripts/tri.js');
-  $PLUGIN_HOOKS['config_page']['reservation'] = 'front/config.form.php';
-  $PLUGIN_HOOKS['item_update']['reservation'] = array('Reservation' => 'plugin_item_update_reservation');
-  $PLUGIN_HOOKS['item_delete']['reservation'] = array('Reservation' => 'plugin_item_update_reservation');
-  $PLUGIN_HOOKS['menu_toadd']['reservation'] = array('plugins' => 'PluginReservationReservation');
+   $PLUGIN_HOOKS['csrf_compliant']['reservation'] = true;
+   $PLUGIN_HOOKS['add_css']['reservation'][] = "css/views.css";
+   $PLUGIN_HOOKS['add_javascript']['reservation'] = ['scripts/tri.js'];
+   $PLUGIN_HOOKS['config_page']['reservation'] = 'front/config.form.php';
+   $PLUGIN_HOOKS['item_update']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
+   $PLUGIN_HOOKS['item_delete']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
+   $PLUGIN_HOOKS['menu_toadd']['reservation'] = ['plugins' => 'PluginReservationReservation'];
 
-  Plugin::registerClass('PluginReservationConfig');
-  Plugin::registerClass('PluginReservationReservation');
-  Plugin::registerClass('PluginReservationTask');
+   Plugin::registerClass('PluginReservationConfig');
+   Plugin::registerClass('PluginReservationReservation');
+   Plugin::registerClass('PluginReservationTask');
 
    // Notifications
    $PLUGIN_HOOKS['item_get_events']['reservation'] =
-         array('NotificationTargetReservation' => array('PluginReservationTask', 'addEvents'));
+   [ 'NotificationTargetReservation' => [ 'PluginReservationTask', 'addEvents' ] ];
 
-
-  if (Session::getLoginUserID()) {
-    $PLUGIN_HOOKS['menu_entry']['reservation']              = 'front/reservation.php';
-  }
+   if (Session::getLoginUserID()) {
+      $PLUGIN_HOOKS['menu_entry']['reservation'] = 'front/reservation.php';
+   }
 }
 
 /**
@@ -36,18 +35,18 @@ function plugin_init_reservation() {
  * @return array
  */
 function plugin_version_reservation() {
-  return [
-    'name'           => 'Reservation',
-    'version'        => '1.5.0',
-    'author'         => 'Sylvain Allemand',
-    'license'        => 'GLPv3',
-    'homepage'       => 'https://plmlab.math.cnrs.fr/sylvain.allemand/reservations',
-    'requirements'   => [
-       'glpi'   => [
-          'min' => '9.2'
-       ]
-    ]
- ];
+   return [
+      'name' => 'Reservation',
+      'version' => '1.5.0',
+      'author' => 'Sylvain Allemand',
+      'license' => 'GLPv3',
+      'homepage' => 'https://plmlab.math.cnrs.fr/sylvain.allemand/reservations',
+      'requirements' => [
+         'glpi' => [
+            'min' => '9.2',
+         ],
+      ],
+   ];
 }
 
 /**
@@ -56,15 +55,15 @@ function plugin_version_reservation() {
  * @return boolean
  */
 function plugin_reservation_check_prerequisites() {
-  if (version_compare(GLPI_VERSION, '9.2', 'lt')) {
-    if (method_exists('Plugin', 'messageIncompatible')) {
-       //since GLPI 9.2
-       Plugin::messageIncompatible('core', 9.2);
-    } else {
-       echo "This plugin requires GLPI >= 9.2";
-    }
-    return false;
- }
+   if (version_compare(GLPI_VERSION, '9.2', 'lt')) {
+      if (method_exists('Plugin', 'messageIncompatible')) {
+         //since GLPI 9.2
+         Plugin::messageIncompatible('core', 9.2);
+      } else {
+         echo "This plugin requires GLPI >= 9.2";
+      }
+      return false;
+   }
 }
 
 /**
@@ -75,15 +74,13 @@ function plugin_reservation_check_prerequisites() {
  *
  * @return boolean
  */
-function plugin_reservation_check_config($verbose=false) {
-  if (true) { // Your configuration check
-    return true;
-  }
+function plugin_reservation_check_config($verbose = false) {
+   if (true) { // Your configuration check
+      return true;
+   }
 
-  if ($verbose) {
-    echo 'Installed / not configured';
-  }
-  return false;
+   if ($verbose) {
+      echo 'Installed / not configured';
+   }
+   return false;
 }
-
-?>
