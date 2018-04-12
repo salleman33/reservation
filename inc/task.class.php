@@ -14,9 +14,9 @@ class PluginReservationTask extends CommonDBTM
       global $LANG;
 
       switch ($name) {
-         case "CheckReservations":
+         case "checkReservations":
             return ['description' => __('Watch Reservations') . " (" . __('plugin') . ")",];
-         case "SendMailLateReservations":
+         case "sendMailLateReservations":
             return ['description' => __('Send an e-mail to users with late reservations') . " (" . __('plugin') . ")",];
       }
    }
@@ -31,13 +31,13 @@ class PluginReservationTask extends CommonDBTM
     *    <0 : to be run again (not finished)
     *     0 : nothing to do
     */
-   public static function cronSurveilleResa($task) {
+   public static function cronCheckReservations($task) {
       $res = self::surveilleResa($task);
       $task->setVolume($res);
       return $res;
    }
 
-   public static function cronMailUserDelayedResa($task) {
+   public static function cronSendMailLateReservations($task) {
       $res = self::mailUserDelayedResa($task);
       $task->setVolume($res);
       return $res;

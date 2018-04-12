@@ -117,16 +117,16 @@ function plugin_reservation_install() {
       CronTask::unregister("Reservation");
    }
 
-   if (!$cron->getFromDBbyName('PluginReservationTask', 'CheckReservations')) {
+   if (!$cron->getFromDBbyName('PluginReservationTask', 'checkReservations')) {
       CronTask::Register('PluginReservationTask',
-                        'CheckReservations',
+                        'checkReservations',
                         5 * MINUTE_TIMESTAMP,
                         ['param' => 24, 'mode' => 2, 'logs_lifetime' => 10]);
    }
 
-   if (!$cron->getFromDBbyName('PluginReservationTask', 'SendMailLateReservations')) {
+   if (!$cron->getFromDBbyName('PluginReservationTask', 'sendMailLateReservations')) {
       CronTask::Register('PluginReservationTask',
-                        'SendMailLateReservations',
+                        'sendMailLateReservations',
                         DAY_TIMESTAMP,
                         ['hourmin' => 23, 'hourmax' => 24, 'mode' => 2, 'logs_lifetime' => 30, 'state' => 0]);
    }
