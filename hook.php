@@ -6,7 +6,7 @@
  * @return boolean
  */
 function plugin_reservation_install() {
-   global $DB;
+   global $DB, $CFG_GLPI;
    if (TableExists("glpi_plugin_reservation_manageresa")) { //UPDATE plugin < 1.5.0
       $query = "ALTER TABLE `glpi_plugin_reservation_manageresa`
                 CHANGE `resaid` `reservations_id` int(11) NOT NULL,
@@ -120,7 +120,7 @@ function plugin_reservation_install() {
    if (!$cron->getFromDBbyName('PluginReservationTask', 'checkReservations')) {
       CronTask::Register('PluginReservationTask',
                         'checkReservations',
-                        5 * MINUTE_TIMESTAMP,
+                        $CFG_GLPI['time_step'] * MINUTE_TIMESTAMP,
                         ['param' => 24, 'mode' => 2, 'logs_lifetime' => 10]);
    }
 
@@ -161,3 +161,5 @@ function plugin_item_update_reservation($item) {
    $DB->query($query) or die("error on 'DELETE' into plugin_item_update_reservation : " . $DB->error());
    return true;
 }
+
+

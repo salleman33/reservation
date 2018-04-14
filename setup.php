@@ -10,7 +10,7 @@ function plugin_init_reservation() {
 
    $PLUGIN_HOOKS['csrf_compliant']['reservation'] = true;
    $PLUGIN_HOOKS['add_css']['reservation'][] = "css/views.css";
-   $PLUGIN_HOOKS['add_javascript']['reservation'] = ['scripts/tri.js'];
+   //$PLUGIN_HOOKS['add_javascript']['reservation'] = ['scripts/tri.js'];
    $PLUGIN_HOOKS['config_page']['reservation'] = 'front/config.form.php';
    $PLUGIN_HOOKS['item_update']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
    $PLUGIN_HOOKS['item_delete']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
@@ -43,7 +43,7 @@ function plugin_version_reservation() {
       'homepage' => 'https://plmlab.math.cnrs.fr/sylvain.allemand/reservations',
       'requirements' => [
          'glpi' => [
-            'min' => '9.2',
+            'min' => '9.3',
          ],
       ],
    ];
@@ -55,15 +55,16 @@ function plugin_version_reservation() {
  * @return boolean
  */
 function plugin_reservation_check_prerequisites() {
-   if (version_compare(GLPI_VERSION, '9.2', 'lt')) {
+   if (version_compare(GLPI_VERSION, '9.3', 'lt')) {
       if (method_exists('Plugin', 'messageIncompatible')) {
          //since GLPI 9.2
-         Plugin::messageIncompatible('core', 9.2);
+         Plugin::messageIncompatible('core', 9.3);
       } else {
-         echo "This plugin requires GLPI >= 9.2";
+         echo "This plugin requires GLPI >= 9.3";
       }
       return false;
    }
+   return true;
 }
 
 /**
