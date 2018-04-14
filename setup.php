@@ -1,5 +1,7 @@
 <?php
 
+define('PLUGIN_VERSION', '1.5.0');
+
 /**
  * Init the hooks of the plugins - Needed
  *
@@ -37,13 +39,14 @@ function plugin_init_reservation() {
 function plugin_version_reservation() {
    return [
       'name' => 'Reservation',
-      'version' => '1.5.0',
+      'version' => PLUGIN_VERSION,
       'author' => 'Sylvain Allemand',
       'license' => 'GLPv3',
       'homepage' => 'https://plmlab.math.cnrs.fr/sylvain.allemand/reservations',
       'requirements' => [
          'glpi' => [
             'min' => '9.3',
+	    'dev' => true,
          ],
       ],
    ];
@@ -55,15 +58,6 @@ function plugin_version_reservation() {
  * @return boolean
  */
 function plugin_reservation_check_prerequisites() {
-   if (version_compare(GLPI_VERSION, '9.3', 'lt')) {
-      if (method_exists('Plugin', 'messageIncompatible')) {
-         //since GLPI 9.2
-         Plugin::messageIncompatible('core', 9.3);
-      } else {
-         echo "This plugin requires GLPI >= 9.3";
-      }
-      return false;
-   }
    return true;
 }
 
