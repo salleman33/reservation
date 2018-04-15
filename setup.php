@@ -14,8 +14,9 @@ function plugin_init_reservation() {
    $PLUGIN_HOOKS['add_css']['reservation'][] = "css/views.css";
    //$PLUGIN_HOOKS['add_javascript']['reservation'] = ['scripts/tri.js'];
    $PLUGIN_HOOKS['config_page']['reservation'] = 'front/config.form.php';
+   $PLUGIN_HOOKS['item_add']['reservation'] = ['Reservation' => 'plugin_item_add_reservation'];
    $PLUGIN_HOOKS['item_update']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
-   $PLUGIN_HOOKS['item_delete']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
+   $PLUGIN_HOOKS['item_delete']['reservation'] = ['Reservation' => 'plugin_item_delete_reservation'];
    $PLUGIN_HOOKS['menu_toadd']['reservation'] = ['plugins' => 'PluginReservationReservation'];
 
    Plugin::registerClass('PluginReservationConfig');
@@ -46,7 +47,7 @@ function plugin_version_reservation() {
       'requirements' => [
          'glpi' => [
             'min' => '9.3',
-	    'dev' => true,
+            'dev' => true,
          ],
       ],
    ];

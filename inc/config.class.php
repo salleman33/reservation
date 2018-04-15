@@ -9,9 +9,9 @@ include GLPI_ROOT . "/plugins/reservation/inc/includes.php";
 class PluginReservationConfig extends CommonDBTM
 {
 
-   public function getConfigurationValue($name, $defaultValue = 0) {
+   public function getConfigurationValue($key, $defaultValue = 0) {
       global $DB;
-      $query = "SELECT * FROM glpi_plugin_reservation_config WHERE name='" . $name . "'";
+      $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE key='" . $key . "'";
       $value = $defaultValue;
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
@@ -24,28 +24,30 @@ class PluginReservationConfig extends CommonDBTM
 
    }
 
-   public function setConfigurationValue($name, $value = 1) {
+   public function setConfigurationValue($key, $value = '') {
       global $DB;
 
-      $query = "INSERT INTO glpi_plugin_reservation_config (name,value) VALUES('" . $name . "','" . $value . "') ON DUPLICATE KEY UPDATE value=Values(value)";
-      $DB->query($query) or die($DB->error());
+      if (!$value == '') {
+         $query = "INSERT INTO glpi_plugin_reservation_configs (key,value) VALUES('" . $key . "','" . $value . "') ON DUPLICATE KEY UPDATE value=Values(value)";
+         $DB->query($query) or die($DB->error());
+      }
    }
 
    public function setMailAutomaticAction($value = 1) {
       global $DB;
 
-      $query = "UPDATE `glpi_crontasks` SET state='" . $value . "' WHERE name = 'MailUserDelayedResa'";
+      $query = "UPDATE `glpi_crontasks` SET state='" . $value . "' WHERE name = 'sendMailLateReservations'";
       $DB->query($query) or die($DB->error());
    }
 
    public function getConfigurationWeek() {
       global $DB;
-
-      $query = "SELECT * FROM glpi_plugin_reservation_configdayforauto WHERE actif=1";
-      if ($result = $DB->query($query)) {
-         if ($DB->numrows($result) > 0) {
-            while ($row = $DB->fetch_assoc($result)) {
-               $config[$row['jour']] = $row['actif'];
+      $config  = [];
+      foreach (['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'] as $day) {
+         $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE `key`='$day'";
+         if ($result = $DB->query($query)) {
+            if ($DB->numrows($result) > 0) {
+               $config[$day] = $row['value'];
             }
          }
       }
@@ -54,22 +56,19 @@ class PluginReservationConfig extends CommonDBTM
 
    public function setConfigurationWeek($week = null) {
       global $DB;
-
-      $query = "UPDATE glpi_plugin_reservation_configdayforauto SET actif=0";
-      $DB->query($query) or die($DB->error());
+      foreach (['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'] as $day) {
+         $query = "UPDATE glpi_plugin_reservation_configs SET `value`=0 where `key` = '$day'";
+         $DB->query($query) or die($DB->error());
+      }
       foreach ($week as $day) {
-         $query = "UPDATE glpi_plugin_reservation_configdayforauto SET actif=1 WHERE jour='$day'";
+         $query = "UPDATE glpi_plugin_reservation_configs SET `value`=1 WHERE `key` = '$day'";
          $DB->query($query) or die($DB->error());
       }
    }
 
    public function showForm() {
-      $late_mail = $this->getConfigurationValue("late_mail");
+      $mode = $this->getConfigurationValue("mode");
       $config = $this->getConfigurationWeek();
-
-      //$_POST["late_mail"] = isset($_POST["late_mail"]) ? $_POST["late_mail"] : 0;
-
-      //print_r($_POST);
 
       echo "<form method='post' action='" . $this->getFormURL() . "'>";
 
@@ -80,36 +79,36 @@ class PluginReservationConfig extends CommonDBTM
       echo "<th>" . __('Method used to send e-mails to users with late reservations') . "</th>";
       echo "<tr>";
       echo "<td>";
-      echo "<input type=\"hidden\" name=\"late_mail\" value=\"0\">";
-      echo "<input type=\"checkbox\" name=\"late_mail\" value=\"1\" " . ($late_mail ? 'checked' : '') . "> " . __('Automatic') . " (" . __('Using the configurable automatic action') . ") </td>";
+      echo "<input type=\"hidden\" name=\"mode\" value=\"0\">";
+      echo "<input type=\"checkbox\" name=\"mode\" value=\"1\" " . ($mode == 'auto' ? 'checked' : '') . "> " . __('Automatic') . " (" . __('Using the configurable automatic action') . ") </td>";
       echo "</tr>";
 
       echo "</table>";
 
-      if ($late_mail) {
+      if ($mode == 'auto') {
          echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
          echo "<th colspan=2>" . __('Days when e-mails for late reservations are sent') . "</th>";
          echo "<tr>";
-         echo "<td> " . __('Monday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" " . (isset($config['lundi']) ? 'checked' : '') . " > </td>";
+         echo "<td> " . __('Monday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" " . ($config['lundi'] ? 'checked' : '') . " > </td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Tuesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mardi\" " . (isset($config['mardi']) ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Tuesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mardi\" " . ($config['mardi'] ? 'checked' : '') . "> </td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Wednesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mercredi\" " . (isset($config['mercredi']) ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Wednesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mercredi\" " . ($config['mercredi'] ? 'checked' : '') . "> </td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Thursday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"jeudi\" " . (isset($config['jeudi']) ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Thursday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"jeudi\" " . ($config['jeudi'] ? 'checked' : '') . "> </td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Friday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"vendredi\" " . (isset($config['vendredi']) ? 'checked' : '') . " ></td>";
+         echo "<td> " . __('Friday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"vendredi\" " . ($config['vendredi'] ? 'checked' : '') . " ></td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Saturday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"samedi\" " . (isset($config['samedi']) ? 'checked' : '') . " ></td>";
+         echo "<td> " . __('Saturday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"samedi\" " . ($config['samedi'] ? 'checked' : '') . " ></td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Sunday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"dimanche\" " . (isset($config['dimanche']) ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Sunday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"dimanche\" " . ($config['dimanche'] ? 'checked' : '') . "> </td>";
 
          echo "</tr>";
          echo "</table>";
@@ -118,14 +117,6 @@ class PluginReservationConfig extends CommonDBTM
       echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
       echo "<th>" . ('Tab Configuration') . "</th>",
-      /*$usetab = $this->getConfigurationValue("usetab");
-      echo "<tr>";
-      echo "<input type=\"hidden\" name=\"usetab\" value=\"0\">";
-      echo "<td> <input type=\"checkbox\" name=\"usetab\" value=\"1\" ".($usetab? 'checked':'')."> ".__('Tab')."</td>";
-      echo "</tr>";
-
-      if ($usetab)
-      {*/
       $tabcurrent = $this->getConfigurationValue("tabcurrent", 1);
       echo "<tr>";
       echo "<input type=\"hidden\" name=\"tabcurrent\" value=\"0\">";

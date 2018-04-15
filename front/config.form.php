@@ -15,9 +15,9 @@ if ($plugin->isActivated("reservation")) {
       $PluginReservationConfig->setConfigurationWeek($_POST["week"]);
       //Html::back();
    }
-   if (isset($_POST["late_mail"])) {
-      $PluginReservationConfig->setMailAutomaticAction($_POST["late_mail"]);
-      $PluginReservationConfig->setConfigurationValue("late_mail", $_POST["late_mail"]);
+   if (isset($_POST["mode"])) {
+      $PluginReservationConfig->setMailAutomaticAction($_POST["mode"]);
+      $PluginReservationConfig->setConfigurationValue("mode", $_POST["mode"]);
       //Html::back();
    }
 

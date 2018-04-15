@@ -37,9 +37,11 @@ function plugin_reservation_install() {
 
    if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 1.5.0
       $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
-                `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                `id` int(11) NOT NULL AUTO_INCREMENT,
                 `key` VARCHAR(10) NOT NULL,
-                `value` VARCHAR(10) NOT NULL
+                `value` VARCHAR(10) NOT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE (`key`),
                 )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
       $DB->queryOrDie($query, $DB->error());
 
@@ -150,16 +152,68 @@ function plugin_reservation_uninstall() {
 }
 
 /**
- * Update hook when a reservation is updated
+ * hook : deladdete Plugin reservation when a GLPI reservation is added
  *
- * @return boolean
+ * @return void
+ */
+function plugin_item_add_reservation($item) {
+   global $DB;
+}
+
+/**
+ * hook : update plugin reservation when a GLPI reservation is updated
+ *
+ * @return void
  */
 function plugin_item_update_reservation($item) {
    global $DB;
-   $query = "DELETE FROM `glpi_plugin_reservation_reservations`
-            WHERE `reservations_id` = '" . $item->fields["id"] . "';";
-   $DB->query($query) or die("error on 'DELETE' into plugin_item_update_reservation : " . $DB->error());
-   return true;
+
+   $end = $item->fields['end'];
+
+   $req = $DB->request('glpi_plugin_reservation_reservations', [
+      'FIELDS' => 'effectivedate',
+      'WHERE' => ['reservations_id' => $items->fields['id']]
+   ]);
+   // maybe the reservation is over
+   $resume = false;
+   if ($row = $req->next()) {
+      if ($end >= $row['effectivedate']) {
+         $resume = true;
+      }
+   }
+
+   if ($resume) {
+      $DB->updateOrDie(
+         'glpi_plugin_reservation_reservations', [
+            'baselinedate' => $end,
+            'effectivedate' => 'NULL'
+         ], [
+            'reservations_id' => $item->fields["id"]
+         ]
+      );
+   } else {
+      $DB->updateOrDie(
+         'glpi_plugin_reservation_reservations', [
+            'baselinedate' => $end
+         ], [
+            'reservations_id' => $item->fields["id"]
+         ]
+      );
+   }
+}
+
+/**
+ * hook : delete Plugin reservation when a GLPI reservation is delete
+ *
+ * @return void
+ */
+function plugin_item_delete_reservation($item) {
+   global $DB;
+   $DB->delete(
+    'glpi_plugin_reservation_reservations', [
+       'reservations_id' => $item->fields["id"]
+        ]
+    );
 }
 
 

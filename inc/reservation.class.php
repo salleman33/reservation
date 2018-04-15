@@ -10,141 +10,140 @@ function getGLPIUrl() {
 
 class PluginReservationReservation extends CommonDBTM
 {
+   // From CommonDBChild
+   static public $reservations_id = 'reservations_id';
 
    protected $tabs = [];
    protected $tabsNames = [];
 
-   public function __construct() {
-      $config = new PluginReservationConfig();
-      $i = 1;
-      if ($config->getConfigurationValue("tabcurrent", 1)) {
-         $this->tabs[$i] = function () {$this->showCurrentResa();};
-         $this->tabsNames[$i++] = __('Current Reservations');
-      }
-      if ($config->getConfigurationValue("tabcoming")) {
-         $this->tabs[$i] = function () {$this->showCurrentResa(true);};
-         $this->tabsNames[$i++] = __('Current and Incoming Reservations');
-      }
-      $this->tabs[$i] = function () {$this->showDispoAndFormResa();};
-      $this->tabsNames[$i++] = __('Available Hardware');
-   }
-
-   public static function getTypeName($nb = 0) {
-      return _n('Resservation', 'Reservations', $nb, 'Reservation');
-   }
-
+   /*
    public function getAbsolutePath() {
       return str_replace("plugins/reservation/inc/reservation.class.php", "", $_SERVER['SCRIPT_FILENAME']);
+   } */
+
+   /**
+   * @param $nb  integer  for singular or plural
+   **/
+   static function getTypeName($nb = 0) {
+      return _n('Reservation', 'Reservations', $nb, 'Reservation');
    }
 
    public static function getMenuName() {
       return PluginReservationReservation::getTypeName(2);
    }
 
-   public static function canView() {
-      global $CFG_GLPI;
-      return true;
-      return Session::haveRightsOr(self::$rightname, [READ, self::RESERVEANITEM]);
-   }
-
-   public static function canCreate() {
-      global $CFG_GLPI;
-      return Reservation::canCreate();
-   }
-
-   public function canViewItem() {
-      global $CFG_GLPI;
-      return true;
-   }
-
-   // =====================================
-
-   public function isNewItem() {
-      return false;
-   }
-
-   /**
-    * Définition des onglets
-    **/
-   public function defineTabs($options = []) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
       $ong = [];
-      $this->addStandardTab(__CLASS__, $ong, $options);
+      $config = new PluginReservationConfig();
+      $i = 1;
+      if ($config->getConfigurationValue("tabcurrent", 1)) {
+         $ong[$i] = __('Current Reservations');
+         $i++;
+      }
+      if ($config->getConfigurationValue("tabcoming")) {
+         $ong[$i] = __('Current and Incoming Reservations');
+         $i++;
+      }
+      $ong[$i] = __('Available Hardware');
       return $ong;
    }
 
-   /**
-    * Définition du nom de l'onglet
-    **/
-   public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
-      return $item->tabsNames;
+   public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+      switch ($tabnum) {
+         case 1 : //"My first tab"
+            self::displayTabContentForCurrentReservations();
+            break;
+         case 2 : //"My second tab""
+            self::displayTabContentForAvailableHardware();
+            break;
+      }
+      return true;
    }
+
 
    /**
     * Définition du contenu de l'onglet
     **/
+   /*
    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
       $item->getDatesResa();
       call_user_func($item->tabs[$tabnum]);
       return true;
+   } */
+
+
+   /*
+   public static function canView() {
+      global $CFG_GLPI;
+      return true;
+      return Session::haveRightsOr(self::$rightname, [READ, self::RESERVEANITEM]);
+   } */
+
+   public static function canCreate() {
+      return Reservation::canCreate();
    }
 
-   //=================
+   /*
+   public static function canViewItem() {
+      return true;
+   } */
+
+   public static function canDelete() {
+      return Reservation::canDelete();
+   }
+
+   public static function canUpdate() {
+      return Reservation::canUpdate();
+   }
+
+   /*
+   public function isNewItem() {
+      return false;
+   } */
+
+
 
    public function showForm($id, $options = []) {
-      global $CFG_GLPI, $datesresa;
+      global $CFG_GLPI, $form_dates;
 
-      $this->getDatesResa();
-
+      $this->getFormDates();
       $this->showFormDate();
 
    }
 
-   public function getDatesResa() {
-      global $datesresa;
-      if (!isset($datesresa)) {
+   public function getFormDates() {
+      global $form_dates;
 
-         $jour = date("d", time());
-         $mois = date("m", time());
-         $annee = date("Y", time());
+      if (!isset($form_dates)) {
+         $day = date("d", time());
+         $month = date("m", time());
+         $year = date("Y", time());
          $begin_time = time();
 
-         $datesresa["begin"] = date("Y-m-d H:i:s", $begin_time);
-
-         if ($begin_time > mktime(19, 0, 0, $mois, $jour, $annee)) {
-            $datesresa["end"] = date("Y-m-d H:i:s", $begin_time + 3600);
-         } else {
-            $datesresa["end"] = date("Y-m-d H:i:s", mktime(19, 0, 0, $mois, $jour, $annee));
-         }
-
+         $form_dates["begin"] = date("Y-m-d H:i:s", $begin_time);
+         $form_dates['end'] =  date("Y-m-d H:i:s", mktime(23, 59, 59, $mois, $jour, $annee));
       }
-      if (isset($_POST['reserve_begin'])) {
-         $datesresa["begin"] = $_POST['reserve_begin'];
+      if (isset($_POST['date_begin'])) {
+         $form_dates["begin"] = $_POST['date_begin'];
       }
-      if (isset($_GET['reserve_begin'])) {
-         $datesresa["begin"] = $_GET['reserve_begin'];
+      if (isset($_GET['date_begin'])) {
+         $form_dates["begin"] = $_GET['date_begin'];
       }
 
-      if (isset($_POST['reserve_end'])) {
-         $datesresa["end"] = $_POST['reserve_end'];
+      if (isset($_POST['date_end'])) {
+         $form_dates["end"] = $_POST['date_end'];
       }
-      if (isset($_GET['reserve_end'])) {
-         $datesresa["end"] = $_GET['reserve_end'];
+      if (isset($_GET['date_end'])) {
+         $form_dates["end"] = $_GET['date_end'];
       }
-      if (isset($_POST['nextday']) || isset($_GET['nextday'])) {
-         $tmpbegin = $datesresa["begin"];
-         $tmpend = $datesresa["end"];
-
-         $datesresa["begin"] = date("Y-m-d H:i:s", strtotime($datesresa["begin"]) + DAY_TIMESTAMP);
-         $datesresa["end"] = date("Y-m-d H:i:s", strtotime($datesresa["end"]) + DAY_TIMESTAMP);
+      if (isset($_POST['next_day']) || isset($_GET['next_day'])) {
+         $form_dates["begin"] = date("Y-m-d H:i:s", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
+         $form_dates["end"] = date("Y-m-d H:i:s", strtotime($form_dates["end"]) + DAY_TIMESTAMP);
       }
-      if (isset($_POST['previousday']) || isset($_GET['previousday'])) {
-         $tmpbegin = $datesresa["begin"];
-         $tmpend = $datesresa["end"];
-
-         $datesresa["begin"] = date("Y-m-d H:i:s", strtotime($datesresa["begin"]) - DAY_TIMESTAMP);
-         $datesresa["end"] = date("Y-m-d H:i:s", strtotime($datesresa["end"]) - DAY_TIMESTAMP);
+      if (isset($_POST['previous_day']) || isset($_GET['previous_day'])) {
+         $form_dates["begin"] = date("Y-m-d H:i:s", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
+         $form_dates["end"] = date("Y-m-d H:i:s", strtotime($form_dates["end"]) - DAY_TIMESTAMP);
       }
-      //    printf(implode($datesresa));
    }
 
    /**
@@ -175,15 +174,10 @@ class PluginReservationReservation extends CommonDBTM
    }
 
    /**
-    * Affiche le cadre avec la date de debut / date de fin
+    * Display the form with begin and end dates, next day, previous day, etc.
     **/
    public function showFormDate() {
-      global $datesresa;
-
-      /*    if(isset($_GET['resareturn'])) {
-      $_POST['reserve'] = $datesresa;
-      }
-      else */
+      global $form_dates;
 
       echo "<div id='viewresasearch'  class='center'>";
       echo "<table class='tab_cadre' style='background-color:transparent;box-shadow:none'>";
@@ -206,8 +200,7 @@ class PluginReservationReservation extends CommonDBTM
       echo "</td>";
 
       echo "<td>" . __('Start date') . "</td><td>";
-      $rand = mt_rand();
-      Html::showDateTimeField('reserve_begin', ['value' => $datesresa["begin"], 'rand' => $rand, 'maybeempty' => false]);
+      Html::showDateTimeField('date_begin', ['value' => $form_dates["begin"], 'maybeempty' => false]);
       echo "</td><td rowspan='3'>";
       echo "<input type='submit' class='submit' name='submit' value=\"" . _sx('button', 'Search') . "\">";
       echo "</td>";
@@ -216,15 +209,11 @@ class PluginReservationReservation extends CommonDBTM
       echo "</td></tr>";
 
       echo "<tr class='tab_bg_2'><td>" . __('End date') . "</td><td>";
-
-      $rand2 = mt_rand();
-      Html::showDateTimeField('reserve_end', ['value' => $datesresa["end"], 'rand' => $rand2, 'maybeempty' => false]);
+      Html::showDateTimeField('date_end', ['value' => $form_dates["end"], 'maybeempty' => false]);
       echo "</td></tr>";
-
       echo "</td></tr>";
 
       echo "</table>";
-      //    echo "<input type='hidden' name='dateEnd' value='".$datesresa['end']."'>";
 
       Html::closeForm();
 

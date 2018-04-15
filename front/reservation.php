@@ -15,6 +15,12 @@ function getAbsolutePath() {
 
 $PluginReservationReservation = new PluginReservationReservation();
 
+// Check if plugin is activated...
+$plugin = new Plugin();
+if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')) {
+   Html::displayNotFoundError();
+}
+
 Session::checkRight("reservation", [CREATE, UPDATE, DELETE]);
 
 if ($_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
@@ -23,28 +29,28 @@ if ($_SESSION["glpiactiveprofile"]["interface"] == "helpdesk") {
    Html::header(PluginReservationReservation::getTypeName(2), $_SERVER['PHP_SELF'], "plugins", "reservation");
 }
 
-if (!isset($datesresa)) {
-   $datesresa = null;
+if (!isset($form_dates)) {
+   $form_dates = null;
 }
 
-if (isset($_POST['reserve'])) {
-   $datesresa = $_POST['reserve'];
+if (isset($_POST['create'])) {
+   $form_dates = $_POST['create'];
 }
 
-if (isset($_GET['resareturn'])) {
-   $PluginReservationReservation->resaReturn($_GET['resareturn']);
+if (isset($_GET['checkout'])) {
+   $PluginReservationReservation->checkoutReservation($_GET['checkout']);
 }
 
-if (isset($_GET['mailuser'])) {
-   $PluginReservationReservation->mailUser($_GET['mailuser']);
+if (isset($_GET['sendMail'])) {
+   $PluginReservationReservation->sendMail($_GET['sendMail']);
 }
 
-if (isset($_POST['AjouterMatToResa'])) {
-   $PluginReservationReservation->addToResa($_POST['matDispoAdd'], $_POST['AjouterMatToResa']);
+if (isset($_POST['addItem'])) {
+   $PluginReservationReservation->addItem($_POST['matDispoAdd'], $_POST['AjouterMatToResa']);
 }
 
-if (isset($_POST['ReplaceMatToResa'])) {
-   $PluginReservationReservation->replaceResa($_POST['matDispoReplace'], $_POST['ReplaceMatToResa']);
+if (isset($_POST['replaceItem'])) {
+   $PluginReservationReservation->replaceItem($_POST['matDispoReplace'], $_POST['ReplaceMatToResa']);
 }
 
 $PluginReservationReservation->display($_POST);

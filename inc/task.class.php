@@ -1,5 +1,8 @@
 <?php
 
+
+$DEBUG = true;
+
 /**
  *
  */
@@ -15,9 +18,9 @@ class PluginReservationTask extends CommonDBTM
 
       switch ($name) {
          case "checkReservations":
-            return ['description' => __('Watch Reservations') . " (" . __('plugin') . ")",];
+            return ['description' => __('Watch Reservations') . " (" . __('plugin') . ")"];
          case "sendMailLateReservations":
-            return ['description' => __('Send an e-mail to users with late reservations') . " (" . __('plugin') . ")",];
+            return ['description' => __('Send an e-mail to users with late reservations') . " (" . __('plugin') . ")"];
       }
    }
 
@@ -33,6 +36,9 @@ class PluginReservationTask extends CommonDBTM
     */
    public static function cronCheckReservations($task) {
       $res = self::surveilleResa($task);
+      /**
+       * prolonger les reservations déja géré => verifier les conflits avec les reservations suivantes lors de la prolongation 
+       */
       $task->setVolume($res);
       return $res;
    }
@@ -98,6 +104,59 @@ class PluginReservationTask extends CommonDBTM
       }
    }
 
+   /**
+    * get ALL next reservations ids
+    * we looking for reservations with an end from now
+    * @return array
+    */
+   static function getNextReservationsIds() {
+      global $DB, $CFG_GLPI;
+
+      $ts = time();
+      $end = date("Y-m-d H:i:s", $ts);
+
+      $reservations_ids = [];
+      foreach ($DB->request('glpi_reservations', [ 'FIELDS' => 'id', 'end' => ['>=', $end] ], $DEBUG) as $id) {
+         array_push($reservations_ids, $id);
+      }
+      return $reservations_ids;
+   }
+
+   /**
+    * insert a GLPI reservation in the plugin table
+    */
+   static function addToWatchedReservations($ID) {
+
+      global $DB, $CFG_GLPI;
+
+      if (!empty($ID)) {
+         $m = new ReservationItem();
+         $m->getFromDB($ID);
+
+         $m->fields['end'];
+
+
+
+
+
+
+      $DB->request(
+         'glpi_reservations', [
+            'FIELDS' => 'end',
+            'WHERE' => ['id' => $id],
+         ]
+      );
+
+      $DB->insert(
+         'glpi_my_table', [
+            'a_field'      => 'My value',
+            'other_field'  => 'Other value'
+         ]
+      );
+   }
+
+
+
    public static function surveilleResa($task) {
       global $DB, $CFG_GLPI;
       $valreturn = 0;
@@ -105,6 +164,8 @@ class PluginReservationTask extends CommonDBTM
       $temps = time();
       $temps -= ($temps % MINUTE_TIMESTAMP);
       $begin = date("Y-m-d H:i:s", $temps);
+            //$time_step = $CFG_GLPI['time_step'];
+
       $end = date("Y-m-d H:i:s", $temps + 5 * MINUTE_TIMESTAMP);
       $task->log("Temps : " . $temps . " Begin : " . $begin . " End : " . $end);
       $left = "";
@@ -230,7 +291,8 @@ class PluginReservationTask extends CommonDBTM
       return $valreturn;
    }
 
-   public static function verifDisponibiliteAndMailIGS($task, $itemtype, $idMat, $currentResa, $datedebut, $datefin, $current_user_id) {
+   public static function verifDisponibiliteAndMailIGS($task, $itemtype, $idMat, $currentResa, $datedebut, $datefin, $current_user_id)
+   {
       global $DB, $CFG_GLPI;
 
       $begin = $datedebut;
@@ -303,7 +365,8 @@ $where";
       }
    }
 
-   public static function find_user_from_resa($resaid) {
+   public static function find_user_from_resa($resaid)
+   {
       global $DB, $CFG_GLPI;
 
       $query = "SELECT `glpi_reservations`.`users_id`
