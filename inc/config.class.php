@@ -174,7 +174,7 @@ class PluginReservationConfig extends CommonDBTM
          "value" => '1'
       ]);
       //echo "<input type=\"checkbox\" name=\"tabcurrent\" value=\"1\" " . ($tabcurrent ? 'checked' : '') . "> "
-      echo __('Current Reservation tab') . "</td>";
+      echo "  " . __('Current Reservation tab') . "</td>";
       echo "</tr>";
 
       $tabcoming = $this->getConfigurationValue("tabcoming");
@@ -187,7 +187,7 @@ class PluginReservationConfig extends CommonDBTM
          "value" => '1'
       ]);
       //echo "<input type=\"checkbox\" name=\"tabcoming\" value=\"1\" " . ($tabcoming ? 'checked' : '') . "> " . 
-      echo __('Incoming Reservation tab') . "</td>";
+      echo "  " . __('Incoming Reservation tab') . "</td>";
       echo "</tr>";
       /*}
       */
@@ -200,13 +200,14 @@ class PluginReservationConfig extends CommonDBTM
       $tooltip = $this->getConfigurationValue("tooltip");
       echo "<tr>";
       echo "<input type=\"hidden\" name=\"tooltip\" value=\"0\">";
+      echo "<td> ";
       echo HTML::getCheckbox([
          'name' => "tooltip",
          "checked" => $tooltip,
          "value" => '1'
       ]);
       //echo "<td> <input type=\"checkbox\" name=\"tooltip\" value=\"1\" " . ($tooltip ? 'checked' : '') . "> " . 
-      echo __('ToolTip') . "</td>";
+      echo "  " . __('ToolTip') . "</td>";
       echo "</tr>";
 
       if ($tooltip) {
