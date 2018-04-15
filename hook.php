@@ -38,9 +38,10 @@ function plugin_reservation_install() {
    if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 1.5.0
       $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
-                `name` VARCHAR(10) NOT NULL UNIQUE,
+                `name` VARCHAR(10) NOT NULL,
                 `value` VARCHAR(10) NOT NULL,
                 PRIMARY KEY (`id`),
+                UNIQUE (`name`)
                 )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
       $DB->queryOrDie($query, $DB->error());
 
