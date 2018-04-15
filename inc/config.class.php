@@ -168,14 +168,26 @@ class PluginReservationConfig extends CommonDBTM
       echo "<tr>";
       echo "<input type=\"hidden\" name=\"tabcurrent\" value=\"0\">";
       echo "<td style=\"padding-left:20px;\">";
-      echo "<input type=\"checkbox\" name=\"tabcurrent\" value=\"1\" " . ($tabcurrent ? 'checked' : '') . "> " . __('Current Reservation tab') . "</td>";
+      echo HTML::getCheckbox([
+         'name' => "tabcurrent",
+         "checked" => $tabcurrent,
+         "value" => '1'
+      ]);
+      //echo "<input type=\"checkbox\" name=\"tabcurrent\" value=\"1\" " . ($tabcurrent ? 'checked' : '') . "> "
+      echo __('Current Reservation tab') . "</td>";
       echo "</tr>";
 
       $tabcoming = $this->getConfigurationValue("tabcoming");
       echo "<tr>";
       echo "<input type=\"hidden\" name=\"tabcoming\" value=\"0\">";
       echo "<td style=\"padding-left:20px;\">";
-      echo "<input type=\"checkbox\" name=\"tabcoming\" value=\"1\" " . ($tabcoming ? 'checked' : '') . "> " . __('Incoming Reservation tab') . "</td>";
+      echo HTML::getCheckbox([
+         'name' => "tabcoming",
+         "checked" => $tabcoming,
+         "value" => '1'
+      ]);
+      //echo "<input type=\"checkbox\" name=\"tabcoming\" value=\"1\" " . ($tabcoming ? 'checked' : '') . "> " . 
+      echo __('Incoming Reservation tab') . "</td>";
       echo "</tr>";
       /*}
       */
@@ -188,7 +200,13 @@ class PluginReservationConfig extends CommonDBTM
       $tooltip = $this->getConfigurationValue("tooltip");
       echo "<tr>";
       echo "<input type=\"hidden\" name=\"tooltip\" value=\"0\">";
-      echo "<td> <input type=\"checkbox\" name=\"tooltip\" value=\"1\" " . ($tooltip ? 'checked' : '') . "> " . __('ToolTip') . "</td>";
+      echo HTML::getCheckbox([
+         'name' => "tooltip",
+         "checked" => $tooltip,
+         "value" => '1'
+      ]);
+      //echo "<td> <input type=\"checkbox\" name=\"tooltip\" value=\"1\" " . ($tooltip ? 'checked' : '') . "> " . 
+      echo __('ToolTip') . "</td>";
       echo "</tr>";
 
       if ($tooltip) {
