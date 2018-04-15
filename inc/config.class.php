@@ -44,7 +44,7 @@ class PluginReservationConfig extends CommonDBTM
       global $DB;
       $config  = [];
       foreach (['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'] as $day) {
-         $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE `name`='$day'";
+         $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE `name`='$day' and `value` = 1";
          if ($result = $DB->query($query)) {
             if ($DB->numrows($result) > 0) {
                $config[$day] = '1';
@@ -98,25 +98,25 @@ class PluginReservationConfig extends CommonDBTM
 
          echo "<th colspan=2>" . __('Days when e-mails for late reservations are sent') . "</th>";
          echo "<tr>";
-         echo "<td> " . __('Monday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" " . ($config['lundi'] ? 'checked' : '') . " > </td>";
+         echo "<td> " . __('Monday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" " . (isset($config['lundi']) ? 'checked' : '') . " > </td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Tuesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mardi\" " . ($config['mardi'] ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Tuesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mardi\" " . (isset($config['mardi']) ? 'checked' : '') . "> </td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Wednesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mercredi\" " . ($config['mercredi'] ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Wednesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mercredi\" " . (isset($config['mercredi']) ? 'checked' : '') . "> </td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Thursday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"jeudi\" " . ($config['jeudi'] ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Thursday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"jeudi\" " . (isset($config['jeudi']) ? 'checked' : '') . "> </td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Friday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"vendredi\" " . ($config['vendredi'] ? 'checked' : '') . " ></td>";
+         echo "<td> " . __('Friday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"vendredi\" " . (isset($config['vendredi']) ? 'checked' : '') . " ></td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Saturday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"samedi\" " . ($config['samedi'] ? 'checked' : '') . " ></td>";
+         echo "<td> " . __('Saturday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"samedi\" " . (isset($config['samedi']) ? 'checked' : '') . " ></td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Sunday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"dimanche\" " . ($config['dimanche'] ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Sunday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"dimanche\" " . (isset($config['dimanche']) ? 'checked' : '') . "> </td>";
 
          echo "</tr>";
          echo "</table>";
