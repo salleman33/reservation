@@ -94,14 +94,14 @@ class PluginReservationConfig extends CommonDBTM
       if ($mode_auto) {
          echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
          echo HTML::showCheckboxMatrix(
-            [__('Days when e-mails for late reservations are sent'), ''],
+            ['Days', ''],
             [
                ['label'=>'lundi',
-               'columns' => 'test'],
+               'columns' => []],
                ['label' =>'mardi',
-               'columns' => 'row2']
+               'columns' => []]
             ],
-            ['title' => 'DAys']);
+            ['title' => __('Days when e-mails for late reservations are sent')]);
          echo "<th colspan=2>" . __('Days when e-mails for late reservations are sent') . "</th>";
          echo "<tr>";
          echo "<td> " . __('Monday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" " . (isset($config['lundi']) ? 'checked' : '') . " > </td>";
