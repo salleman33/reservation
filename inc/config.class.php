@@ -79,7 +79,7 @@ class PluginReservationConfig extends CommonDBTM
       echo "<th>" . __('Method used to send e-mails to users with late reservations') . "</th>";
       echo "<tr>";
       echo "<td>";
-      //echo "<input type=\"hidden\" name=\"mode_auto\" value=\"0\">";
+      echo "<input type=\"hidden\" name=\"mode_auto\" value=\"0\">";
       echo HTML::getCheckbox([
          'name' => "mode_auto",
          "checked" => $mode_auto,
