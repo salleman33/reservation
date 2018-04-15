@@ -82,7 +82,6 @@ class PluginReservationConfig extends CommonDBTM
       //echo "<input type=\"hidden\" name=\"mode_auto\" value=\"0\">";
       echo HTML::getCheckbox([
          'name' => "mode_auto",
-         'value' => "mode_auto",
          "checked" => $mode_auto,
          ]);
       echo __('Automatic') . " (" . __('Using the configurable automatic action') . ") ";
