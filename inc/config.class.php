@@ -93,22 +93,16 @@ class PluginReservationConfig extends CommonDBTM
 
       if ($mode_auto) {
          echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
-         echo HTML::showCheckboxMatrix(
-            ['Days', ''],
-            [
-               ['label'=>'lundi',
-               'columns' => [
-                  'lundi',
-                  0,
-                  ['use_checkbox']
-               ]],
-               ['label' =>'mardi',
-               'columns' => []]
-            ],
-            ['title' => __('Days when e-mails for late reservations are sent')]);
          echo "<th colspan=2>" . __('Days when e-mails for late reservations are sent') . "</th>";
          echo "<tr>";
-         echo "<td> " . __('Monday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" " . (isset($config['lundi']) ? 'checked' : '') . " > </td>";
+         echo "<td> " . __('Monday') . " : </td><td>";
+         echo HTML::getCheckbox([
+            'name' => "week[]",
+            "checked" => isset($config['lundi']),
+            "value" => 'lundi'
+         ]);
+         echo "</td>";
+         //<INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" " . (isset($config['lundi']) ? 'checked' : '') . " > </td>";
          echo "</tr>";
          echo "<tr>";
          echo "<td> " . __('Tuesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mardi\" " . (isset($config['mardi']) ? 'checked' : '') . "> </td>";
