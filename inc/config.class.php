@@ -102,25 +102,60 @@ class PluginReservationConfig extends CommonDBTM
             "value" => 'lundi'
          ]);
          echo "</td>";
-         //<INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" " . (isset($config['lundi']) ? 'checked' : '') . " > </td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Tuesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mardi\" " . (isset($config['mardi']) ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Tuesday') . " : </td><td>";
+         echo HTML::getCheckbox([
+            'name' => "week[]",
+            "checked" => isset($config['mardi']),
+            "value" => 'mardi'
+         ]);
+         echo "</td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Wednesday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"mercredi\" " . (isset($config['mercredi']) ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Wednesday') . " : </td><td>";
+         echo HTML::getCheckbox([
+            'name' => "week[]",
+            "checked" => isset($config['mercredi']),
+            "value" => 'mercredi'
+         ]);
+         echo "</td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Thursday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"jeudi\" " . (isset($config['jeudi']) ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Thursday') . " : </td><td>";
+         echo HTML::getCheckbox([
+            'name' => "week[]",
+            "checked" => isset($config['jeudi']),
+            "value" => 'jeudi'
+         ]);
+         echo "</td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Friday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"vendredi\" " . (isset($config['vendredi']) ? 'checked' : '') . " ></td>";
+         echo "<td> " . __('Friday') . " : </td><td>";
+         echo HTML::getCheckbox([
+            'name' => "week[]",
+            "checked" => isset($config['vendredi']),
+            "value" => 'vendredi'
+         ]);
+         echo "</td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Saturday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"samedi\" " . (isset($config['samedi']) ? 'checked' : '') . " ></td>";
+         echo "<td> " . __('Saturday') . " : </td><td>";
+         echo HTML::getCheckbox([
+            'name' => "week[]",
+            "checked" => isset($config['samedi']),
+            "value" => 'samedi'
+         ]);
+         echo "</td>";
          echo "</tr>";
          echo "<tr>";
-         echo "<td> " . __('Sunday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"dimanche\" " . (isset($config['dimanche']) ? 'checked' : '') . "> </td>";
+         echo "<td> " . __('Sunday') . " : </td><td>";
+         echo HTML::getCheckbox([
+            'name' => "week[]",
+            "checked" => isset($config['dimanche']),
+            "value" => 'dimanche'
+         ]);
+         echo "</td>";
 
          echo "</tr>";
          echo "</table>";
