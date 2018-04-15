@@ -46,7 +46,7 @@ function plugin_reservation_install() {
       $DB->queryOrDie($query, $DB->error());
 
       $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
-                VALUES (\"mode_auto\",1)";
+                VALUES (\"mode_auto\",0)";
 
       $DB->queryOrDie($query, $DB->error());
 
