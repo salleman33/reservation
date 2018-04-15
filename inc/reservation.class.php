@@ -198,7 +198,7 @@ class PluginReservationReservation extends CommonDBTM
       echo "<td rowspan='3'>";
       echo "<input type='submit' class='submit' name='previousday' value='" . __('Previous') . "'>";
       echo "</td>";
-
+      
       echo "<td>" . __('Start date') . "</td><td>";
       Html::showDateTimeField('date_begin', ['value' => $form_dates["begin"], 'maybeempty' => false]);
       echo "</td><td rowspan='3'>";

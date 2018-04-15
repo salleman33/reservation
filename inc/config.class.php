@@ -94,7 +94,7 @@ class PluginReservationConfig extends CommonDBTM
 
       if ($mode_auto) {
          echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
-
+         echo HTML::showCheckboxMatrix(['colonne1', 'colonene2'], ['row1','row2']);
          echo "<th colspan=2>" . __('Days when e-mails for late reservations are sent') . "</th>";
          echo "<tr>";
          echo "<td> " . __('Monday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" " . (isset($config['lundi']) ? 'checked' : '') . " > </td>";
