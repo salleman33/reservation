@@ -47,7 +47,7 @@ class PluginReservationConfig extends CommonDBTM
          $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE `key`='$day'";
          if ($result = $DB->query($query)) {
             if ($DB->numrows($result) > 0) {
-               $config[$day] = $row['value'];
+               $config[$day] = '1';
             }
          }
       }
