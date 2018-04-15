@@ -17,7 +17,7 @@ if ($plugin->isActivated("reservation")) {
    }
    if (isset($_POST["mode_auto"])) {
       $PluginReservationConfig->setMailAutomaticAction($_POST["mode_auto"]);
-      $PluginReservationConfig->setConfigurationValue("mode_auto", issed($_POST["mode_auto"]));
+      $PluginReservationConfig->setConfigurationValue("mode_auto", isset($_POST["mode_auto"]));
       //Html::back();
    }
 
