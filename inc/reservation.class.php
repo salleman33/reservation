@@ -121,7 +121,7 @@ class PluginReservationReservation extends CommonDBTM
          $begin_time = time();
 
          $form_dates["begin"] = date("Y-m-d H:i:s", $begin_time);
-         $form_dates['end'] =  date("Y-m-d H:i:s", mktime(23, 59, 59, $mois, $jour, $annee));
+         $form_dates['end'] =  date("Y-m-d H:i:s", mktime(23, 59, 59, $month, $day, $year));
       }
       if (isset($_POST['date_begin'])) {
          $form_dates["begin"] = $_POST['date_begin'];
@@ -198,7 +198,7 @@ class PluginReservationReservation extends CommonDBTM
       echo "<td rowspan='3'>";
       echo "<input type='submit' class='submit' name='previousday' value='" . __('Previous') . "'>";
       echo "</td>";
-      
+
       echo "<td>" . __('Start date') . "</td><td>";
       Html::showDateTimeField('date_begin', ['value' => $form_dates["begin"], 'maybeempty' => false]);
       echo "</td><td rowspan='3'>";
