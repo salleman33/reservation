@@ -85,7 +85,6 @@ class PluginReservationConfig extends CommonDBTM
          "checked" => $mode_auto,
          ]);
       echo __('Automatic') . " (" . __('Using the configurable automatic action') . ") ";
-      echo "TEST :" . $mode_auto;
       echo "</td>";
 //echo "<input type=\"checkbox\" name=\"mode_auto\" value=\"1\" " . ($mode_auto ? 'checked' : '') . "> " . __('Automatic') . " (" . __('Using the configurable automatic action') . ") </td>";
       echo "</tr>";
@@ -96,7 +95,13 @@ class PluginReservationConfig extends CommonDBTM
          echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
          echo HTML::showCheckboxMatrix(
             [__('Days when e-mails for late reservations are sent'), ''],
-            [['lundi','testlundi'],['mardi','row2']]);
+            [
+               ['label'=>'lundi',
+               'columns' => 'test'],
+               ['label' =>'mardi',
+               'columns' => 'row2']
+            ],
+            ['title' => 'DAys']);
          echo "<th colspan=2>" . __('Days when e-mails for late reservations are sent') . "</th>";
          echo "<tr>";
          echo "<td> " . __('Monday') . " : </td><td> <INPUT type=\"checkbox\" name=\"week[]\" value=\"lundi\" " . (isset($config['lundi']) ? 'checked' : '') . " > </td>";
