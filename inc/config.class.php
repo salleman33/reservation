@@ -97,7 +97,11 @@ class PluginReservationConfig extends CommonDBTM
             ['Days', ''],
             [
                ['label'=>'lundi',
-               'columns' => []],
+               'columns' => [
+                  'lundi',
+                  0,
+                  ['use_checkbox']
+               ]],
                ['label' =>'mardi',
                'columns' => []]
             ],
