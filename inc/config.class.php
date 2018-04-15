@@ -9,9 +9,9 @@ include GLPI_ROOT . "/plugins/reservation/inc/includes.php";
 class PluginReservationConfig extends CommonDBTM
 {
 
-   public function getConfigurationValue($key, $defaultValue = 0) {
+   public function getConfigurationValue($name, $defaultValue = 0) {
       global $DB;
-      $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE key='" . $key . "'";
+      $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE `name`='" . $name . "'";
       $value = $defaultValue;
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
@@ -24,11 +24,11 @@ class PluginReservationConfig extends CommonDBTM
 
    }
 
-   public function setConfigurationValue($key, $value = '') {
+   public function setConfigurationValue($name, $value = '') {
       global $DB;
 
       if (!$value == '') {
-         $query = "INSERT INTO glpi_plugin_reservation_configs (key,value) VALUES('" . $key . "','" . $value . "') ON DUPLICATE KEY UPDATE value=Values(value)";
+         $query = "INSERT INTO glpi_plugin_reservation_configs (name,value) VALUES('" . $name . "','" . $value . "') ON DUPLICATE KEY UPDATE value=Values(value)";
          $DB->query($query) or die($DB->error());
       }
    }
@@ -44,7 +44,7 @@ class PluginReservationConfig extends CommonDBTM
       global $DB;
       $config  = [];
       foreach (['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'] as $day) {
-         $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE `key`='$day'";
+         $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE `name`='$day'";
          if ($result = $DB->query($query)) {
             if ($DB->numrows($result) > 0) {
                $config[$day] = '1';
@@ -57,17 +57,17 @@ class PluginReservationConfig extends CommonDBTM
    public function setConfigurationWeek($week = null) {
       global $DB;
       foreach (['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'] as $day) {
-         $query = "UPDATE glpi_plugin_reservation_configs SET `value`=0 where `key` = '$day'";
+         $query = "UPDATE glpi_plugin_reservation_configs SET `value`=0 where `name` = '$day'";
          $DB->query($query) or die($DB->error());
       }
       foreach ($week as $day) {
-         $query = "UPDATE glpi_plugin_reservation_configs SET `value`=1 WHERE `key` = '$day'";
+         $query = "UPDATE glpi_plugin_reservation_configs SET `value`=1 WHERE `name` = '$day'";
          $DB->query($query) or die($DB->error());
       }
    }
 
    public function showForm() {
-      $mode = $this->getConfigurationValue("mode");
+      $mode_auto = $this->getConfigurationValue("mode_auto");
       $config = $this->getConfigurationWeek();
 
       echo "<form method='post' action='" . $this->getFormURL() . "'>";
@@ -79,13 +79,13 @@ class PluginReservationConfig extends CommonDBTM
       echo "<th>" . __('Method used to send e-mails to users with late reservations') . "</th>";
       echo "<tr>";
       echo "<td>";
-      echo "<input type=\"hidden\" name=\"mode\" value=\"0\">";
-      echo "<input type=\"checkbox\" name=\"mode\" value=\"1\" " . ($mode == 'auto' ? 'checked' : '') . "> " . __('Automatic') . " (" . __('Using the configurable automatic action') . ") </td>";
+      echo "<input type=\"hidden\" name=\"mode_auto\" value=\"0\">";
+      echo "<input type=\"checkbox\" name=\"mode_auto\" value=\"1\" " . ($mode_auto ? 'checked' : '') . "> " . __('Automatic') . " (" . __('Using the configurable automatic action') . ") </td>";
       echo "</tr>";
 
       echo "</table>";
 
-      if ($mode == 'auto') {
+      if ($mode_auto) {
          echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
 
          echo "<th colspan=2>" . __('Days when e-mails for late reservations are sent') . "</th>";

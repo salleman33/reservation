@@ -38,19 +38,19 @@ function plugin_reservation_install() {
    if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 1.5.0
       $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
-                `key` VARCHAR(10) NOT NULL,
+                `name` VARCHAR(10) NOT NULL,
                 `value` VARCHAR(10) NOT NULL,
                 PRIMARY KEY (`id`),
-                UNIQUE (`key`),
+                UNIQUE (`name`),
                 )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
       $DB->queryOrDie($query, $DB->error());
 
-      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`key` , `value`)
-                VALUES (\"mode\",\"manual\")";
+      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
+                VALUES (\"mode_auto\",1)";
 
       $DB->queryOrDie($query, $DB->error());
 
-      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`key` , `value`)
+      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
                 VALUES  (\"lundi\",1),
                         (\"mardi\",1),
                         (\"mercredi\",1),
@@ -70,14 +70,14 @@ function plugin_reservation_install() {
                     FROM `glpi_plugin_reservation_config`
                     WHERE `name` = \"methode\"
                 )
-                WHERE `key` = \"mode\"";
+                WHERE `name` = \"mode_auto\"";
 
       $DB->queryOrDie($query, $DB->error());
 
       $query = "DROP TABLE `glpi_plugin_reservation_config`";
       $DB->queryOrDie($query, $DB->error());
 
-      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`key` , `value`)
+      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
                 VALUES  (\"lundi\", CAST((
                         SELECT `actif`
                         FROM `glpi_plugin_reservation_configdayforauto`
