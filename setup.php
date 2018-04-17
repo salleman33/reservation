@@ -17,8 +17,10 @@ function plugin_init_reservation() {
    $PLUGIN_HOOKS['item_add']['reservation'] = ['Reservation' => 'plugin_item_add_reservation'];
    $PLUGIN_HOOKS['item_update']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
    $PLUGIN_HOOKS['item_delete']['reservation'] = ['Reservation' => 'plugin_item_delete_reservation'];
-   $PLUGIN_HOOKS['menu_toadd']['reservation'] = ['plugins' => 'PluginReservationReservation'];
+   //$PLUGIN_HOOKS['menu_toadd']['reservation'] = ['plugins' => 'PluginReservationReservation'];
+   $PLUGIN_HOOKS['menu_toadd']['reservation'] = ['plugins' => 'PluginReservationMenu'];
 
+   Plugin::registerClass('PluginReservationMenu');
    Plugin::registerClass('PluginReservationConfig');
    Plugin::registerClass('PluginReservationReservation');
    Plugin::registerClass('PluginReservationTask');

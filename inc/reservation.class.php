@@ -4,35 +4,76 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
-function getGLPIUrl() {
+function getGLPIUrl()
+{
    return str_replace("plugins/reservation/front/reservation.php", "", $_SERVER['SCRIPT_NAME']);
 }
 
 class PluginReservationReservation extends CommonDBTM
 {
    // From CommonDBChild
-   static public $reservations_id = 'reservations_id';
-
-   protected $tabs = [];
-   protected $tabsNames = [];
-
-   /*
-   public function getAbsolutePath() {
-      return str_replace("plugins/reservation/inc/reservation.class.php", "", $_SERVER['SCRIPT_FILENAME']);
-   } */
+   public static $reservations_id = 'reservations_id';
 
    /**
-   * @param $nb  integer  for singular or plural
-   **/
-   static function getTypeName($nb = 0) {
-      return _n('Reservation', 'Reservations', $nb, 'Reservation');
+    * @param $nb  integer  for singular or plural
+    **/
+   public static function getTypeName($nb = 0) {
+      return _n('Reservation', 'Reservations', $nb, 'reservation');
    }
 
    public static function getMenuName() {
       return PluginReservationReservation::getTypeName(2);
    }
 
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   /*
+   protected $tabs = [];
+   protected $tabsNames = [];
+    */
+   /*
+   public function getAbsolutePath() {
+   return str_replace("plugins/reservation/inc/reservation.class.php", "", $_SERVER['SCRIPT_FILENAME']);
+   } */
+
+   // TEST
+   /*
+   public function __construct() {
+   $config = new PluginReservationConfig();
+   $i = 1;
+   if ($config->getConfigurationValue("tabcurrent", 1)) {
+   $this->tabs[$i] = function () {$this->showCurrentResa();};
+   $this->tabsNames[$i++] = __('Current Reservations');
+   }
+   if ($config->getConfigurationValue("tabcoming")) {
+   $this->tabs[$i] = function () {$this->showCurrentResa(true);};
+   $this->tabsNames[$i++] = __('Current and Incoming Reservations');
+   }
+   $this->tabs[$i] = function () {$this->showDispoAndFormResa();};
+   $this->tabsNames[$i++] = __('Available Hardware');
+   }*/
+
+   /*
+   public function isNewItem() {
+   return false;
+   }*/
+
+   /**
+    * Définition des onglets
+    **/
+   /* public function defineTabs($options = []) {
+   $ong = [];
+   $this->addStandardTab(__CLASS__, $ong, $options);
+   return $ong;
+   }
+    */
+   /**
+    * Définition du nom de l'onglet
+    **/
+   /*
+   public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   return $item->tabsNames;
+   }*/
+   public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+   {
       $ong = [];
       $config = new PluginReservationConfig();
       $i = 1;
@@ -48,188 +89,91 @@ class PluginReservationReservation extends CommonDBTM
       return $ong;
    }
 
+   /**
+    * Définition du contenu de l'onglet
+    **/
+   /*
    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+   $item->getFormDates();
+   call_user_func($item->tabs[$tabnum]);
+   return true;
+   }
+    */
+
+   public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+   {
       switch ($tabnum) {
-         case 1 : //"My first tab"
+         case 1: //"My first tab"
             self::displayTabContentForCurrentReservations();
             break;
-         case 2 : //"My second tab""
+         case 2: //"My second tab""
             self::displayTabContentForAvailableHardware();
             break;
       }
       return true;
    }
 
+   public static function displayTabContentForCurrentReservations()
+   {
+      echo "toto";
+   }
+
+   public static function displayTabContentForAvailableHardware()
+   {
+      echo "TTAT";
+   }
 
    /**
     * Définition du contenu de l'onglet
     **/
    /*
    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
-      $item->getDatesResa();
-      call_user_func($item->tabs[$tabnum]);
-      return true;
-   } */
-
+   $item->getDatesResa();
+   call_user_func($item->tabs[$tabnum]);
+   return true;
+   }
+    */
 
    /*
    public static function canView() {
-      global $CFG_GLPI;
-      return true;
-      return Session::haveRightsOr(self::$rightname, [READ, self::RESERVEANITEM]);
+   global $CFG_GLPI;
+   return true;
+   return Session::haveRightsOr(self::$rightname, [READ, self::RESERVEANITEM]);
    } */
 
-   public static function canCreate() {
+   public static function canCreate()
+   {
       return Reservation::canCreate();
    }
 
    /*
    public static function canViewItem() {
-      return true;
+   return true;
    } */
 
-   public static function canDelete() {
+   public static function canDelete()
+   {
       return Reservation::canDelete();
    }
 
-   public static function canUpdate() {
+   public static function canUpdate()
+   {
       return Reservation::canUpdate();
    }
 
    /*
    public function isNewItem() {
-      return false;
+   return false;
    } */
 
 
-
-   public function showForm($id, $options = []) {
-      global $CFG_GLPI, $form_dates;
-
-      $this->getFormDates();
-      $this->showFormDate();
-
-   }
-
-   public function getFormDates() {
-      global $form_dates;
-
-      if (!isset($form_dates)) {
-         $day = date("d", time());
-         $month = date("m", time());
-         $year = date("Y", time());
-         $begin_time = time();
-
-         $form_dates["begin"] = date("Y-m-d H:i:s", $begin_time);
-         $form_dates['end'] =  date("Y-m-d H:i:s", mktime(23, 59, 59, $month, $day, $year));
-      }
-      if (isset($_POST['date_begin'])) {
-         $form_dates["begin"] = $_POST['date_begin'];
-      }
-      if (isset($_GET['date_begin'])) {
-         $form_dates["begin"] = $_GET['date_begin'];
-      }
-
-      if (isset($_POST['date_end'])) {
-         $form_dates["end"] = $_POST['date_end'];
-      }
-      if (isset($_GET['date_end'])) {
-         $form_dates["end"] = $_GET['date_end'];
-      }
-      if (isset($_POST['next_day']) || isset($_GET['next_day'])) {
-         $form_dates["begin"] = date("Y-m-d H:i:s", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
-         $form_dates["end"] = date("Y-m-d H:i:s", strtotime($form_dates["end"]) + DAY_TIMESTAMP);
-      }
-      if (isset($_POST['previous_day']) || isset($_GET['previous_day'])) {
-         $form_dates["begin"] = date("Y-m-d H:i:s", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
-         $form_dates["end"] = date("Y-m-d H:i:s", strtotime($form_dates["end"]) - DAY_TIMESTAMP);
-      }
-   }
-
-   /**
-   * Link with current month reservations
-   */
-   public function showCurrentMonthForAllLink() {
-      global $CFG_GLPI;
-      if (!Session::haveRight("reservation", "1")) {
-         return false;
-      }
-      $mois_courant = intval(strftime("%m"));
-      $annee_courante = strftime("%Y");
-
-      $mois_courant = intval($mois_courant);
-
-      $all = "<a class='vsubmit' href='../../../front/reservation.php?reservationitems_id=&amp;mois_courant=" . "$mois_courant&amp;annee_courante=$annee_courante'>" . __('Show all') . "</a>";
-
-      echo "<div class='center'>";
-      echo "<table class='tab_cadre'>";
-      echo "<tr><th colspan='2'>" . __('Reservations This Month') . "</th></tr>\n";
-      echo "<td>";
-      echo "<img src='" . $CFG_GLPI["root_doc"] . "/pics/reservation.png' alt=''>";
-      echo "</td>";
-      echo "<td >$all</td>\n";
-      echo "</table>";
-      echo "</div>";
-
-   }
-
-   /**
-    * Display the form with begin and end dates, next day, previous day, etc.
-    **/
-   public function showFormDate() {
-      global $form_dates;
-
-      echo "<div id='viewresasearch'  class='center'>";
-      echo "<table class='tab_cadre' style='background-color:transparent;box-shadow:none'>";
-
-      echo "<tr>";
-      echo "<td>";
-      $this->showCurrentMonthForAllLink();
-      echo "</td>";
-      echo "<td>";
-
-      echo "<form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
-      echo "<table class='tab_cadre'><tr class='tab_bg_2'>";
-      echo "<th colspan='5'>" . __('Date') . "</th>";
-      echo "</tr>";
-
-      echo "<tr class='tab_bg_2'>";
-
-      echo "<td rowspan='3'>";
-      echo "<input type='submit' class='submit' name='previousday' value='" . __('Previous') . "'>";
-      echo "</td>";
-
-      echo "<td>" . __('Start date') . "</td><td>";
-      Html::showDateTimeField('date_begin', ['value' => $form_dates["begin"], 'maybeempty' => false]);
-      echo "</td><td rowspan='3'>";
-      echo "<input type='submit' class='submit' name='submit' value=\"" . _sx('button', 'Search') . "\">";
-      echo "</td>";
-      echo "<td rowspan='3'>";
-      echo "<input type='submit' class='submit' name='nextday' value='" . __('Next') . "'>";
-      echo "</td></tr>";
-
-      echo "<tr class='tab_bg_2'><td>" . __('End date') . "</td><td>";
-      Html::showDateTimeField('date_end', ['value' => $form_dates["end"], 'maybeempty' => false]);
-      echo "</td></tr>";
-      echo "</td></tr>";
-
-      echo "</table>";
-
-      Html::closeForm();
-
-      echo "</td>";
-      echo "</tr>";
-      echo "</table>";
-
-      echo "</div>";
-
-   }
 
    /**
     * Fonction permettant d'afficher les materiels disponibles et de faire une nouvelle reservation
     * C'est juste une interface differente de celle de GLPI. Pour les nouvelles reservations, on utilise les fonctions du coeur de GLPI
     **/
-   public function showDispoAndFormResa() {
+   public function showDispoAndFormResa()
+   {
       global $DB, $CFG_GLPI, $datesresa;
       $showentity = Session::isMultiEntitiesMode();
       $config = new PluginReservationConfig();
@@ -386,7 +330,8 @@ class PluginReservationReservation extends CommonDBTM
       echo "</div>\n";
    }
 
-   public function mailUser($resaid) {
+   public function mailUser($resaid)
+   {
       global $DB, $CFG_GLPI;
       $reservation = new Reservation();
       $reservation->getFromDB($resaid);
@@ -403,7 +348,8 @@ class PluginReservationReservation extends CommonDBTM
     * Si elle etait dans la table glpi_plugin_reservation_manageresa (c'etait donc une reservation prolongée), on insert la date de retour à l'heure actuelle ET on met à jour la date de fin de la vraie reservation.
     * Sinon, on insert une nouvelle entree dans la table pour avoir un historique du retour de la reservation ET on met à jour la date de fin de la vraie reservation
     **/
-   public function resaReturn($resaid) {
+   public function resaReturn($resaid)
+   {
       global $DB, $CFG_GLPI;
       // on cherche dans la table de gestion des resa du plugin
       $query = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = " . $resaid;
@@ -442,7 +388,8 @@ class PluginReservationReservation extends CommonDBTM
     * Fonction permettant d'afficher les reservations actuelles
     *
     **/
-   public function showCurrentResa($includeFuture = 0) {
+   public function showCurrentResa($includeFuture = 0)
+   {
       global $DB, $CFG_GLPI, $datesresa;
       $showentity = Session::isMultiEntitiesMode();
       $config = new PluginReservationConfig();
@@ -717,7 +664,8 @@ class PluginReservationReservation extends CommonDBTM
 
    }
 
-   public function addToResa($idmat, $idresa) {
+   public function addToResa($idmat, $idresa)
+   {
 
       global $DB, $CFG_GLPI;
 
@@ -754,7 +702,8 @@ class PluginReservationReservation extends CommonDBTM
 
    }
 
-   public function replaceResa($idmat, $idresa) {
+   public function replaceResa($idmat, $idresa)
+   {
       global $DB, $CFG_GLPI;
 
       $query = "UPDATE `glpi_reservations` SET `reservationitems_id`='" . $idmat . "' WHERE `id`='" . $idresa . "';";
@@ -764,7 +713,8 @@ class PluginReservationReservation extends CommonDBTM
 
 }
 
-function getLinkforItem($item) {
+function getLinkforItem($item)
+{
    $itemLink = $item->getFormUrl();
    $argConcatenator = "?";
    if (strpos($itemLink, '?') !== false) {
@@ -775,7 +725,8 @@ function getLinkforItem($item) {
 
 }
 
-function getToolTipforItem($item) {
+function getToolTipforItem($item)
+{
    $config = new PluginReservationConfig();
 
    $show_toolTip = $config->getConfigurationValue("tooltip");
@@ -817,28 +768,32 @@ function getToolTipforItem($item) {
    Html::showToolTip($tooltip, null);
 }
 
-function getGroupFromItem($item) {
+function getGroupFromItem($item)
+{
    $group_id = $item->fields["groups_id"];
    $group_tmp = new Group();
    $group_tmp->getFromDB($group_id);
    return $group_tmp->getName();
 }
 
-function getLocationFromItem($item) {
+function getLocationFromItem($item)
+{
    $location_id = $item->fields["locations_id"];
    $location_tmp = new Location();
    $location_tmp->getFromDB($location_id);
    return $location_tmp->getName();
 }
 
-function getManufacturerFromItem($item) {
+function getManufacturerFromItem($item)
+{
    $manufacturer_id = $item->fields["manufacturers_id"];
    $manufacturer_tmp = new Manufacturer();
    $manufacturer_tmp->getFromDB($manufacturer_id);
    return $manufacturer_tmp->getName();
 }
 
-function getModelFromItem($item) {
+function getModelFromItem($item)
+{
    global $DB;
    $typemodel = "N/A";
    $modeltable = getSingular($item->getTable()) . "models";
@@ -866,7 +821,8 @@ function getModelFromItem($item) {
    return $typemodel;
 }
 
-function getMatDispo() {
+function getMatDispo()
+{
 
    global $DB, $CFG_GLPI, $datesresa;
 
@@ -933,10 +889,12 @@ function getMatDispo() {
    return $myArray;
 }
 
-function compare_date_by_user($a, $b) {
+function compare_date_by_user($a, $b)
+{
    return strnatcmp($a['debut'], $b['debut']);
 }
 
-function compare_date_by_alluser($a, $b) {
+function compare_date_by_alluser($a, $b)
+{
    return strnatcmp($a[0]['debut'], $b[0]['debut']);
 }
