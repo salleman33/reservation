@@ -20,7 +20,8 @@ Session::checkRight("reservation", [CREATE, UPDATE, DELETE]);
 
 $menu = new PluginReservationMenu();
 $menu->showFormDate();
-$menu->display();
+
+$menu->display($_POST);
 
 if ($_SESSION["glpiactiveprofile"]["interface"] == "central") {
    Html::footer();

@@ -72,6 +72,7 @@ class PluginReservationReservation extends CommonDBTM
    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
    return $item->tabsNames;
    }*/
+   /*
    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
    {
       $ong = [];
@@ -87,7 +88,7 @@ class PluginReservationReservation extends CommonDBTM
       }
       $ong[$i] = __('Available Hardware');
       return $ong;
-   }
+   }*/
 
    /**
     * Définition du contenu de l'onglet
@@ -99,7 +100,7 @@ class PluginReservationReservation extends CommonDBTM
    return true;
    }
     */
-
+/*
    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
    {
       switch ($tabnum) {
@@ -141,8 +142,7 @@ class PluginReservationReservation extends CommonDBTM
    return Session::haveRightsOr(self::$rightname, [READ, self::RESERVEANITEM]);
    } */
 
-   public static function canCreate()
-   {
+   public static function canCreate() {
       return Reservation::canCreate();
    }
 
@@ -151,13 +151,11 @@ class PluginReservationReservation extends CommonDBTM
    return true;
    } */
 
-   public static function canDelete()
-   {
+   public static function canDelete() {
       return Reservation::canDelete();
    }
 
-   public static function canUpdate()
-   {
+   public static function canUpdate() {
       return Reservation::canUpdate();
    }
 
@@ -166,7 +164,39 @@ class PluginReservationReservation extends CommonDBTM
    return false;
    } */
 
+   /**
+    * @return array reservations infos mixed with plugin reservations 
+    */
+   public static function getAllReservationsFromDates($begin, $end = '') {
+      global $DB;
 
+      $res = [];
+      $and = '';
+
+      if ($end != '') {
+         $and = "AND '".$end."' > `begin`";
+      }
+
+      $reservation_table = getTableForItemType('reservation');
+      $plugin_table = getTableForItemType(__CLASS__);
+
+      $query = "SELECT *
+               FROM $reservation_table
+                  , $plugin_table
+               WHERE '".$begin."' < `end`
+                     ".$and."
+               AND ".$plugin_table.".reservations_id = ".$reservation_table.".id";
+
+      if ($result = $DB->query($query)) {
+         if ($DB->numrows($result) > 0) {
+            while ($row = $DB->fetch_assoc($result)) {
+               $res[$row['reservations_id']] = $row;
+            }
+         }
+      }
+      Toolbox::logInFile('sylvain', "getAllReservationsFromDates RETURN : ".json_encode($res)."\n", $force = false);
+      return $res;
+   }
 
    /**
     * Fonction permettant d'afficher les materiels disponibles et de faire une nouvelle reservation

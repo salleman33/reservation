@@ -63,24 +63,26 @@ class PluginReservationMenu extends CommonGLPI
       $tabcoming = $config->getConfigurationValue("tabcoming");
       switch ($tabnum) {
          case 1: //"My first tab"
-            self::displayTabContentForCurrentReservations();
+            self::displayTabContentForCurrentReservations($item);
             break;
          case 2: //"My second tab""
             if ($tabcoming) {
-               self::displayTabContentForAllReservations();
+               self::displayTabContentForAllReservations($item);
             } else {
-               self::displayTabContentForAvailableHardware();
+               self::displayTabContentForAvailableHardware($item);
             }
             break;
          case 3: //"My third tab""
-            self::displayTabContentForAvailableHardware();
+            self::displayTabContentForAvailableHardware($item);
             break;
       }
       return true;
    }
 
-   public static function displayTabContentForCurrentReservations() {
-      global $DB, $CFG_GLPI, $form_dates;
+   public static function displayTabContentForCurrentReservations($item) {
+      global $DB, $CFG_GLPI; //, $FORM_DATES;
+      $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+
       $showentity = Session::isMultiEntitiesMode();
       $config = new PluginReservationConfig();
       $includeFuture = $config->getConfigurationValue("tabcoming");
@@ -94,42 +96,61 @@ class PluginReservationMenu extends CommonGLPI
       echo "<thead>";
       echo "<tr><th colspan='" . ($showentity ? "11" : "10") . "'>" . ($includeFuture ? __('Current and future reservations in the selected timeline') : __('Reservations in the selected timeline')) . "</th></tr>\n";
       echo "<tr class='tab_bg_2'>";
-
       echo "<th>" . __('User') . "</a></th>";
       echo "<th colspan='2'>" . __('Item') . "</a></th>";
       echo "<th>" . __('Begin') . "</a></th>";
       echo "<th>" . __('End') . "</a></th>";
       echo "<th>" . __('Comment') . "</a></th>";
-      echo "<th>" . __('Move') . "</a></th>";
-      echo "<th>" . __('Checkout') . "</th>";
+      echo "<th>" . __('Moves', 'reservation') . "</a></th>";
+      echo "<th>" . __('Checkout', 'reservation') . "</th>";
       echo "<th colspan='" . ($mode == "manual" ? 3 : 2) . "'>" . __('Action') . "</th>";
 
       echo "</tr></thead>";
       echo "<tbody>";
 
-      //debut TEST
-      // echo "<tr class='tab_bg_2'>";
-      // echo "<td colspan='100%' bgcolor='lightgrey' style='padding:1px;'/>";
-      // echo "</tr>";
-      echo "<tr class='tab_bg_2'>";
-      echo "<td rowspan=1> salleman </td>";
-      echo "<td>";
-      echo "test";
-      echo "</td>";
-      echo "<td rowspan=1>" . date("d-m-Y \à H:i:s", strtotime($begin)) . "</td>";
-      echo "<td rowspan=1>" . date("d-m-Y \à H:i:s", strtotime($end)) . "</td>";
-      echo "<td rowspan=1> commentaire </td>";
-      echo "<td rowspan=1><center>";
-      echo "<img title=\"\" alt=\"\" src=\"../pics/up-icon.png\"></img>";
-      echo "<img title=\"\" alt=\"\" src=\"../pics/down-icon.png\"></img>";
-      echo "</center></td>";
+      $list = PluginReservationReservation::getAllReservationsFromDates($begin, $end);
 
-      echo "<td><center><a href=\"reservation.php?resareturn=1\"><img title=\"" . _x('tooltip', 'Set As Returned') . "\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
-      echo "<td>";
-      echo "test";
-      echo "</td>";
-      echo "</tr>";
-      //fin TEST
+      foreach ($list as $reservation_id => $reservation_info) {
+         $reservation = new Reservation();
+         $reservation->getFromDB($reservation_id);
+
+         $user = $reservation->getConnexityItem('user', 'users_id');
+         Toolbox::logInFile('sylvain', "USER : ".json_encode($user)."\n", $force = false);
+
+         $reservationitems = $reservation->getConnexityItem('reservationitem', 'reservationitems_id');
+         Toolbox::logInFile('sylvain', "RESERVATIONITEM : ".json_encode($reservationitems)."\n", $force = false);
+
+         $item = $reservationitems->getConnexityItem($reservationitems->fields['itemtype'], 'items_id');
+         Toolbox::logInFile('sylvain', "ITEM : ".json_encode($item)."\n", $force = false);
+
+         //debut TEST
+         // echo "<tr class='tab_bg_2'>";
+         // echo "<td colspan='100%' bgcolor='lightgrey' style='padding:1px;'/>";
+         // echo "</tr>";
+         echo "<tr class='tab_bg_2'>";
+         echo "<td rowspan=1>".$user->fields['name']."</td>";
+         echo "<td>".$item->fields['name']."</td><td></td>";
+         echo "<td>".$reservation->fields['begin']."</td>";
+         echo "<td>".$reservation_info['baselinedate']."</td>";
+         echo "<td>".$reservation->fields['comment']."</td>";
+         echo "<td rowspan=1><center>";
+         echo "<img title=\"\" alt=\"\" src=\"../pics/up-icon.png\"></img>";
+         echo "<img title=\"\" alt=\"\" src=\"../pics/down-icon.png\"></img>";
+         echo "</center></td>";
+
+         echo "<td><center><a href=\"reservation.php?resareturn=1\"><img title=\"" . _x('tooltip', 'Set As Returned') . "\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
+         echo "<td>";
+         echo "test";
+         echo "</td>";
+         echo "</tr>";
+         //fin TEST
+
+      }
+      
+
+      //HELP
+      //formatUserName($user->fields["id"], $user->fields["name"], $user->fields["realname"], $user->fields["firstname"]);
+      // Toolbox::logInFile($name, $text, $force = false) {
 
 
       //on parcourt le tableau pour construire la table à afficher
@@ -298,7 +319,6 @@ class PluginReservationMenu extends CommonGLPI
    }
 
 
-   
 
    public static function displayTabContentForAllReservations() {
       echo "displayTabContentForAllReservations";
@@ -311,9 +331,10 @@ class PluginReservationMenu extends CommonGLPI
 
 
    public function getFormDates() {
-      global $form_dates;
+      //global $FORM_DATES;
+      $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
 
-      if (!isset($form_dates)) {
+      
          $day = date("d", time());
          $month = date("m", time());
          $year = date("Y", time());
@@ -321,7 +342,7 @@ class PluginReservationMenu extends CommonGLPI
 
          $form_dates["begin"] = date("Y-m-d H:i:s", $begin_time);
          $form_dates['end'] = date("Y-m-d H:i:s", mktime(23, 59, 59, $month, $day, $year));
-      }
+      
       if (isset($_POST['date_begin'])) {
          $form_dates["begin"] = $_POST['date_begin'];
       }
@@ -343,6 +364,8 @@ class PluginReservationMenu extends CommonGLPI
          $form_dates["begin"] = date("Y-m-d H:i:s", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
          $form_dates["end"] = date("Y-m-d H:i:s", strtotime($form_dates["end"]) - DAY_TIMESTAMP);
       }
+
+      $_SESSION['glpi_plugin_reservation_form_dates'] = $form_dates;
    }
 
 
@@ -350,9 +373,11 @@ class PluginReservationMenu extends CommonGLPI
     * Display the form with begin and end dates, next day, previous day, etc.
    **/
    public function showFormDate() {
-      global $form_dates;
+      //global $FORM_DATES;
 
       $this->getFormDates();
+
+      $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
 
       echo "<div id='viewresasearch'  class='center'>";
       echo "<table class='tab_cadre' style='background-color:transparent;box-shadow:none'>";

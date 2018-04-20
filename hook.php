@@ -25,8 +25,8 @@ function plugin_reservation_install() {
       $query = "CREATE TABLE `glpi_plugin_reservation_reservations` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `reservations_id` int(11) NOT NULL,
-                `effectivedate`  datetime,
                 `baselinedate` datetime NOT NULL,
+                `effectivedate`  datetime,
                 `mailingdate` datetime,
                 PRIMARY KEY (`id`),
                 KEY `reservations_id` (`reservations_id`)
@@ -158,6 +158,12 @@ function plugin_reservation_uninstall() {
  */
 function plugin_item_add_reservation($item) {
    global $DB;
+
+   $DB->insertOrDie('glpi_plugin_reservation_reservations', [
+      'reservations_id' => $item->fields['id'],
+      'baselinedate' => $item->fields['end']
+   ]
+   );
 }
 
 /**
