@@ -165,7 +165,7 @@ class PluginReservationReservation extends CommonDBTM
    } */
 
    /**
-    * @return array reservations infos mixed with plugin reservations 
+    * @return array reservations infos mixed with plugin reservations
     */
    public static function getAllReservationsFromDates($begin, $end = '') {
       global $DB;
@@ -190,11 +190,11 @@ class PluginReservationReservation extends CommonDBTM
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
             while ($row = $DB->fetch_assoc($result)) {
-               $res[$row['reservations_id']] = $row;
+               $res[] = $row;
             }
          }
       }
-      Toolbox::logInFile('sylvain', "getAllReservationsFromDates RETURN : ".json_encode($res)."\n", $force = false);
+      //Toolbox::logInFile('sylvain', "getAllReservationsFromDates RETURN : ".json_encode($res)."\n", $force = false);
       return $res;
    }
 
@@ -919,6 +919,8 @@ function getMatDispo()
    return $myArray;
 }
 
+
+/*
 function compare_date_by_user($a, $b)
 {
    return strnatcmp($a['debut'], $b['debut']);
@@ -928,3 +930,4 @@ function compare_date_by_alluser($a, $b)
 {
    return strnatcmp($a[0]['debut'], $b[0]['debut']);
 }
+*/
