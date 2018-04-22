@@ -62,17 +62,17 @@ class PluginReservationMenu extends CommonGLPI
       $config = new PluginReservationConfig();
       $tabcoming = $config->getConfigurationValue("tabcoming");
       switch ($tabnum) {
-         case 1: //"My first tab"
+         case 1:
             self::displayTabContentForCurrentReservations($item);
             break;
-         case 2: //"My second tab""
+         case 2:
             if ($tabcoming) {
                self::displayTabContentForAllReservations($item);
             } else {
                self::displayTabContentForAvailableHardware($item);
             }
             break;
-         case 3: //"My third tab""
+         case 3:
             self::displayTabContentForAvailableHardware($item);
             break;
       }
@@ -104,17 +104,28 @@ class PluginReservationMenu extends CommonGLPI
       return $result;
    }
 
-   public static function displayTabContentForCurrentReservations($item) {
-      global $DB, $CFG_GLPI; //, $FORM_DATES;
+   public static function displayTabContentForCurrentReservations() {
       $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+      $begin = $form_dates["begin"];
+      $end = $form_dates["end"];
+      self::displayTabReservations($begin, $end);
+   }
+
+
+
+   public static function displayTabContentForAllReservations() {
+      $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+      $begin = $form_dates["begin"];
+      self::displayTabReservations($begin);
+   }
+
+   private static function displayTabReservations($begin, $end = '') {
+      global $DB, $CFG_GLPI;
 
       $showentity = Session::isMultiEntitiesMode();
       $config = new PluginReservationConfig();
       $includeFuture = $config->getConfigurationValue("tabcoming");
       $mode = $config->getConfigurationValue("mode_auto");
-
-      $begin = $form_dates["begin"];
-      $end = $form_dates["end"];
 
       echo "<div class='center'>";
       echo "<table class='tab_cadre'>";
@@ -133,7 +144,7 @@ class PluginReservationMenu extends CommonGLPI
       echo "</tr></thead>";
       echo "<tbody>";
 
-      $list = PluginReservationReservation::getAllReservationsFromDates($begin, $end);
+      $list = PluginReservationReservation::getAllReservations($begin, $end);
       $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
 
       foreach ($ReservationsByUser as $reservation_user => $reservations_user_list) {
@@ -142,7 +153,7 @@ class PluginReservationMenu extends CommonGLPI
          });
          $user = new User();
          $user->getFromDB($reservation_user);
-         Toolbox::logInFile('sylvain', "USER : ".json_encode($user)."\n", $force = false);
+         // Toolbox::logInFile('sylvain', "USER : ".json_encode($user)."\n", $force = false);
 
          echo "<tr class='tab_bg_2'>";
          echo "<td colspan='100%' bgcolor='lightgrey' style='padding:1px;'/>";
@@ -162,10 +173,10 @@ class PluginReservationMenu extends CommonGLPI
             $reservation->getFromDB($reservation_user_info['reservations_id']);
 
             $reservationitems = $reservation->getConnexityItem('reservationitem', 'reservationitems_id');
-            Toolbox::logInFile('sylvain', "RESERVATIONITEM : ".json_encode($reservationitems)."\n", $force = false);
+            // Toolbox::logInFile('sylvain', "RESERVATIONITEM : ".json_encode($reservationitems)."\n", $force = false);
 
             $item = $reservationitems->getConnexityItem($reservationitems->fields['itemtype'], 'items_id');
-            Toolbox::logInFile('sylvain', "ITEM : ".json_encode($item)."\n", $force = false);
+            // Toolbox::logInFile('sylvain', "ITEM : ".json_encode($item)."\n", $force = false);
 
             $color = "";
             if ($reservation_user_info["begin"] > date("Y-m-d H:i:s", time())) {
@@ -173,12 +184,12 @@ class PluginReservationMenu extends CommonGLPI
             }
             if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
                $color = "bgcolor=\"red\"";
-               //$flagSurveille = 1;
             }
 
             // item
             echo "<td $color>";
-            getLinkforItem($item);
+            echo Html::link($item->fields['name'], $item->getFormURLWithID($item->fields['id']));
+            //getLinkforItem($item);
             echo "</td>";
             echo "<td $color>";
             getToolTipforItem($item);
@@ -232,7 +243,9 @@ class PluginReservationMenu extends CommonGLPI
             }
 
             // action
-            $available_reservationsitem = [];
+            $available_reservationsitem = PluginReservationReservation::getAvailablesItems($reservation->fields['begin'], $reservation->fields['end']);
+            //Toolbox::logInFile('sylvain', "getAvailablesItems : ".json_encode($available_reservationsitem)."\n", $force = false);
+
             echo "<td>";
             echo "<ul>";
 
@@ -241,7 +254,7 @@ class PluginReservationMenu extends CommonGLPI
             <form method='POST' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
             echo '<select name="add_item">';
             foreach ($available_reservationsitem as $item) {
-               echo "\t", '<option value="', key($item), '">', current($item), '</option>';
+               echo "\t", '<option value="', $item['items_id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() .' - '.$item["name"], '</option>';
             }
             echo "<input type='hidden' name='add_item_to_reservation' value='" . $reservation_user_info['reservations_id'] . "'>";
             echo "<input type='submit' class='submit' name='submit' value=" . _sx('button', 'Add') . ">";
@@ -253,7 +266,7 @@ class PluginReservationMenu extends CommonGLPI
             <form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
             echo '<select name="switch_item">';
             foreach ($available_reservationsitem as $item) {
-               echo "\t", '<option value="', key($item), '">', current($item), '</option>';
+               echo "\t", '<option value="', $item['items_id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() .' - '.$item["name"], '</option>';
             }
             echo "<input type='hidden' name='switch_item_to_reservation' value='" . $reservation_user_info['id'] . "'>";
             echo "<input type='submit' class='submit' name='submit' value=" . _sx('button', 'Save') . ">";
@@ -268,7 +281,6 @@ class PluginReservationMenu extends CommonGLPI
             echo "</ul>";
             echo "</td>";
 
-            
 
             if ($mode == "manual") {
                echo "<td>";
@@ -288,10 +300,6 @@ class PluginReservationMenu extends CommonGLPI
             echo "<tr class='tab_bg_2'>";
          }
          echo "</tr>";
-
-         //Toolbox::logInFile('sylvain', "TESSSST : ".json_encode(array_column($list, 'reservations_id'))."\n", $force = false);
-         //Toolbox::logInFile('sylvain', "TESSSST : ".json_encode(array_count_values(array_column($list, 'users_id')))."\n", $force = false);
-
       }
 
       echo "</tbody>";
@@ -299,15 +307,76 @@ class PluginReservationMenu extends CommonGLPI
       echo "</div>\n";
    }
 
-
-
-   public static function displayTabContentForAllReservations() {
-      echo "displayTabContentForAllReservations";
-   }
-
-
    public static function displayTabContentForAvailableHardware() {
-      echo "TdisplayTabContentForAvailableHardwareTAT";
+      global $DB, $CFG_GLPI;
+      $showentity = Session::isMultiEntitiesMode();
+      $config = new PluginReservationConfig();
+      $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+
+      $begin = $form_dates["begin"];
+      $end = $form_dates["end"];
+
+      $available_reservationsitem = PluginReservationReservation::getAvailablesItems($begin, $end);
+
+      echo "<div class='center'>\n";
+      echo "<form name='form' method='GET' action='../../../front/reservation.form.php'>\n";
+      echo "<table class='tab_cadre' style=\"border-spacing:20px;\">\n";
+      echo "<tr>";
+
+      $reservations = $CFG_GLPI["reservation_types"];
+
+      foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
+         $filtered_array = array_filter($available_reservationsitem,
+            function ($element) use ($itemtype) {
+               return ($element['itemtype'] == $itemtype);
+            } );
+
+         if (!$filtered_array) {
+            continue;
+         }
+         echo "<td valign=\"top\">";
+
+         $item = getItemForItemtype($itemtype);
+         echo "\n\t<table class='tab_cadre'>";
+         echo "<tr><th colspan='" . ($showentity ? "6" : "5") . "'>" . $item->getTypeName() . "</th></tr>\n";
+         foreach ($filtered_array as $reservation_item) {
+            $item->getFromDB($reservation_item['items_id']);
+
+            echo "<td>";
+            echo HTML::getCheckbox([
+               'name' => "item[" . $item->fields["id"] . "]",
+               "value" => $item->fields["id"]
+            ]);
+            echo "</td>";
+
+            echo "<td>";
+            echo Html::link($item->fields['name'], $item->getFormURLWithID($item->fields['id']));
+            echo "</td>";
+
+            echo "<td>" . nl2br($item->fields["comment"]) . "</td>";
+
+            echo "<td>";
+            getToolTipforItem($item);
+            echo "</td>";
+
+            echo "<td><a title=\"Show Calendar\" href='../../../front/reservation.php?reservationitems_id=" . $item->fields['id'] . "'>" . "<img title=\"\" alt=\"\" src=\"" . getGLPIUrl() . "pics/reservation-3.png\"></a></td>";
+            echo "</tr>\n";
+         }
+         echo "</table>\n";
+         echo "</td>";
+      }
+
+      echo "</tr>";
+      echo "<tr class='tab_bg_1 center'><td colspan='" . ($showentity ? "5" : "4") . "'>";
+      echo "<input type='submit' value='" . __('Create new reservation') . "' class='submit'></td></tr>\n";
+
+      echo "</table>\n";
+
+      echo "<input type='hidden' name='id' value=''>";
+      echo "<input type='hidden' name='begin' value='" . $begin . "'>";
+      echo "<input type='hidden' name='end' value='" . $end . "'>";
+      Html::closeForm();
+      echo "</div>\n";
    }
 
 
@@ -370,7 +439,7 @@ class PluginReservationMenu extends CommonGLPI
 
       echo "<form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
       echo "<table class='tab_cadre'><tr class='tab_bg_2'>";
-      echo "<th colspan='5'>" . __('Date') . "</th>";
+      echo "<th colspan='6'>" . __('Date') . "</th>";
       echo "</tr>";
 
       echo "<tr class='tab_bg_2'>";
@@ -386,13 +455,16 @@ class PluginReservationMenu extends CommonGLPI
       echo "</td>";
       echo "<td rowspan='3'>";
       echo "<input type='submit' class='submit' name='nextday' value='" . __('Next') . "'>";
-      echo "</td></tr>";
+      echo "</td>";
+      echo "<td rowspan='3'>";
+      echo '<a class="fa fa-undo reset-search" href="'. Toolbox::getItemTypeSearchURL(__CLASS__) . '?reset=reset" title="'.__('Reset').'"><span class="sr-only">'.__('Reset').'</span></a>';
+      echo "</td>";
+      echo "</tr>";
 
       echo "<tr class='tab_bg_2'><td>" . __('End date') . "</td><td>";
       Html::showDateTimeField('date_end', ['value' => $form_dates["end"], 'maybeempty' => false]);
       echo "</td></tr>";
       echo "</td></tr>";
-
       echo "</table>";
 
       Html::closeForm();

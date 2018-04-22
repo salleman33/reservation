@@ -143,10 +143,10 @@ function plugin_reservation_install() {
  */
 function plugin_reservation_uninstall() {
    global $DB;
-   $tables = ["glpi_plugin_reservation_reservations", "glpi_plugin_reservation_configs"];
+   /*$tables = ["glpi_plugin_reservation_reservations", "glpi_plugin_reservation_configs"];
    foreach ($tables as $table) {
       $DB->query("DROP TABLE IF EXISTS `$table`;");
-   }
+   }*/
    CronTask::unregister("Reservation");
    return true;
 }
@@ -178,7 +178,7 @@ function plugin_item_update_reservation($item) {
 
    $req = $DB->request('glpi_plugin_reservation_reservations', [
       'FIELDS' => 'effectivedate',
-      'WHERE' => ['reservations_id' => $items->fields['id']]
+      'WHERE' => ['reservations_id' => $item->fields['id']]
    ]);
    // maybe the reservation is over
    $resume = false;

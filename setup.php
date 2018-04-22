@@ -12,7 +12,7 @@ function plugin_init_reservation() {
 
    $PLUGIN_HOOKS['csrf_compliant']['reservation'] = true;
    $PLUGIN_HOOKS['add_css']['reservation'][] = "css/views.css";
-   //$PLUGIN_HOOKS['add_javascript']['reservation'] = ['scripts/tri.js'];
+   $PLUGIN_HOOKS['add_javascript']['reservation'] = ['scripts/tools.js'];
    $PLUGIN_HOOKS['config_page']['reservation'] = 'front/config.form.php';
    $PLUGIN_HOOKS['item_add']['reservation'] = ['Reservation' => 'plugin_item_add_reservation'];
    $PLUGIN_HOOKS['item_update']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
