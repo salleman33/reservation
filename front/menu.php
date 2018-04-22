@@ -15,8 +15,9 @@ if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')
    Html::displayNotFoundError();
 }
 
-
 Session::checkRight("reservation", [CREATE, UPDATE, DELETE]);
+
+
 
 $menu = new PluginReservationMenu();
 $menu->showFormDate();

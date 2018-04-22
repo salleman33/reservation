@@ -229,7 +229,7 @@ class PluginReservationReservation extends CommonDBTM
                                                     $_SESSION['glpiactiveentities'],
                                                     $item->maybeRecursive())."
                    ORDER BY `$itemtable`.`entities_id`,
-                            `$itemtable`.`name`";
+                            `$itemtable`.`name`+0";
 
          if ($res = $DB->query($query)) {
             while ($row = $DB->fetch_assoc($res)) {

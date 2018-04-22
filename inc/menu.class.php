@@ -239,12 +239,12 @@ class PluginReservationMenu extends CommonGLPI
             if ($reservation_user_info['effectivedate'] != null) {
                echo "<td>" . date(self::getDateFormat()." \à H:i:s", strtotime($reservation_user_info['effectivedate'])) . "</td>";
             } else {
-               echo "<td><center><a href=\"reservation.php?resareturn=" . $reservation_user_info['reservations_id'] . "\"><img title=\"" . _x('tooltip', 'Set As Returned') . "\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
+               echo "<td><center><a href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?resareturn=" . $reservation_user_info['reservations_id'] . "\"><img title=\"" . _x('tooltip', 'Set As Returned') . "\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
             }
 
             // action
             $available_reservationsitem = PluginReservationReservation::getAvailablesItems($reservation->fields['begin'], $reservation->fields['end']);
-            //Toolbox::logInFile('sylvain', "getAvailablesItems : ".json_encode($available_reservationsitem)."\n", $force = false);
+            // Toolbox::logInFile('sylvain', "getAvailablesItems : ".json_encode(__CLASS__)."\n", $force = false);
 
             echo "<td>";
             echo "<ul>";
@@ -277,7 +277,7 @@ class PluginReservationMenu extends CommonGLPI
 
             echo "<td>";
             echo "<ul>";
-            echo "<li><a class=\"bouton\" title=\"Editer la reservation\" href='../../../front/reservation.form.php?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
+            echo "<li><a class=\"bouton\" title=\"Editer la reservation\" href='".Toolbox::getItemTypeFormURL('Reservation')."?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
             echo "</ul>";
             echo "</td>";
 
@@ -286,7 +286,7 @@ class PluginReservationMenu extends CommonGLPI
                echo "<td>";
                echo "<ul>";
                if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
-                  echo "<li><a class=\"bouton\" title=\"" . _sx('tooltip', 'Send an e-mail for the late reservation') . "\" href=\"reservation.php?mailuser=" . $resa['resaid'] . "\">" . _sx('button', 'Send an e-mail') . "</a></li>";
+                  echo "<li><a class=\"bouton\" title=\"" . _sx('tooltip', 'Send an e-mail for the late reservation') . "\" href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?mailuser=" . $resa['resaid'] . "\">" . _sx('button', 'Send an e-mail') . "</a></li>";
                   if (isset($reservation_user_info['mailingdate'])) {
                      echo "<li>" . __('Last e-mail sent on') . " </li>";
                      echo "<li>" . date(self::getDateFormat()." \à H:i:s", strtotime($reservation_user_info['mailingdate'])) . "</li>";
@@ -319,7 +319,7 @@ class PluginReservationMenu extends CommonGLPI
       $available_reservationsitem = PluginReservationReservation::getAvailablesItems($begin, $end);
 
       echo "<div class='center'>\n";
-      echo "<form name='form' method='GET' action='../../../front/reservation.form.php'>\n";
+      echo "<form name='form' method='GET' action='".Reservation::getFormURL()."'>\n";
       echo "<table class='tab_cadre' style=\"border-spacing:20px;\">\n";
       echo "<tr>";
 
@@ -341,19 +341,18 @@ class PluginReservationMenu extends CommonGLPI
          echo "<tr><th colspan='" . ($showentity ? "6" : "5") . "'>" . $item->getTypeName() . "</th></tr>\n";
          foreach ($filtered_array as $reservation_item) {
             $item->getFromDB($reservation_item['items_id']);
-
             echo "<td>";
             echo HTML::getCheckbox([
                'name' => "item[" . $item->fields["id"] . "]",
-               "value" => $item->fields["id"]
+               "value" => $item->fields["id"],
+               "zero_on_empty" => false
             ]);
             echo "</td>";
 
             echo "<td>";
             echo Html::link($item->fields['name'], $item->getFormURLWithID($item->fields['id']));
             echo "</td>";
-
-            echo "<td>" . nl2br($item->fields["comment"]) . "</td>";
+            echo "<td>" . nl2br($reservation_item['comment']) . "</td>";
 
             echo "<td>";
             getToolTipforItem($item);
