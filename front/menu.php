@@ -17,6 +17,24 @@ if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')
 
 Session::checkRight("reservation", [CREATE, UPDATE, DELETE]);
 
+if (isset($_GET['mailuser'])) {
+   $PluginReservationReservation->sendMail($_GET['sendMail']);
+}
+if (isset($_GET['checkout'])) {
+   PluginReservationReservation::checkoutReservation($_GET['checkout']);
+}
+
+if (isset($_POST['add_item_to_reservation'])) {
+   $current_reservation = $_POST['add_item_to_reservation'];
+   $item_to_add = $_POST['add_item'];
+   PluginReservationReservation::addItemToResa($item_to_add, $current_reservation);
+}
+
+if (isset($_POST['switch_item_to_reservation'])) {
+   $current_reservation = $_POST['switch_item_to_reservation'];
+   $item_to_switch = $_POST['switch_item'];
+   PluginReservationReservation::switchItemToResa($item_to_switch, $current_reservation);
+}
 
 
 $menu = new PluginReservationMenu();

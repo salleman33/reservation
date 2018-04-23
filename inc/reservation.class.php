@@ -162,14 +162,24 @@ class PluginReservationReservation extends CommonDBTM
    /**
     * @return array reservations infos mixed with plugin reservations
     */
-   public static function getAllReservations($begin, $end = '') {
+   public static function getAllReservations($begin = '', $end = '', $filter = '') {
       global $DB;
 
       $res = [];
-      $and = '';
+      $where = '';
+
+      if ($begin == '') {
+         $where .= "WHERE '".$end."' >= `end`";
+      } else {
+         $where .= "WHERE '".$begin."' < `end`";
+      }
 
       if ($end != '') {
-         $and = "AND '".$end."' > `begin`";
+         $where .= " AND '".$end."' > `begin`";
+      }
+
+      if ($filter != '') {
+         $filter = ' AND '.$filter;
       }
 
       $reservation_table = getTableForItemType('reservation');
@@ -178,9 +188,10 @@ class PluginReservationReservation extends CommonDBTM
       $query = "SELECT *
                FROM $reservation_table
                   , $plugin_table
-               WHERE '".$begin."' < `end`
-                     ".$and."
-               AND ".$plugin_table.".reservations_id = ".$reservation_table.".id";
+               $where
+               AND ".$plugin_table.".reservations_id = ".$reservation_table.".id".
+               $filter;
+      // Toolbox::logInFile('sylvain', "QUERY : ".$query."\n", $force = false);
 
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
@@ -189,7 +200,7 @@ class PluginReservationReservation extends CommonDBTM
             }
          }
       }
-      //Toolbox::logInFile('sylvain', "getAllReservationsFromDates RETURN : ".json_encode($res)."\n", $force = false);
+      Toolbox::logInFile('sylvain', "getAllReservationsFromDates RETURN : ".json_encode($res)."\n", $force = false);
       return $res;
    }
 
@@ -233,8 +244,6 @@ class PluginReservationReservation extends CommonDBTM
 
          if ($res = $DB->query($query)) {
             while ($row = $DB->fetch_assoc($res)) {
-               //$typename = $item->getTypeName();
-               //$result[] = array_merge($row, ['typename'=>$typename]);
                $result[] = array_merge($row, ['itemtype'=>$itemtype]);
             }
          }
@@ -243,396 +252,77 @@ class PluginReservationReservation extends CommonDBTM
    }
 
 
-   // public static function getAvailablesItems($begin, $end) {
-   //    global $DB, $CFG_GLPI;
-   //    $showentity = Session::isMultiEntitiesMode();
-   //    $result = [];
-
-   //    foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
-   //       if (!($item = getItemForItemtype($itemtype))) {
-   //          continue;
-   //       }
-   //       $itemtable = getTableForItemType($itemtype);
-   //       $otherserial = "'' AS otherserial";
-   //       if ($item->isField('otherserial')) {
-   //          $otherserial = "`$itemtable`.`otherserial`";
-   //       }
-   //       $left = "";
-   //       $where = "";
-   //       $left = "LEFT JOIN `glpi_reservations`
-   //                      ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
-   //                          AND '". $begin."' < `glpi_reservations`.`end`
-   //                          AND '". $end."' > `glpi_reservations`.`begin`)";
-
-   //       $where = " AND `glpi_reservations`.`id` IS NULL ";
-
-   //       $query = "SELECT `glpi_reservationitems`.`id`,
-   //                        `glpi_reservationitems`.`comment`,
-   //                        `$itemtable`.`name` AS name,
-   //                        `$itemtable`.`entities_id` AS entities_id,
-   //                        $otherserial,
-   //                        `glpi_reservationitems`.`items_id` AS items_id
-   //                 FROM `glpi_reservationitems`
-   //                 INNER JOIN `$itemtable`
-   //                      ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
-   //                          AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
-   //                 $left
-   //                 WHERE `glpi_reservationitems`.`is_active` = '1'
-   //                       AND `glpi_reservationitems`.`is_deleted` = '0'
-   //                       AND `$itemtable`.`is_deleted` = '0'
-   //                       $where ".
-   //                       getEntitiesRestrictRequest(" AND", $itemtable, '',
-   //                                                  $_SESSION['glpiactiveentities'],
-   //                                                  $item->maybeRecursive())."
-   //                 ORDER BY `$itemtable`.`entities_id`,
-   //                          `$itemtable`.`name`";
-
-   //       if ($res = $DB->query($query)) {
-   //          while ($row = $DB->fetch_assoc($res)) {
-   //             $typename = $item->getTypeName();
-   //             if ($itemtype == 'Peripheral') {
-   //                $item->getFromDB($row['items_id']);
-   //                if (isset($item->fields["peripheraltypes_id"])
-   //                    && ($item->fields["peripheraltypes_id"] != 0)) {
-
-   //                   $typename = Dropdown::getDropdownName("glpi_peripheraltypes",
-   //                                                         $item->fields["peripheraltypes_id"]);
-   //                }
-   //             }
-   //             $text = '';
-   //             if ($showentity) {
-   //                $text = Dropdown::getDropdownName("glpi_entities", $row["entities_id"]).' - '.$typename.' - '.$row["name"];
-   //             } else {
-   //                $text = $typename.' - '.$row["name"];
-   //             }
-   //             $result[$row['id']] = $text;
-   //          }
-   //       }
-   //    }
-   //    return $result;
-   // }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   // /**
-   //  * Fonction permettant d'afficher les materiels disponibles et de faire une nouvelle reservation
-   //  * C'est juste une interface differente de celle de GLPI. Pour les nouvelles reservations, on utilise les fonctions du coeur de GLPI
-   //  **/
-   //  public static function showDispoAndFormResa()
-   //  {
-   //     global $DB, $CFG_GLPI, $datesresa;
-   //     $showentity = Session::isMultiEntitiesMode();
-   //     $config = new PluginReservationConfig();
- 
-   //     $begin = $datesresa["begin"];
-   //     $end = $datesresa["end"];
-   //     $left = "";
-   //     $where = "";
- 
-   //     echo "<div class='center'>\n";
-   //     echo "<form name='form' method='GET' action='../../../front/reservation.form.php'>\n";
-   //     echo "<table class='tab_cadre' style=\"border-spacing:20px;\">\n";
-   //     echo "<tr>";
- 
-   //     //get max number of item in a category
-   //     $query = "SELECT itemtype, count(itemtype) as count FROM glpi_reservationitems WHERE glpi_reservationitems.is_active=1 AND glpi_reservationitems.is_deleted=0 GROUP BY itemtype";
-   //     if ($result = $DB->query($query)) {
-   //        while ($row = $DB->fetch_assoc($result)) {
-   //           $typesNb_array[$row["itemtype"]] = $row["count"];
-   //        }
-   //        $maxNbItems = max(array_values($typesNb_array));
-   //     }
-   //     static $currentItemRowSize = 0;
-   //     $test = 0;
-   //     $changeRow = false;
- 
-   //     $reservations = $CFG_GLPI["reservation_types"];
-   //     echo "<td>";
- 
-   //     foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
-   //        if (!($item = getItemForItemtype($itemtype))) {
-   //           continue;
-   //        }
- 
-   //        $itemtable = getTableForItemType($itemtype);
- 
-   //        $otherserial = "'' AS otherserial";
- 
-   //        if ($item->isField('otherserial')) {
-   //           $otherserial = "`$itemtable`.`otherserial`";
-   //        }
- 
-   //        if (isset($begin) && isset($end)) {
-   //           $left = "LEFT JOIN `glpi_reservations`
-   //          ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
-   //          AND '" . $begin . "' < `glpi_reservations`.`end`
-   //          AND '" . $end . "' > `glpi_reservations`.`begin`)";
-   //           $where = " AND `glpi_reservations`.`id` IS NULL ";
-   //        }
- 
-   //        $query = "SELECT `glpi_reservationitems`.`id`,
-   //        `glpi_reservationitems`.`comment`,
-   //        `$itemtable`.`id` AS materielid,
-   //        `$itemtable`.`name` AS name,
-   //        `$itemtable`.`entities_id` AS entities_id,
-   //        $otherserial,
-   //        `glpi_locations`.`completename` AS location,
-   //        `glpi_reservationitems`.`items_id` AS items_id,
-   //        `glpi_manufacturers`.`name` AS manufacturer
-   //        FROM `glpi_reservationitems`
-   //          $left
-   //          INNER JOIN `$itemtable`
-   //          ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
-   //          AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
-   //          LEFT JOIN `glpi_locations`
-   //          ON (`$itemtable`.`locations_id` = `glpi_locations`.`id`)
-   //     #Left join produce null value when value does not exist
-   //     LEFT JOIN `glpi_manufacturers`
-   //     ON (`$itemtable`.`manufacturers_id` = `glpi_manufacturers`.`id`)
-   //          WHERE `glpi_reservationitems`.`is_active` = '1'
-   //            AND `glpi_reservationitems`.`is_deleted` = '0'
-   //            AND `$itemtable`.`is_deleted` = '0'
-   //          $where " .
-   //        getEntitiesRestrictRequest(" AND", $itemtable, '',
-   //           $_SESSION['glpiactiveentities'],
-   //           $item->maybeRecursive()) . "
-   //        ORDER BY `$itemtable`.`entities_id`,
-   //       `$itemtable`.`name`";
- 
-   //        if ($result = $DB->query($query)) {
-   //           $test++;
-
-   //           // If there is at least one item, prepare the table header for the type
-   //           if ($DB->numrows($result)) {
- 
-   //              $currentItemRowSize += $typesNb_array[$itemtype];
-   //              Toolbox::logInFile('sylvain', "TEST : $test :$itemtype ".$currentItemRowSize.'//'. $typesNb_array[$itemtype]."\n", $force = false);
-
-   //              if ($currentItemRowSize < $maxNbItems) {
-   //                 $changeRow = false;
-   //              } else {
- 
-   //                 $changeRow = true;
-
-   //                 $currentItemRowSize = $typesNb_array[$itemtype];
-   //                 Toolbox::logInFile('sylvain', "RAAAAAZZZZ : $test :$itemtype ".$currentItemRowSize.'//'. $typesNb_array[$itemtype]."\n", $force = false);
-
-   //              }
-   //              if ($changeRow) {
-   //                 echo "</td><td>";
-   //              } else {
- 
-   //                 echo "<div style='padding: 10px;'></div>";
-   //              }
-   //              echo "\n\t<table class='tab_cadre'>";
-   //              echo "<tr><th colspan='" . ($showentity ? "6" : "5") . "'>" . $item->getTypeName() . "</th></tr>\n";
-   //           }
- 
-   //           // Display all items entries for the current type
-   //           while ($row = $DB->fetch_assoc($result)) {
-   //              $item->getFromDB($row['items_id']);
-   //              echo "<tr class='tab_bg_2'><td>";
-   //              echo "<input type='checkbox' name='item[" . $row["id"] . "]' value='" . $row["id"] . "'>" .$test. "</td>";
-   //              $typename = $item->getTypeName();
-   //              if ($itemtype == 'Peripheral') {
-   //                 // TODO isn't that already done ?
-   //                 $item->getFromDB($row['items_id']);
-   //                 if (isset($item->fields["peripheraltypes_id"]) && ($item->fields["peripheraltypes_id"] != 0)) {
-   //                    $typename = Dropdown::getDropdownName("glpi_peripheraltypes",
-   //                       $item->fields["peripheraltypes_id"]);
-   //                 }
-   //              }
- 
-   //              echo "<td>";
-   //              getLinkforItem($item);
-   //              echo "</td>";
- 
-   //              echo "<td>" . nl2br($row["comment"]) . "</td>";
-   //              if ($showentity) {
-   //                 echo "<td>" . Dropdown::getDropdownName("glpi_entities", $row["entities_id"]) . "</td>";
-   //              }
- 
-   //              echo "<td>";
-   //              getToolTipforItem($item);
-   //              echo "</td>";
- 
-   //              echo "<td><a title=\"Show Calendar\" href='../../../front/reservation.php?reservationitems_id=" . $row['id'] . "'>" . "<img title=\"\" alt=\"\" src=\"" . getGLPIUrl() . "pics/reservation-3.png\"></a></td>";
-   //              echo "</tr>\n";
-   //           }
-   //           // if there is at least one entry for the current type
-   //           if ($DB->numrows($result)) {
-   //              echo "</table>";
- 
-   //           }
- 
-   //        }
- 
-   //     }
-   //     echo "</td>";
- 
-   //     echo "</tr>";
-   //     echo "<tr class='tab_bg_1 center'><td colspan='" . ($showentity ? "5" : "4") . "'>";
-   //     echo "<input type='submit' value='" . __('Create new reservation') . "' class='submit'></td></tr>\n";
- 
-   //     echo "</table>\n";
- 
-   //     echo "<input type='hidden' name='id' value=''>";
-   //     echo "<input type='hidden' name='begin' value='" . $begin . "'>";
-   //     echo "<input type='hidden' name='end' value='" . $end . "'>";
-   //     Html::closeForm();
-   //     echo "</div>\n";
-   //  }
-
-
-
-
-
-
-   public function mailUser($resaid)
-   {
+   public static function sendMail($reservation_id) {
       global $DB, $CFG_GLPI;
       $reservation = new Reservation();
-      $reservation->getFromDB($resaid);
+      $reservation->getFromDB($reservation_id);
       NotificationEvent::raiseEvent('plugin_reservation_expiration', $reservation);
-      $config = new PluginReservationConfig();
 
-      $query = "UPDATE `glpi_plugin_reservation_manageresa` SET `dernierMail`= '" . date("Y-m-d H:i:s", time()) . "' WHERE `resaid` = " . $resaid;
-      $DB->query($query) or die("error on 'update' in mailUser: " . $DB->error());
+      $tablename = getTableForItemType(__CLASS__);
+      $query = "UPDATE `".$tablename."` SET `mailingdate`= '" . date("Y-m-d H:i:s", time()) . "' WHERE `reservations_id` = " . $reservation_id;
+      $DB->query($query) or die("error on 'update' in sendMail: " . $DB->error());
 
+      Event::log($reservation_id, "reservation", 4, "inventory",
+                  sprintf(__('%1$s sends email for the reservation %2$s'),
+                           $_SESSION["glpiname"], $reservation_id));
    }
 
-   /**
-    * Fonction permettant de marquer une reservation comme rendue
-    * Si elle etait dans la table glpi_plugin_reservation_manageresa (c'etait donc une reservation prolongée), on insert la date de retour à l'heure actuelle ET on met à jour la date de fin de la vraie reservation.
-    * Sinon, on insert une nouvelle entree dans la table pour avoir un historique du retour de la reservation ET on met à jour la date de fin de la vraie reservation
-    **/
-   public function resaReturn($resaid)
-   {
+   public static function checkoutReservation($reservation_id) {
       global $DB, $CFG_GLPI;
-      // on cherche dans la table de gestion des resa du plugin
-      $query = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = " . $resaid;
-      $trouve = 0;
-      $matId;
-      if ($result = $DB->query($query)) {
-         // $matId =
-         if ($DB->numrows($result)) {
-            $trouve = 1;
-         }
 
-      }
+      $tablename = getTableForItemType(__CLASS__);
+      // Toolbox::logInFile('sylvain', "checkoutReservation RETURN : ".$tablename."\n", $force = false);
+      $query = "UPDATE `".$tablename."` 
+               SET `effectivedate` = '" . date("Y-m-d H:i:s", time()) . "' 
+               WHERE `reservations_id` = '" . $reservation_id . "';";
+      $DB->query($query) or die("error on checkoutReservation 1 : " . $DB->error());
 
-      $ok = 0;
-      if ($trouve) {
-         // maj de la date de retour dans la table manageresa du plugin
-         $query = "UPDATE `glpi_plugin_reservation_manageresa` SET `date_return` = '" . date("Y-m-d H:i:s", time()) . "' WHERE `resaid` = '" . $resaid . "';";
-         $DB->query($query) or die("error on 'update' into glpi_plugin_reservation_manageresa / hash: " . $DB->error());
-         $ok = 1;
-      } else {
-         $temps = time();
-         // insertion de la reservation dans la table manageresa
-         $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `matid`, `date_return`, `date_theorique`, `itemtype`) VALUES ('" . $resaid . "', '0',  '" . date("Y-m-d H:i:s", $temps) . "', '" . date("Y-m-d H:i:s", $temps) . "','null');";
-         $DB->query($query) or die("error on 'insert' into glpi_plugin_reservation_manageresa / hash: " . $DB->error());
-         $ok = 1;
-      }
+      $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", time()) . "' WHERE `id`='" . $reservation_id . "';";
+      $DB->query($query) or die("error on checkoutReservation 2 : " . $DB->error());
 
-      //update de la vrai reservation
-      if ($ok) {
-         $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", time()) . "' WHERE `id`='" . $resaid . "';";
-         $DB->query($query) or die("error on 'update' into glpi_reservations / hash: " . $DB->error());
-      }
+      Event::log($reservation_id, "reservation", 4, "inventory",
+                  sprintf(__('%1$s marks the reservation %2$s as returned'),
+                           $_SESSION["glpiname"], $reservation_id));
    }
 
 
-   public function addToResa($idmat, $idresa)
-   {
+   public static function addItemToResa($item_id, $reservation_id) {
+      $resa = new Reservation();
+      $resa->getFromDb($reservation_id);
 
-      global $DB, $CFG_GLPI;
-
-      $query = "SELECT * FROM `glpi_reservations` WHERE `id`='" . $idresa . "';";
-      $result = $DB->query($query) or die("error on 'select' dans addToResa / 1: " . $DB->error());
-
-      $matToAdd = $DB->fetch_assoc($result);
-
-      $query = "INSERT INTO  `glpi_reservations` (`begin`, `end`, `reservationitems_id`,`users_id`) VALUES ('" . $matToAdd['begin'] . "', '" . $matToAdd['end'] . "', '" . $idmat . "', '" . $matToAdd['users_id'] . "');";
-      $DB->query($query) or die("error on 'insert' dans addToResa / hash: " . $DB->error());
-
-      // pour avoir l'id et l'itemtypede la nouvelle reservation créée
-      $query = "SELECT `glpi_reservations`.`id`, `glpi_reservationitems`.`itemtype` FROM `glpi_reservations`, `glpi_reservationitems`  WHERE `begin` = '" . $matToAdd['begin'] . "' AND `end` = '" . $matToAdd['end'] . "' AND `reservationitems_id` = '" . $idmat . "' AND `users_id` ='" . $matToAdd['users_id'] . "' AND `glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`";
-      $result = $DB->query($query) or die("error on 'select' dans addToResa / 2: " . $DB->error());
-      $res = $DB->fetch_row($result);
-      $idnewreservation = $res[0];
-      $itemtypenewresa = $res[1];
-
-      //on regarde si la reservation à laquelle on ajoute le materiel est deja "surveillée", pour  alors surveiller le nouveau mat
-      $query = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE `resaid` = '" . $idresa . "';";
-      $result = $DB->query($query) or die("error on 'select' dans addToResa / manageresa: " . $DB->error());
-
-      if ($DB->numrows($result) > 0) {
-         $row = $DB->fetch_assoc($result);
-         if ($row['date_return'] == null) {
-            $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `matid`, `itemtype`,  `date_theorique`) VALUES ('" . $idnewreservation . "', '" . $idmat . "', '" . $itemtypenewresa . "', '" . $row['date_theorique'] . "');";
-         } else {
-            $query = "INSERT INTO  `glpi_plugin_reservation_manageresa` (`resaid`, `matid`, `itemtype`, `date_return`, `date_theorique`) VALUES ('" . $idnewreservation . "', '" . $idmat . "', '" . $itemtypenewresa . "', " . $row['date_return'] . "', '" . $row['date_theorique'] . "');";
-         }
-
-         $DB->query($query) or die("error on 'insert' in addToResa / hash: " . $DB->error());
-
+      $rr = new Reservation();
+      $input                        = [];
+      $input['reservationitems_id'] = $item_id;
+      $input['comment']             = $resa->fields['comment'];
+      $input['group']               = $rr->getUniqueGroupFor($item_id);
+      $input['begin']               = $resa->fields['begin'];
+      $input['end']                 = $resa->fields['end'];
+      $input['users_id']            = $resa->fields['users_id'];
+      unset($rr->fields["id"]);
+      Toolbox::logInFile('sylvain', "addItemToResa INPUT : ".json_encode($input)."\n", $force = false);
+      if ($newID = $rr->add($input)) {
+         Event::log($newID, "reservation", 4, "inventory",
+                  sprintf(__('%1$s adds the reservation %2$s for item %3$s'),
+                           $_SESSION["glpiname"], $newID, $item_id));
       }
-
+      // Toolbox::logInFile('sylvain', "addItemToResa RETURN : ".json_encode($newID)."\n", $force = false);
    }
 
-   public function replaceResa($idmat, $idresa)
-   {
-      global $DB, $CFG_GLPI;
+   public static function switchItemToResa($item_id, $reservation_id) {
+      global $DB;
 
-      $query = "UPDATE `glpi_reservations` SET `reservationitems_id`='" . $idmat . "' WHERE `id`='" . $idresa . "';";
+      $query = "UPDATE `glpi_reservations` SET `reservationitems_id`='" . $item_id . "' WHERE `id`='" . $reservation_id . "';";
       $DB->query($query) or die("error on 'update' in replaceResa / hash: " . $DB->error());
-
+      Event::log($reservation_id, "reservation", 4, "inventory",
+                  sprintf(__('%1$s switchs the reservation %2$s with item %3$s'),
+                          $_SESSION["glpiname"], $reservation_id, $item_id));
    }
 
 }
 
-function getLinkforItem($item)
-{
+function getLinkforItem($item) {
    $itemLink = $item->getFormUrl();
    $argConcatenator = "?";
    if (strpos($itemLink, '?') !== false) {
@@ -643,8 +333,7 @@ function getLinkforItem($item)
 
 }
 
-function getToolTipforItem($item)
-{
+function getToolTipforItem($item) {
    $config = new PluginReservationConfig();
 
    $show_toolTip = $config->getConfigurationValue("tooltip");
@@ -686,32 +375,28 @@ function getToolTipforItem($item)
    Html::showToolTip($tooltip, null);
 }
 
-function getGroupFromItem($item)
-{
+function getGroupFromItem($item) {
    $group_id = $item->fields["groups_id"];
    $group_tmp = new Group();
    $group_tmp->getFromDB($group_id);
    return $group_tmp->getName();
 }
 
-function getLocationFromItem($item)
-{
+function getLocationFromItem($item) {
    $location_id = $item->fields["locations_id"];
    $location_tmp = new Location();
    $location_tmp->getFromDB($location_id);
    return $location_tmp->getName();
 }
 
-function getManufacturerFromItem($item)
-{
+function getManufacturerFromItem($item) {
    $manufacturer_id = $item->fields["manufacturers_id"];
    $manufacturer_tmp = new Manufacturer();
    $manufacturer_tmp->getFromDB($manufacturer_id);
    return $manufacturer_tmp->getName();
 }
 
-function getModelFromItem($item)
-{
+function getModelFromItem($item) {
    global $DB;
    $typemodel = "N/A";
    $modeltable = getSingular($item->getTable()) . "models";
@@ -815,73 +500,73 @@ function getModelFromItem($item)
 
 
 
-function getMatDispo()
-{
+// function getMatDispo()
+// {
 
-   global $DB, $CFG_GLPI, $datesresa;
+//    global $DB, $CFG_GLPI, $datesresa;
 
-   $showentity = Session::isMultiEntitiesMode();
+//    $showentity = Session::isMultiEntitiesMode();
 
-   $begin = $datesresa["begin"];
-   $end = $datesresa["end"];
-   $left = "";
-   $where = "";
-   $myArray = [];
+//    $begin = $datesresa["begin"];
+//    $end = $datesresa["end"];
+//    $left = "";
+//    $where = "";
+//    $myArray = [];
 
-   foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
-      if (!($item = getItemForItemtype($itemtype))) {
-         continue;
-      }
+//    foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
+//       if (!($item = getItemForItemtype($itemtype))) {
+//          continue;
+//       }
 
-      $itemtable = getTableForItemType($itemtype);
-      $otherserial = "'' AS otherserial";
+//       $itemtable = getTableForItemType($itemtype);
+//       $otherserial = "'' AS otherserial";
 
-      if ($item->isField('otherserial')) {
-         $otherserial = "`$itemtable`.`otherserial`";
-      }
+//       if ($item->isField('otherserial')) {
+//          $otherserial = "`$itemtable`.`otherserial`";
+//       }
 
-      if (isset($begin) && isset($end)) {
-         $left = "LEFT JOIN `glpi_reservations`
-    ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
-        AND '" . $begin . "' < `glpi_reservations`.`end`
-        AND '" . $end . "' > `glpi_reservations`.`begin`)";
-         $where = " AND `glpi_reservations`.`id` IS NULL ";
-      }
+//       if (isset($begin) && isset($end)) {
+//          $left = "LEFT JOIN `glpi_reservations`
+//     ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
+//         AND '" . $begin . "' < `glpi_reservations`.`end`
+//         AND '" . $end . "' > `glpi_reservations`.`begin`)";
+//          $where = " AND `glpi_reservations`.`id` IS NULL ";
+//       }
 
-      $query = "SELECT `glpi_reservationitems`.`id`,
-  `glpi_reservationitems`.`comment`,
-  `$itemtable`.`id` AS materielid,
-  `$itemtable`.`name` AS name,
-  `$itemtable`.`entities_id` AS entities_id,
-  $otherserial,
-  `glpi_locations`.`completename` AS location,
-  `glpi_reservationitems`.`items_id` AS items_id
-    FROM `glpi_reservationitems`
-    $left
-    INNER JOIN `$itemtable`
-    ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
-        AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
-    LEFT JOIN `glpi_locations`
-    ON (`$itemtable`.`locations_id` = `glpi_locations`.`id`)
-    WHERE `glpi_reservationitems`.`is_active` = '1'
-    AND `glpi_reservationitems`.`is_deleted` = '0'
-    AND `$itemtable`.`is_deleted` = '0'
-    $where " .
-      getEntitiesRestrictRequest(" AND", $itemtable, '',
-         $_SESSION['glpiactiveentities'],
-         $item->maybeRecursive()) . "
-    ORDER BY `$itemtable`.`entities_id`,
-  `$itemtable`.`name`";
+//       $query = "SELECT `glpi_reservationitems`.`id`,
+//   `glpi_reservationitems`.`comment`,
+//   `$itemtable`.`id` AS materielid,
+//   `$itemtable`.`name` AS name,
+//   `$itemtable`.`entities_id` AS entities_id,
+//   $otherserial,
+//   `glpi_locations`.`completename` AS location,
+//   `glpi_reservationitems`.`items_id` AS items_id
+//     FROM `glpi_reservationitems`
+//     $left
+//     INNER JOIN `$itemtable`
+//     ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
+//         AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
+//     LEFT JOIN `glpi_locations`
+//     ON (`$itemtable`.`locations_id` = `glpi_locations`.`id`)
+//     WHERE `glpi_reservationitems`.`is_active` = '1'
+//     AND `glpi_reservationitems`.`is_deleted` = '0'
+//     AND `$itemtable`.`is_deleted` = '0'
+//     $where " .
+//       getEntitiesRestrictRequest(" AND", $itemtable, '',
+//          $_SESSION['glpiactiveentities'],
+//          $item->maybeRecursive()) . "
+//     ORDER BY `$itemtable`.`entities_id`,
+//   `$itemtable`.`name`";
 
-      if ($result = $DB->query($query)) {
+//       if ($result = $DB->query($query)) {
 
-         while ($row = $DB->fetch_assoc($result)) {
-            array_push($myArray, [$row["id"] => $row["name"]]);
-         }
-      }
-   }
-   return $myArray;
-}
+//          while ($row = $DB->fetch_assoc($result)) {
+//             array_push($myArray, [$row["id"] => $row["name"]]);
+//          }
+//       }
+//    }
+//    return $myArray;
+// }
 
 
 /*

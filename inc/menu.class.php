@@ -146,6 +146,7 @@ class PluginReservationMenu extends CommonGLPI
 
       $list = PluginReservationReservation::getAllReservations($begin, $end);
       $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
+      ksort($ReservationsByUser);
 
       foreach ($ReservationsByUser as $reservation_user => $reservations_user_list) {
          uasort($reservations_user_list, function ($a, $b) {
@@ -239,36 +240,38 @@ class PluginReservationMenu extends CommonGLPI
             if ($reservation_user_info['effectivedate'] != null) {
                echo "<td>" . date(self::getDateFormat()." \à H:i:s", strtotime($reservation_user_info['effectivedate'])) . "</td>";
             } else {
-               echo "<td><center><a href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?resareturn=" . $reservation_user_info['reservations_id'] . "\"><img title=\"" . _x('tooltip', 'Set As Returned') . "\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
+               echo "<td><center><a href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?checkout=" . $reservation_user_info['reservations_id'] . "\"><img title=\"" . _x('tooltip', 'Set As Returned') . "\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
             }
 
             // action
             $available_reservationsitem = PluginReservationReservation::getAvailablesItems($reservation->fields['begin'], $reservation->fields['end']);
             // Toolbox::logInFile('sylvain', "getAvailablesItems : ".json_encode(__CLASS__)."\n", $force = false);
-
             echo "<td>";
             echo "<ul>";
 
+            // add item
             echo "<li><span class=\"bouton\" id=\"bouton_add" . $reservation_user_info['reservations_id'] . "\" onclick=\"javascript:afficher_cacher('add" . $reservation_user_info['reservations_id'] . "');\">" . _sx('button', 'Add an item') . "</span>
             <div id=\"add" . $reservation_user_info['reservations_id'] . "\" style=\"display:none;\">
             <form method='POST' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
             echo '<select name="add_item">';
             foreach ($available_reservationsitem as $item) {
-               echo "\t", '<option value="', $item['items_id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() .' - '.$item["name"], '</option>';
+               echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() .' - '.$item["name"], '</option>';
             }
+
             echo "<input type='hidden' name='add_item_to_reservation' value='" . $reservation_user_info['reservations_id'] . "'>";
-            echo "<input type='submit' class='submit' name='submit' value=" . _sx('button', 'Add') . ">";
+            echo "<input type='submit' class='submit' name='add' value=" . _sx('button', 'Add') . ">";
             Html::closeForm();
             echo "</div></li>";
 
+            // switch item
             echo "<li><span class=\"bouton\" id=\"bouton_replace" . $reservation_user_info['reservations_id'] . "\" onclick=\"javascript:afficher_cacher('replace" . $reservation_user_info['reservations_id'] . "');\">" . _sx('button', 'Replace an item') . "</span>
             <div id=\"replace" . $reservation_user_info['reservations_id'] . "\" style=\"display:none;\">
             <form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
             echo '<select name="switch_item">';
             foreach ($available_reservationsitem as $item) {
-               echo "\t", '<option value="', $item['items_id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() .' - '.$item["name"], '</option>';
+               echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() .' - '.$item["name"], '</option>';
             }
-            echo "<input type='hidden' name='switch_item_to_reservation' value='" . $reservation_user_info['id'] . "'>";
+            echo "<input type='hidden' name='switch_item_to_reservation' value='" . $reservation_user_info['reservations_id'] . "'>";
             echo "<input type='submit' class='submit' name='submit' value=" . _sx('button', 'Save') . ">";
             Html::closeForm();
             echo "</div></li>";
