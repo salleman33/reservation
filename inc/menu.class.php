@@ -4,6 +4,7 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
+
 class PluginReservationMenu extends CommonGLPI
 {
 
@@ -144,17 +145,18 @@ class PluginReservationMenu extends CommonGLPI
       echo "</tr></thead>";
       echo "<tbody>";
 
-      $list = PluginReservationReservation::getAllReservations($begin, $end);
+      $filters = $end == '' ? [ "'".$begin."' < `end`"] : [ "'".$begin."' < `end`", "'".$end."' > `begin`"];
+      $list = PluginReservationReservation::getAllReservations($filters);
       $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
       ksort($ReservationsByUser);
 
       foreach ($ReservationsByUser as $reservation_user => $reservations_user_list) {
-         uasort($reservations_user_list, function ($a, $b) {
+         usort($reservations_user_list, function ($a, $b) {
             return strnatcmp($a['begin'], $b['begin']);
          });
          $user = new User();
          $user->getFromDB($reservation_user);
-         // Toolbox::logInFile('sylvain', "USER : ".json_encode($user)."\n", $force = false);
+         // Toolbox::logInFile('sylvain', "reservations_user_list : ".json_encode($reservations_user_list)."\n", $force = false);
 
          echo "<tr class='tab_bg_2'>";
          echo "<td colspan='100%' bgcolor='lightgrey' style='padding:1px;'/>";
@@ -329,6 +331,7 @@ class PluginReservationMenu extends CommonGLPI
       $reservations = $CFG_GLPI["reservation_types"];
 
       foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
+
          $filtered_array = array_filter($available_reservationsitem,
             function ($element) use ($itemtype) {
                return ($element['itemtype'] == $itemtype);
@@ -346,8 +349,8 @@ class PluginReservationMenu extends CommonGLPI
             $item->getFromDB($reservation_item['items_id']);
             echo "<td>";
             echo HTML::getCheckbox([
-               'name' => "item[" . $item->fields["id"] . "]",
-               "value" => $item->fields["id"],
+               'name' => "item[" . $reservation_item["id"] . "]",
+               "value" => $reservation_item["id"],
                "zero_on_empty" => false
             ]);
             echo "</td>";
@@ -357,11 +360,15 @@ class PluginReservationMenu extends CommonGLPI
             echo "</td>";
             echo "<td>" . nl2br($reservation_item['comment']) . "</td>";
 
+            if ($showentity) {
+               echo "<td>".Dropdown::getDropdownName("glpi_entities", $reservation_item["entities_id"])."</td>";
+            }
+
             echo "<td>";
             getToolTipforItem($item);
             echo "</td>";
 
-            echo "<td><a title=\"Show Calendar\" href='../../../front/reservation.php?reservationitems_id=" . $item->fields['id'] . "'>" . "<img title=\"\" alt=\"\" src=\"" . getGLPIUrl() . "pics/reservation-3.png\"></a></td>";
+            echo "<td><a title=\"Show Calendar\" href='../../../front/reservation.php?reservationitems_id=" . $reservation_item['id'] . "'>" . "<img title=\"\" alt=\"\" src=\"../../../pics/reservation-3.png\"></a></td>";
             echo "</tr>\n";
          }
          echo "</table>\n";

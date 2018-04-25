@@ -46,18 +46,60 @@ class PluginReservationTask extends CommonDBTM
       $return = 0;
 
       $time = time();
+      $time -= ($time % MINUTE_TIMESTAMP);
+      $begin = date("Y-m-d H:i:s", $time);
       $delay = $CFG_GLPI['time_step'] * MINUTE_TIMESTAMP;
       $end = date("Y-m-d H:i:s", $time + (2 * $delay));
-      $task->log("Temps : " . $time . " End : " . $end);
+      $task->log("Until : " . $end);
 
-      $reservations_list = PluginReservationReservations::getAllReservations('', $end, 'effectivedate is null');
+      $reservations_list = PluginReservationReservation::getAllReservations(["'".$end."' >= `end`", 'effectivedate is null']);
+      //Toolbox::logInFile('sylvain', "reservations_list : ".json_encode($reservations_list)."\n", $force = false);
 
       foreach ($reservations_list as $reservation) {
-         //CHANGER LA METHODE GETALLRESERVATIONS AVEC UNE LISTE DE FILTRE !!!
          $task->log(__('Extending reservation') . " : " . $reservation['reservations_id']);
+
+         // check conflit
+         $conflict_reservations = PluginReservationReservation::getAllReservations(["`begin` >= '".$begin."'", "`begin` <= '".$end."'"]);
+         foreach ($conflict_reservations as $conflict) {
+            if ($conflict['users_id'] == $reservation['users_id']
+               && $conflict['reservationitems_id'] == $reservation['reservationitem_id']) {
+               $user = new User();
+               $user->getFromDB($reservation_user);
+               $formatName = formatUserName($user->fields["id"], $user->fields["name"], $user->fields["realname"], $user->fields["firstname"]);
+               $task->log("$formatName a créé une nouvelle reservation pour le meme matos : " . $row['resaid']);
+            }
+
+            $task->log("CONFLIT avec la reservation du materiel " . $row['name'] . " par " . $row['username'] . " (du " . date("\L\e d-m-Y \à H:i:s", strtotime($row['begin'])) . " au " . date("\L\e d-m-Y \à H:i:s", strtotime($row['end'])));
+            $task->log("on supprime la resa numero : " . $row['resaid']);
+         }
+         
+         
+         $reservation = new Reservation();
+         $reservation->getFromDB($row['resaid']);
+         NotificationEvent::raiseEvent('plugin_reservation_conflit', $reservation);
+         
+         $query = "DELETE FROM `glpi_reservations` WHERE `id`='" . $row["resaid"] . "';";
+         $DB->query($query) or die("error on 'delete' into glpi_reservations lors du cron : " . $DB->error());
+
+
+
+
+
          $task->setVolume($return++);
 
       }
+      return $return;
+
+
+
+
+
+
+
+
+
+
+
 
       //on va prolonger toutes les resa managées qui n'ont pas de date de retour et qui sont en retard
       $query = "SELECT * FROM `glpi_plugin_reservation_manageresa` WHERE date_return is NULL;";
@@ -291,96 +333,97 @@ class PluginReservationTask extends CommonDBTM
             'other_field'  => 'Other value'
          ]
       );
-   }
-
-
-   public static function verifDisponibiliteAndMailIGS($task, $itemtype, $idMat, $currentResa, $datedebut, $datefin, $current_user_id)
-   {
-      global $DB, $CFG_GLPI;
-
-      $begin = $datedebut;
-      $end = $datefin;
-
-      $left = "";
-      $where = "";
-      $itemtable = getTableForItemType($itemtype);
-
-      if (isset($begin) && isset($end)) {
-         $left = "LEFT JOIN `glpi_reservations`
-ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
-AND '" . $begin . "' < `glpi_reservations`.`end`
-AND '" . $end . "' > `glpi_reservations`.`begin`)";
-         $where = " AND `glpi_reservations`.`id` IS NOT NULL
-AND `glpi_reservations`.`id` != '" . $currentResa . "'
-AND `glpi_reservationitems`.`items_id` = '" . $idMat . "'";
-      }
-      $query = "SELECT `glpi_reservationitems`.`id`,
-`glpi_reservationitems`.`comment`,
-`$itemtable`.`name` AS name,
-`$itemtable`.`entities_id` AS entities_id,
-`glpi_reservations`.`id` AS resaid,
-`glpi_reservations`.`comment`,
-`glpi_reservations`.`begin`,
-`glpi_reservations`.`end`,
-`glpi_reservations`.`comment`,
-`glpi_users`.`name` AS username,
-`glpi_reservationitems`.`items_id` AS items_id
-FROM `glpi_reservationitems`
-$left
-INNER JOIN `$itemtable`
-ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
-   AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
-LEFT JOIN `glpi_users`
-ON (`glpi_reservations`.`users_id` = `glpi_users`.`id`)
-WHERE `glpi_reservationitems`.`is_active` = '1'
-AND `glpi_reservationitems`.`is_deleted` = '0'
-AND `$itemtable`.`is_deleted` = '0'
-$where";
-
-      if ($result = $DB->query($query)) {
-         while ($row = $DB->fetch_assoc($result)) {
-
-            $user_id = self::find_user_from_resa($row['resaid']);
-            if ($user_id == $current_user_id) {
-               $task->log(" l'utilisateur " . $user_id . " (current : " . $current_user_id . ") a reservé de nouveau le matos " . $row['id'] . ", on supprime la nouvelle reservation numero " . $row['resaid']);
-               $query = "UPDATE `glpi_reservations` SET `end` = '" . $row['end'] . "' WHERE `id`='" . $currentResa . "';";
-               $DB->query($query) or die("error on 'update date end' into glpi_reservations lors du cron : " . $DB->error());
-               $query = "UPDATE `glpi_reservations` SET `comment` = concat(comment,' //// " . $row['comment'] . "') WHERE `id`='" . $currentResa . "';";
-               $DB->query($query) or die("error on 'update comment' into glpi_reservations lors du cron : " . $DB->error());
-               $query = "DELETE FROM `glpi_reservations` WHERE `id`='" . $row['resaid'] . "';";
-               $DB->query($query) or die("error on 'delete' into glpi_reservations lors du cron : " . $DB->error());
-               $query = "DELETE FROM `glpi_plugin_reservation_manageresa` WHERE `resaid`='" . $currentResa . "';";
-               $DB->query($query) or die("error on 'delete' into glpi_plugin_reservation_manageresa lors du cron : " . $DB->error());
-               return 1;
-            }
-
-            $task->log("CONFLIT avec la reservation du materiel " . $row['name'] . " par " . $row['username'] . " (du " . date("\L\e d-m-Y \à H:i:s", strtotime($row['begin'])) . " au " . date("\L\e d-m-Y \à H:i:s", strtotime($row['end'])));
-            $task->log("on supprime la resa numero : " . $row['resaid']);
-
-            $reservation = new Reservation();
-            $reservation->getFromDB($row['resaid']);
-            NotificationEvent::raiseEvent('plugin_reservation_conflit', $reservation);
-
-            $query = "DELETE FROM `glpi_reservations` WHERE `id`='" . $row["resaid"] . "';";
-            $DB->query($query) or die("error on 'delete' into glpi_reservations lors du cron : " . $DB->error());
-
-         }
       }
    }
 
-   public static function find_user_from_resa($resaid)
-   {
-      global $DB, $CFG_GLPI;
 
-      $query = "SELECT `glpi_reservations`.`users_id`
-FROM `glpi_reservations`, `glpi_plugin_reservation_manageresa`
-WHERE `glpi_reservations`.`id` = `glpi_plugin_reservation_manageresa`.`resaid`
-AND glpi_reservations.`id` = " . $resaid;
+//    public static function verifDisponibiliteAndMailIGS($task, $itemtype, $idMat, $currentResa, $datedebut, $datefin, $current_user_id)
+//    {
+//       global $DB, $CFG_GLPI;
 
-      if ($result = $DB->query($query)) {
-         while ($row = $DB->fetch_assoc($result)) {
-            return $row["users_id"];
-         }
-      }
-   }
+//       $begin = $datedebut;
+//       $end = $datefin;
+
+//       $left = "";
+//       $where = "";
+//       $itemtable = getTableForItemType($itemtype);
+
+//       if (isset($begin) && isset($end)) {
+//          $left = "LEFT JOIN `glpi_reservations`
+// ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
+// AND '" . $begin . "' < `glpi_reservations`.`end`
+// AND '" . $end . "' > `glpi_reservations`.`begin`)";
+//          $where = " AND `glpi_reservations`.`id` IS NOT NULL
+// AND `glpi_reservations`.`id` != '" . $currentResa . "'
+// AND `glpi_reservationitems`.`items_id` = '" . $idMat . "'";
+//       }
+//       $query = "SELECT `glpi_reservationitems`.`id`,
+// `glpi_reservationitems`.`comment`,
+// `$itemtable`.`name` AS name,
+// `$itemtable`.`entities_id` AS entities_id,
+// `glpi_reservations`.`id` AS resaid,
+// `glpi_reservations`.`comment`,
+// `glpi_reservations`.`begin`,
+// `glpi_reservations`.`end`,
+// `glpi_reservations`.`comment`,
+// `glpi_users`.`name` AS username,
+// `glpi_reservationitems`.`items_id` AS items_id
+// FROM `glpi_reservationitems`
+// $left
+// INNER JOIN `$itemtable`
+// ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
+//    AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
+// LEFT JOIN `glpi_users`
+// ON (`glpi_reservations`.`users_id` = `glpi_users`.`id`)
+// WHERE `glpi_reservationitems`.`is_active` = '1'
+// AND `glpi_reservationitems`.`is_deleted` = '0'
+// AND `$itemtable`.`is_deleted` = '0'
+// $where";
+
+//       if ($result = $DB->query($query)) {
+//          while ($row = $DB->fetch_assoc($result)) {
+
+//             $user_id = self::find_user_from_resa($row['resaid']);
+//             if ($user_id == $current_user_id) {
+//                $task->log(" l'utilisateur " . $user_id . " (current : " . $current_user_id . ") a reservé de nouveau le matos " . $row['id'] . ", on supprime la nouvelle reservation numero " . $row['resaid']);
+//                $query = "UPDATE `glpi_reservations` SET `end` = '" . $row['end'] . "' WHERE `id`='" . $currentResa . "';";
+//                $DB->query($query) or die("error on 'update date end' into glpi_reservations lors du cron : " . $DB->error());
+//                $query = "UPDATE `glpi_reservations` SET `comment` = concat(comment,' //// " . $row['comment'] . "') WHERE `id`='" . $currentResa . "';";
+//                $DB->query($query) or die("error on 'update comment' into glpi_reservations lors du cron : " . $DB->error());
+//                $query = "DELETE FROM `glpi_reservations` WHERE `id`='" . $row['resaid'] . "';";
+//                $DB->query($query) or die("error on 'delete' into glpi_reservations lors du cron : " . $DB->error());
+//                $query = "DELETE FROM `glpi_plugin_reservation_manageresa` WHERE `resaid`='" . $currentResa . "';";
+//                $DB->query($query) or die("error on 'delete' into glpi_plugin_reservation_manageresa lors du cron : " . $DB->error());
+//                return 1;
+//             }
+
+//             $task->log("CONFLIT avec la reservation du materiel " . $row['name'] . " par " . $row['username'] . " (du " . date("\L\e d-m-Y \à H:i:s", strtotime($row['begin'])) . " au " . date("\L\e d-m-Y \à H:i:s", strtotime($row['end'])));
+//             $task->log("on supprime la resa numero : " . $row['resaid']);
+
+//             $reservation = new Reservation();
+//             $reservation->getFromDB($row['resaid']);
+//             NotificationEvent::raiseEvent('plugin_reservation_conflit', $reservation);
+
+//             $query = "DELETE FROM `glpi_reservations` WHERE `id`='" . $row["resaid"] . "';";
+//             $DB->query($query) or die("error on 'delete' into glpi_reservations lors du cron : " . $DB->error());
+
+//          }
+//       }
+//    }
+
+//    public static function find_user_from_resa($resaid)
+//    {
+//       global $DB, $CFG_GLPI;
+
+//       $query = "SELECT `glpi_reservations`.`users_id`
+// FROM `glpi_reservations`, `glpi_plugin_reservation_manageresa`
+// WHERE `glpi_reservations`.`id` = `glpi_plugin_reservation_manageresa`.`resaid`
+// AND glpi_reservations.`id` = " . $resaid;
+
+//       if ($result = $DB->query($query)) {
+//          while ($row = $DB->fetch_assoc($result)) {
+//             return $row["users_id"];
+//          }
+//       }
+//    }
 }

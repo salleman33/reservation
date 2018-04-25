@@ -4,10 +4,10 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
-function getGLPIUrl()
-{
-   return str_replace("plugins/reservation/front/reservation.php", "", $_SERVER['SCRIPT_NAME']);
-}
+// function getGLPIUrl()
+// {
+//    return str_replace("plugins/reservation/front/reservation.php", "", $_SERVER['SCRIPT_NAME']);
+// }
 
 class PluginReservationReservation extends CommonDBTM
 {
@@ -159,39 +159,72 @@ class PluginReservationReservation extends CommonDBTM
       return Reservation::canUpdate();
    }
 
+   // /**
+   //  * @return array reservations infos mixed with plugin reservations
+   //  */
+   // public static function getAllReservations($begin = '', $end = '', $filter = '') {
+   //    global $DB;
+
+   //    $res = [];
+   //    $where = '';
+
+   //    if ($begin == '') {
+   //       $where .= "WHERE '".$end."' >= `end`";
+   //    } else {
+   //       $where .= "WHERE '".$begin."' < `end`";
+   //    }
+
+   //    if ($end != '') {
+   //       $where .= " AND '".$end."' > `begin`";
+   //    }
+
+   //    if ($filter != '') {
+   //       $filter = ' AND '.$filter;
+   //    }
+
+   //    $reservation_table = getTableForItemType('reservation');
+   //    $plugin_table = getTableForItemType(__CLASS__);
+
+   //    $query = "SELECT *
+   //             FROM $reservation_table
+   //                , $plugin_table
+   //             $where
+   //             AND ".$plugin_table.".reservations_id = ".$reservation_table.".id".
+   //             $filter;
+   //    // Toolbox::logInFile('sylvain', "QUERY : ".$query."\n", $force = false);
+
+   //    if ($result = $DB->query($query)) {
+   //       if ($DB->numrows($result) > 0) {
+   //          while ($row = $DB->fetch_assoc($result)) {
+   //             $res[] = $row;
+   //          }
+   //       }
+   //    }
+   //    Toolbox::logInFile('sylvain', "getAllReservationsFromDates RETURN : ".json_encode($res)."\n", $force = false);
+   //    return $res;
+   // }
+
    /**
-    * @return array reservations infos mixed with plugin reservations
+    * @return array GLPI reservations mixed with plugin reservations
     */
-   public static function getAllReservations($begin = '', $end = '', $filter = '') {
+   public static function getAllReservations($filters = []) {
       global $DB;
 
       $res = [];
-      $where = '';
-
-      if ($begin == '') {
-         $where .= "WHERE '".$end."' >= `end`";
-      } else {
-         $where .= "WHERE '".$begin."' < `end`";
-      }
-
-      if ($end != '') {
-         $where .= " AND '".$end."' > `begin`";
-      }
-
-      if ($filter != '') {
-         $filter = ' AND '.$filter;
-      }
-
       $reservation_table = getTableForItemType('reservation');
       $plugin_table = getTableForItemType(__CLASS__);
+
+      $where = "WHERE ".$plugin_table.".reservations_id = ".$reservation_table.".id";
+
+      foreach ($filters as $filter) {
+         $where .= " AND ".$filter;
+      }
 
       $query = "SELECT *
                FROM $reservation_table
                   , $plugin_table
-               $where
-               AND ".$plugin_table.".reservations_id = ".$reservation_table.".id".
-               $filter;
-      // Toolbox::logInFile('sylvain', "QUERY : ".$query."\n", $force = false);
+               $where";
+      Toolbox::logInFile('sylvain', "QUERY : ".$query."\n", $force = false);
 
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
@@ -200,10 +233,14 @@ class PluginReservationReservation extends CommonDBTM
             }
          }
       }
-      Toolbox::logInFile('sylvain', "getAllReservationsFromDates RETURN : ".json_encode($res)."\n", $force = false);
+      // Toolbox::logInFile('sylvain', "getAllReservations RETURN : ".json_encode($res)."\n", $force = false);
       return $res;
    }
 
+
+   /**
+    *
+    */
    public static function getAvailablesItems($begin, $end) {
       global $DB, $CFG_GLPI;
 
