@@ -126,7 +126,7 @@ class PluginReservationMenu extends CommonGLPI
       $showentity = Session::isMultiEntitiesMode();
       $config = new PluginReservationConfig();
       $includeFuture = $config->getConfigurationValue("tabcoming");
-      $mode = $config->getConfigurationValue("mode_auto");
+      $mode_auto = $config->getConfigurationValue("mode_auto");
 
       echo "<div class='center'>";
       echo "<table class='tab_cadre'>";
@@ -140,7 +140,7 @@ class PluginReservationMenu extends CommonGLPI
       echo "<th>" . __('Comment') . "</a></th>";
       echo "<th>" . __('Moves', 'reservation') . "</a></th>";
       echo "<th>" . __('Checkout', 'reservation') . "</th>";
-      echo "<th colspan='" . ($mode == "manual" ? 3 : 2) . "'>" . __('Action') . "</th>";
+      echo "<th colspan='" . ($mode_auto ? 2 : 3) . "'>" . __('Action') . "</th>";
 
       echo "</tr></thead>";
       echo "<tbody>";
@@ -182,10 +182,12 @@ class PluginReservationMenu extends CommonGLPI
             // Toolbox::logInFile('sylvain', "ITEM : ".json_encode($item)."\n", $force = false);
 
             $color = "";
-            if ($reservation_user_info["begin"] > date("Y-m-d H:i:s", time())) {
+            if ($reservation_user_info["begin"] > $end && $reservation_user_info["begin"] > date("Y-m-d H:i:s", time())) {
                $color = "bgcolor=\"lightgrey\"";
             }
-            if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
+            //if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
+            if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time())) {
+
                $color = "bgcolor=\"red\"";
             }
 
@@ -230,13 +232,11 @@ class PluginReservationMenu extends CommonGLPI
 
                   echo "<img title=\"\" alt=\"\" src=\"../pics/up-icon.png\"></img>";
                }
-               if (date("Y-m-d", strtotime($reservation->fields['end'])) == date("Y-m-d", strtotime($end))) {
+               if (date("Y-m-d", strtotime($reservation_user_info['baselinedate'])) == date("Y-m-d", strtotime($end))) {
                   echo "<img title=\"\" alt=\"\" src=\"../pics/down-icon.png\"></img>";
                }
                echo "</center></td>";
             }
-
-
 
             // checkout buttons or date checkout
             if ($reservation_user_info['effectivedate'] != null) {
@@ -286,12 +286,11 @@ class PluginReservationMenu extends CommonGLPI
             echo "</ul>";
             echo "</td>";
 
-
-            if ($mode == "manual") {
+            if (!$mode_auto) {
                echo "<td>";
                echo "<ul>";
                if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
-                  echo "<li><a class=\"bouton\" title=\"" . _sx('tooltip', 'Send an e-mail for the late reservation') . "\" href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?mailuser=" . $resa['resaid'] . "\">" . _sx('button', 'Send an e-mail') . "</a></li>";
+                  echo "<li><a class=\"bouton\" title=\"" . _sx('tooltip', 'Send an e-mail for the late reservation') . "\" href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?mailuser=" . $reservation_user_info['reservations_id'] . "\">" . _sx('button', 'Send an e-mail') . "</a></li>";
                   if (isset($reservation_user_info['mailingdate'])) {
                      echo "<li>" . __('Last e-mail sent on') . " </li>";
                      echo "<li>" . date(self::getDateFormat()." \à H:i:s", strtotime($reservation_user_info['mailingdate'])) . "</li>";

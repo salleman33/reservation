@@ -49,18 +49,6 @@ function plugin_reservation_install() {
                 VALUES (\"mode_auto\",0)";
 
       $DB->queryOrDie($query, $DB->error());
-
-      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
-                VALUES  (\"lundi\",1),
-                        (\"mardi\",1),
-                        (\"mercredi\",1),
-                        (\"jeudi\",1),
-                        (\"vendredi\",1),
-                        (\"samedi\",0),
-                        (\"dimanche\",0)";
-
-      $DB->queryOrDie($query, $DB->error());
-
    }
 
    if (TableExists("glpi_plugin_reservation_config")) { //UPDATE plugin < 1.5.0
@@ -77,37 +65,6 @@ function plugin_reservation_install() {
       $query = "DROP TABLE `glpi_plugin_reservation_config`";
       $DB->queryOrDie($query, $DB->error());
 
-      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
-                VALUES  (\"lundi\", CAST((
-                        SELECT `actif`
-                        FROM `glpi_plugin_reservation_configdayforauto`
-                        WHERE `jour` = \"lundi\") as CHAR(10))),
-                    (\"mardi\", CAST((
-                        SELECT `actif`
-                        FROM `glpi_plugin_reservation_configdayforauto`
-                        WHERE `jour` = \"mardi\") as CHAR(10))),
-                    (\"mercredi\", CAST((
-                        SELECT `actif`
-                        FROM `glpi_plugin_reservation_configdayforauto`
-                        WHERE `jour` = \"mercredi\") as CHAR(10))),
-                    (\"jeudi\", CAST((
-                        SELECT `actif`
-                        FROM `glpi_plugin_reservation_configdayforauto`
-                        WHERE `jour` = \"jeudi\") as CHAR(10))),
-                    (\"vendredi\", CAST((
-                        SELECT `actif`
-                        FROM `glpi_plugin_reservation_configdayforauto`
-                        WHERE `jour` = \"vendredi\") as CHAR(10))),
-                    (\"samedi\", CAST((
-                        SELECT `actif`
-                        FROM `glpi_plugin_reservation_configdayforauto`
-                        WHERE `jour` = \"samedi\") as CHAR(10))),
-                    (\"dimanche\", CAST((
-                        SELECT `actif`
-                        FROM `glpi_plugin_reservation_configdayforauto`
-                        WHERE `jour` = \"dimanche\") as CHAR(10)))";
-
-      $DB->queryOrDie($query, $DB->error());
       $query = "DROP TABLE `glpi_plugin_reservation_configdayforauto`";
       $DB->queryOrDie($query, $DB->error());
 

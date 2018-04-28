@@ -18,7 +18,7 @@ if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')
 Session::checkRight("reservation", [CREATE, UPDATE, DELETE]);
 
 if (isset($_GET['mailuser'])) {
-   $PluginReservationReservation->sendMail($_GET['sendMail']);
+   PluginReservationReservation::sendMail($_GET['mailuser']);
 }
 if (isset($_GET['checkout'])) {
    PluginReservationReservation::checkoutReservation($_GET['checkout']);
@@ -39,7 +39,6 @@ if (isset($_POST['switch_item_to_reservation'])) {
 
 $menu = new PluginReservationMenu();
 $menu->showFormDate();
-
 $menu->display($_POST);
 
 if ($_SESSION["glpiactiveprofile"]["interface"] == "central") {

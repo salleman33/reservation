@@ -25,131 +25,11 @@ class PluginReservationReservation extends CommonDBTM
       return PluginReservationReservation::getTypeName(2);
    }
 
-   /*
-   protected $tabs = [];
-   protected $tabsNames = [];
-    */
-   /*
-   public function getAbsolutePath() {
-   return str_replace("plugins/reservation/inc/reservation.class.php", "", $_SERVER['SCRIPT_FILENAME']);
-   } */
-
-   // TEST
-   /*
-   public function __construct() {
-   $config = new PluginReservationConfig();
-   $i = 1;
-   if ($config->getConfigurationValue("tabcurrent", 1)) {
-   $this->tabs[$i] = function () {$this->showCurrentResa();};
-   $this->tabsNames[$i++] = __('Current Reservations');
-   }
-   if ($config->getConfigurationValue("tabcoming")) {
-   $this->tabs[$i] = function () {$this->showCurrentResa(true);};
-   $this->tabsNames[$i++] = __('Current and Incoming Reservations');
-   }
-   $this->tabs[$i] = function () {$this->showDispoAndFormResa();};
-   $this->tabsNames[$i++] = __('Available Hardware');
-   }*/
-
-   /*
-   public function isNewItem() {
-   return false;
-   }*/
-
-   /**
-    * Définition des onglets
-    **/
-   /* public function defineTabs($options = []) {
-   $ong = [];
-   $this->addStandardTab(__CLASS__, $ong, $options);
-   return $ong;
-   }
-    */
-   /**
-    * Définition du nom de l'onglet
-    **/
-   /*
-   public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
-   return $item->tabsNames;
-   }*/
-   /*
-   public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
-   {
-      $ong = [];
-      $config = new PluginReservationConfig();
-      $i = 1;
-      if ($config->getConfigurationValue("tabcurrent", 1)) {
-         $ong[$i] = __('Current Reservations');
-         $i++;
-      }
-      if ($config->getConfigurationValue("tabcoming")) {
-         $ong[$i] = __('Current and Incoming Reservations');
-         $i++;
-      }
-      $ong[$i] = __('Available Hardware');
-      return $ong;
-   }*/
-
-   /**
-    * Définition du contenu de l'onglet
-    **/
-   /*
-   public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
-   $item->getFormDates();
-   call_user_func($item->tabs[$tabnum]);
-   return true;
-   }
-    */
-/*
-   public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
-   {
-      switch ($tabnum) {
-         case 1: //"My first tab"
-            self::displayTabContentForCurrentReservations();
-            break;
-         case 2: //"My second tab""
-            self::displayTabContentForAvailableHardware();
-            break;
-      }
-      return true;
-   }
-
-   public static function displayTabContentForCurrentReservations()
-   {
-      echo "toto";
-   }
-
-   public static function displayTabContentForAvailableHardware()
-   {
-      echo "TTAT";
-   }
-
-   /**
-    * Définition du contenu de l'onglet
-    **/
-   /*
-   public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
-   $item->getDatesResa();
-   call_user_func($item->tabs[$tabnum]);
-   return true;
-   }
-    */
-
-   /*
-   public static function canView() {
-   global $CFG_GLPI;
-   return true;
-   return Session::haveRightsOr(self::$rightname, [READ, self::RESERVEANITEM]);
-   } */
-
    public static function canCreate() {
       return Reservation::canCreate();
    }
 
-   /*
-   public static function canViewItem() {
-   return true;
-   } */
+
 
    public static function canDelete() {
       return Reservation::canDelete();
@@ -159,50 +39,6 @@ class PluginReservationReservation extends CommonDBTM
       return Reservation::canUpdate();
    }
 
-   // /**
-   //  * @return array reservations infos mixed with plugin reservations
-   //  */
-   // public static function getAllReservations($begin = '', $end = '', $filter = '') {
-   //    global $DB;
-
-   //    $res = [];
-   //    $where = '';
-
-   //    if ($begin == '') {
-   //       $where .= "WHERE '".$end."' >= `end`";
-   //    } else {
-   //       $where .= "WHERE '".$begin."' < `end`";
-   //    }
-
-   //    if ($end != '') {
-   //       $where .= " AND '".$end."' > `begin`";
-   //    }
-
-   //    if ($filter != '') {
-   //       $filter = ' AND '.$filter;
-   //    }
-
-   //    $reservation_table = getTableForItemType('reservation');
-   //    $plugin_table = getTableForItemType(__CLASS__);
-
-   //    $query = "SELECT *
-   //             FROM $reservation_table
-   //                , $plugin_table
-   //             $where
-   //             AND ".$plugin_table.".reservations_id = ".$reservation_table.".id".
-   //             $filter;
-   //    // Toolbox::logInFile('sylvain', "QUERY : ".$query."\n", $force = false);
-
-   //    if ($result = $DB->query($query)) {
-   //       if ($DB->numrows($result) > 0) {
-   //          while ($row = $DB->fetch_assoc($result)) {
-   //             $res[] = $row;
-   //          }
-   //       }
-   //    }
-   //    Toolbox::logInFile('sylvain', "getAllReservationsFromDates RETURN : ".json_encode($res)."\n", $force = false);
-   //    return $res;
-   // }
 
    /**
     * @return array GLPI reservations mixed with plugin reservations

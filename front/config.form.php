@@ -11,27 +11,21 @@ $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {
    $PluginReservationConfig = new PluginReservationConfig();
    Session::checkRight("config", [CREATE, UPDATE, DELETE]);
-   if (isset($_POST["week"])) {
-      $PluginReservationConfig->setConfigurationWeek($_POST["week"]);
-      //Html::back();
-   }
+
    if (isset($_POST["mode_auto"])) {
       $PluginReservationConfig->setMailAutomaticAction($_POST["mode_auto"]);
       $PluginReservationConfig->setConfigurationValue("mode_auto", $_POST["mode_auto"]);
-      //Html::back();
    }
 
    foreach ($toolTipConfig as $config) {
       if (isset($_POST[$config])) {
          $PluginReservationConfig->setConfigurationValue($config, $_POST[$config]);
-         //Html::back();
       }
    }
 
    foreach ($tabConfig as $config) {
       if (isset($_POST[$config])) {
          $PluginReservationConfig->setConfigurationValue($config, $_POST[$config]);
-         //Html::back();
       }
    }
 
