@@ -1,0 +1,20 @@
+{
+    "name": "glpi-project/coding-standard",
+    "description": "GLPI PHP CodeSniffer Coding Standard",
+    "keywords": ["phpcs", "CodeSniffer", "GLPI"],
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Teclib'",
+            "email": "glpi@teclib.com",
+            "homepage": "https://teclib.com"
+        }
+    ],
+    "support" : {
+        "source": "https://github.com/glpi-project/coding-standard",
+        "issues": "https://github.com/glpi-project/coding-standard/issues"
+    },
+    "require": {
+        "squizlabs/php_codesniffer": "^3.2"
+    }
+}
