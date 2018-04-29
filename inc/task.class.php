@@ -9,8 +9,8 @@ $DEBUG = true;
 class PluginReservationTask extends CommonDBTM
 {
    public static function addEvents(NotificationTargetReservation $target) {
-      $target->events['plugin_reservation_conflict'] = __("Reservation Conflict When Extended (plugin)");
-      $target->events['plugin_reservation_expiration'] = __("User Reservation Expired (plugin)");
+      $target->events['plugin_reservation_conflict'] = __("Reservation Conflict When Extended (plugin)", "reservation");
+      $target->events['plugin_reservation_expiration'] = __("User Reservation Expired (plugin)", "reservation");
    }
 
    public static function cronInfo($name) {
@@ -18,9 +18,9 @@ class PluginReservationTask extends CommonDBTM
 
       switch ($name) {
          case "checkReservations":
-            return ['description' => __('Watch Reservations') . " (" . __('plugin') . ")"];
+            return ['description' => __('Watch Reservations', 'reservation') . " (" . __('plugin') . ")"];
          case "sendMailLateReservations":
-            return ['description' => __('Send an e-mail to users with late reservations') . " (" . __('plugin') . ")"];
+            return ['description' => __('Send an e-mail to users with late reservations', 'reservation') . " (" . __('plugin') . ")"];
       }
    }
 
@@ -56,7 +56,7 @@ class PluginReservationTask extends CommonDBTM
       //Toolbox::logInFile('sylvain', "reservations_list : ".json_encode($reservations_list)."\n", $force = false);
 
       foreach ($reservations_list as $res) {
-         $task->log(__('Extending reservation') . " : " . $res['reservations_id']);
+         $task->log(__('Extending reservation', 'reservation') . " : " . $res['reservations_id']);
 
          $reservation = new Reservation();
          $reservation->getFromDB($res['reservations_id']);
@@ -82,8 +82,8 @@ class PluginReservationTask extends CommonDBTM
             // same user ?
             if ($conflict['users_id'] == $res['users_id']) {
                $task->log("$formatName a créé une nouvelle reservation pour le meme materiel : " . $item->fields['name']);
-               $new_comment = $reservation->fields['comment'];
-               $new_comment .= " ==" .date("d-m-Y", strtotime($time)). " ==> ".$conflict_reservation->fields['comment'];
+               $new_comment = "(".$reservation->fields['comment'].")";
+               $new_comment .= " ==(" .date("d-m-Y", $time). ")==> ".$conflict_reservation->fields['comment'];
 
                $query = "UPDATE `glpi_reservations` 
                         SET `end` = '".$conflict_reservation->fields["end"]."',

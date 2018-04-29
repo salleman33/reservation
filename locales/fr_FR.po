@@ -3,20 +3,20 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-29 16:54+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2018-04-29 17:32+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_FR\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 1.8.7.1\n"
 
 #: front/config.form.php:37
 msgid "Setup"
@@ -24,7 +24,7 @@ msgstr ""
 
 #: front/config.form.php:40
 msgid "Please activate the plugin"
-msgstr ""
+msgstr "Veuillez activer le plugin"
 
 #: front/menu.php:9
 msgid "Simplified interface"
@@ -37,34 +37,36 @@ msgstr ""
 #: inc/config.class.php:55
 msgid "Method used to send e-mails to users with late reservations"
 msgstr ""
+"Méthode utilisée pour notifier par mail les utilisateurs d'une reservation "
+"expirée"
 
 #: inc/config.class.php:57
 msgid "Automatic"
-msgstr ""
+msgstr "Automatique"
 
 #: inc/config.class.php:58
 msgid "Manual"
-msgstr ""
+msgstr "Manuel"
 
 #: inc/config.class.php:65
 msgid "Tab Configuration"
-msgstr ""
+msgstr "Configuration des onglets"
 
 #: inc/config.class.php:72
 msgid "Current Reservation tab"
-msgstr ""
+msgstr "Onglet des réservations actuelles"
 
 #: inc/config.class.php:80
 msgid "Incoming Reservation tab"
-msgstr ""
+msgstr "Onglet des réservations futures"
 
 #: inc/config.class.php:86
 msgid "ToolTip Configuration"
-msgstr ""
+msgstr "Configuration des info-bulles"
 
 #: inc/config.class.php:93
 msgid "ToolTip"
-msgstr ""
+msgstr "Info-bulle"
 
 #: inc/config.class.php:101 inc/menu.class.php:278
 msgid "Comment"
@@ -105,23 +107,23 @@ msgstr ""
 
 #: inc/menu.class.php:163
 msgid "Current Reservations"
-msgstr ""
+msgstr "Réservations actuelles"
 
 #: inc/menu.class.php:167
 msgid "Current and Incoming Reservations"
-msgstr ""
+msgstr "Réservations actuelles et à venir"
 
 #: inc/menu.class.php:170
 msgid "Available Hardware"
-msgstr ""
+msgstr "Matériel disponible"
 
 #: inc/menu.class.php:269
 msgid "Current and future reservations"
-msgstr ""
+msgstr "Réservations actuelles et à venir"
 
 #: inc/menu.class.php:271
 msgid "Reservations in the selected timeline"
-msgstr ""
+msgstr "Réservations actuelles"
 
 #: inc/menu.class.php:274
 msgid "User"
@@ -141,25 +143,25 @@ msgstr ""
 
 #: inc/menu.class.php:279
 msgid "Moves"
-msgstr ""
+msgstr "Mouvements"
 
 #: inc/menu.class.php:280
 msgid "Checkout"
-msgstr ""
+msgstr "Acquittement"
 
 #: inc/menu.class.php:281
 msgid "Action"
-msgstr ""
+msgstr "Action"
 
 #: inc/menu.class.php:371
 msgctxt "tooltip"
 msgid "Set As Returned"
-msgstr ""
+msgstr "Acquitter le retour"
 
 #: inc/menu.class.php:380
 msgctxt "button"
 msgid "Add an item"
-msgstr ""
+msgstr "Ajouter un élément"
 
 #: inc/menu.class.php:389
 msgctxt "button"
@@ -169,7 +171,7 @@ msgstr ""
 #: inc/menu.class.php:394
 msgctxt "button"
 msgid "Replace an item"
-msgstr ""
+msgstr "Remplacer un élément"
 
 #: inc/menu.class.php:410
 msgid "Edit"
@@ -183,20 +185,20 @@ msgstr ""
 #: inc/menu.class.php:418
 msgctxt "tooltip"
 msgid "Send an e-mail for the late reservation"
-msgstr ""
+msgstr "Envoyer un email"
 
 #: inc/menu.class.php:418
 msgctxt "button"
 msgid "Send an e-mail"
-msgstr ""
+msgstr "Envoyer un email"
 
 #: inc/menu.class.php:420
 msgid "Last e-mail sent on"
-msgstr ""
+msgstr "Dernier email envoyé"
 
 #: inc/menu.class.php:507
 msgid "Create new reservation"
-msgstr ""
+msgstr "Créer une nouvelle réservation"
 
 #: inc/menu.class.php:581
 msgid "Date"
@@ -233,45 +235,45 @@ msgstr ""
 
 #: inc/menu.class.php:635
 msgid "Reservations This Month"
-msgstr ""
+msgstr "Réservations du mois"
 
 #: inc/reservation.class.php:21
 msgid "Reservation"
 msgid_plural "Reservations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Réservation"
+msgstr[1] "Réservations"
 
 #: inc/reservation.class.php:140
 #, php-format
 msgid "%1$s sends email for the reservation %2$s"
-msgstr ""
+msgstr "%1$s envoie un email pour la réservation %2$s"
 
 #: inc/reservation.class.php:159
 #, php-format
 msgid "%1$s marks the reservation %2$s as returned"
-msgstr ""
+msgstr "%1$s acquitte la réservation %2$s"
 
 #: inc/reservation.class.php:181
 #, php-format
 msgid "%1$s adds the reservation %2$s for item %3$s"
-msgstr ""
+msgstr "%1$s ajoute la réservation %2$s pour le matériel %3$s"
 
 #: inc/reservation.class.php:193
 #, php-format
 msgid "%1$s switchs the reservation %2$s with item %3$s"
-msgstr ""
+msgstr "%1$s permutte la réservation %2$s pour le matériel %3$s"
 
 #: inc/task.class.php:12
 msgid "Reservation Conflict When Extended (plugin)"
-msgstr ""
+msgstr "Conflit lors de la prolongation d'une réservation (Plugin)"
 
 #: inc/task.class.php:13
 msgid "User Reservation Expired (plugin)"
-msgstr ""
+msgstr "Réservation expirée (Plugin)"
 
 #: inc/task.class.php:21
 msgid "Watch Reservations"
-msgstr ""
+msgstr "Surveille les réservations"
 
 #: inc/task.class.php:21 inc/task.class.php:23
 msgid "plugin"
@@ -279,26 +281,26 @@ msgstr ""
 
 #: inc/task.class.php:23
 msgid "Send an e-mail to users with late reservations"
-msgstr ""
+msgstr "Envoi un email aux utilisateurs avec des réservations expirées"
 
 #: inc/task.class.php:59
 msgid "Extending reservation"
-msgstr ""
+msgstr "Prolongation d'une réservation"
 
 #: inc/task.class.php:143
 #, php-format
 msgid "Sending e-mail for reservation %1$s"
-msgstr ""
+msgstr "Envoi d'un email pour la réservation %1$s"
 
 #: inc/task.class.php:144
 #, php-format
 msgid "Expected return time was : %1$s"
-msgstr ""
+msgstr "Date de retour attendue :: %1$s"
 
 #: inc/task.class.php:146
 msgid "Sending an e-mail"
-msgstr ""
+msgstr "Envoi d'un email"
 
 #: inc/task.class.php:148
 msgid "Could not send notification"
-msgstr ""
+msgstr "Notification impossible"

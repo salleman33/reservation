@@ -4,17 +4,14 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
-
-function getLinkforItem($item) {
-   $itemLink = $item->getFormUrl();
-   $argConcatenator = "?";
-   if (strpos($itemLink, '?') !== false) {
-      $argConcatenator = "&amp;";
-   }
-
-   echo "<a target='_blank' href='" . $itemLink . $argConcatenator . "id=" . $item->fields["id"] . "'>" . $item->fields["name"] . "</a>";
-
-}
+// function getLinkforItem($item) {
+//    $itemLink = $item->getFormUrl();
+//    $argConcatenator = "?";
+//    if (strpos($itemLink, '?') !== false) {
+//       $argConcatenator = "&amp;";
+//    }
+//    echo "<a target='_blank' href='" . $itemLink . $argConcatenator . "id=" . $item->fields["id"] . "'>" . $item->fields["name"] . "</a>";
+// }
 
 function getToolTipforItem($item) {
    $config = new PluginReservationConfig();
@@ -170,10 +167,9 @@ class PluginReservationMenu extends CommonGLPI
          $ong[$i] = __('Current and Incoming Reservations', "reservation");
          $i++;
       }
-      $ong[$i] = __('Available Hardware');
+      $ong[$i] = __('Available Hardware', "reservation");
       return $ong;
    }
-
 
    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
       $config = new PluginReservationConfig();
@@ -213,6 +209,9 @@ class PluginReservationMenu extends CommonGLPI
       }
    }
 
+   /**
+    *
+    */
    public static function arrayGroupBy($array, $element) {
       $result = [];
       foreach ($array as $one) {
@@ -221,6 +220,9 @@ class PluginReservationMenu extends CommonGLPI
       return $result;
    }
 
+   /**
+    *
+    */
    public static function displayTabContentForCurrentReservations() {
       $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
       $begin = $form_dates["begin"];
@@ -230,11 +232,14 @@ class PluginReservationMenu extends CommonGLPI
       $list = PluginReservationReservation::getAllReservations($filters);
       $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
       ksort($ReservationsByUser);
+      Toolbox::logInFile('sylvain', "reservations_list : ".json_encode($list)."\n", $force = false);
 
       self::displayTabReservations($begin, $end, $ReservationsByUser, false);
    }
 
-
+   /**
+    *
+    */
    public static function displayTabContentForAllReservations() {
       $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
       $begin = $form_dates["begin"];
@@ -248,6 +253,9 @@ class PluginReservationMenu extends CommonGLPI
       self::displayTabReservations($begin, $end, $ReservationsByUser, true);
    }
 
+   /**
+    *
+    */
    private static function displayTabReservations($begin, $end, $ReservationsByUser, $includeFuture) {
       global $DB;
 
@@ -282,7 +290,6 @@ class PluginReservationMenu extends CommonGLPI
          });
          $user = new User();
          $user->getFromDB($reservation_user);
-         // Toolbox::logInFile('sylvain', "reservations_user_list : ".json_encode($reservations_user_list)."\n", $force = false);
 
          echo "<tr class='tab_bg_2'>";
          echo "<td colspan='100%' bgcolor='lightgrey' style='padding:1px;'/>";
@@ -300,20 +307,14 @@ class PluginReservationMenu extends CommonGLPI
 
             $reservation = new Reservation();
             $reservation->getFromDB($reservation_user_info['reservations_id']);
-
             $reservationitems = $reservation->getConnexityItem('reservationitem', 'reservationitems_id');
-            // Toolbox::logInFile('sylvain', "RESERVATIONITEM : ".json_encode($reservationitems)."\n", $force = false);
-
             $item = $reservationitems->getConnexityItem($reservationitems->fields['itemtype'], 'items_id');
-            // Toolbox::logInFile('sylvain', "ITEM : ".json_encode($item)."\n", $force = false);
 
             $color = "";
             if ($reservation_user_info["begin"] > $end) {
                $color = "bgcolor=\"lightgrey\"";
             }
-            //if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
-            if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
-
+            if ($reservation_user_info['baselinedate'] < $end && $reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
                $color = "bgcolor=\"red\"";
             }
 
@@ -367,12 +368,11 @@ class PluginReservationMenu extends CommonGLPI
             if ($reservation_user_info['effectivedate'] != null) {
                echo "<td>" . date(self::getDateFormat()." \à H:i:s", strtotime($reservation_user_info['effectivedate'])) . "</td>";
             } else {
-               echo "<td><center><a href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?checkout=" . $reservation_user_info['reservations_id'] . "\"><img title=\"" . _x('tooltip', 'Set As Returned') . "\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
+               echo "<td><center><a href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?checkout=" . $reservation_user_info['reservations_id'] . "\"><img title=\"" . _sx('tooltip', 'Set As Returned', "reservation") . "\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
             }
 
             // action
             $available_reservationsitem = PluginReservationReservation::getAvailablesItems($reservation->fields['begin'], $reservation->fields['end']);
-            // Toolbox::logInFile('sylvain', "getAvailablesItems : ".json_encode(__CLASS__)."\n", $force = false);
             echo "<td>";
             echo "<ul>";
 
@@ -407,7 +407,7 @@ class PluginReservationMenu extends CommonGLPI
 
             echo "<td>";
             echo "<ul>";
-            echo "<li><a class=\"bouton\" title=\"Editer la reservation\" href='".Toolbox::getItemTypeFormURL('Reservation')."?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
+            echo "<li><a class=\"bouton\" title=\"".__('Edit')."\" href='".Toolbox::getItemTypeFormURL('Reservation')."?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
             echo "</ul>";
             echo "</td>";
 
@@ -432,10 +432,13 @@ class PluginReservationMenu extends CommonGLPI
       }
 
       echo "</tbody>";
-      echo "</table>\n";
-      echo "</div>\n";
+      echo "</table>";
+      echo "</div>";
    }
 
+   /**
+    *
+    */
    public static function displayTabContentForAvailableHardware() {
       global $DB, $CFG_GLPI;
       $showentity = Session::isMultiEntitiesMode();
@@ -501,7 +504,7 @@ class PluginReservationMenu extends CommonGLPI
 
       echo "</tr>";
       echo "<tr class='tab_bg_1 center'><td colspan='" . ($showentity ? "5" : "4") . "'>";
-      echo "<input type='submit' value='" . __('Create new reservation') . "' class='submit'></td></tr>\n";
+      echo "<input type='submit' value='" . __('Create new reservation', "reservation") . "' class='submit'></td></tr>\n";
 
       echo "</table>\n";
 
@@ -509,12 +512,13 @@ class PluginReservationMenu extends CommonGLPI
       echo "<input type='hidden' name='begin' value='" . $begin . "'>";
       echo "<input type='hidden' name='end' value='" . $end . "'>";
       Html::closeForm();
-      echo "</div>\n";
+      echo "</div>";
    }
 
-
+   /**
+    *
+    */
    public function getFormDates() {
-      //global $FORM_DATES;
       $form_dates = [];
 
       if (isset($_SESSION['glpi_plugin_reservation_form_dates'])) {
@@ -556,11 +560,9 @@ class PluginReservationMenu extends CommonGLPI
 
 
    /**
-    * Display the form with begin and end dates, next day, previous day, etc.
-   **/
+   * Display the form with begin and end dates, next day, previous day, etc.
+   */
    public function showFormDate() {
-      //global $FORM_DATES;
-
       $this->getFormDates();
 
       $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
@@ -613,9 +615,8 @@ class PluginReservationMenu extends CommonGLPI
       echo "</div>";
    }
 
-
    /**
-    * Link with current month reservations
+   * Link with current month reservations
    */
    public function showCurrentMonthForAllLink() {
       global $CFG_GLPI;
@@ -631,14 +632,13 @@ class PluginReservationMenu extends CommonGLPI
 
       echo "<div class='center'>";
       echo "<table class='tab_cadre'>";
-      echo "<tr><th colspan='2'>" . __('Reservations This Month') . "</th></tr>\n";
+      echo "<tr><th colspan='2'>" . __('Reservations This Month', "reservation") . "</th></tr>\n";
       echo "<td>";
       echo "<img src='" . $CFG_GLPI["root_doc"] . "/pics/reservation.png' alt=''>";
       echo "</td>";
       echo "<td >$all</td>\n";
       echo "</table>";
       echo "</div>";
-
    }
 
 }

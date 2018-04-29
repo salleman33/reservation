@@ -67,7 +67,6 @@ function plugin_reservation_install() {
 
       $query = "DROP TABLE `glpi_plugin_reservation_configdayforauto`";
       $DB->queryOrDie($query, $DB->error());
-
    }
 
    // add existing reservations
@@ -121,7 +120,7 @@ function plugin_reservation_uninstall() {
 }
 
 /**
- * hook : deladdete Plugin reservation when a GLPI reservation is added
+ * hook : add Plugin reservation when a GLPI reservation is added
  *
  * @return void
  */
@@ -134,7 +133,6 @@ function plugin_item_add_reservation($reservation) {
    ]
    );
    Toolbox::logInFile('reservations_plugin', "plugin_item_add_reservation : ".json_encode($reservation)."\n", $force = false);
-
 }
 
 /**
@@ -177,7 +175,6 @@ function plugin_item_update_reservation($reservation) {
       );
    }
    Toolbox::logInFile('reservations_plugin', "plugin_item_update_reservation : ".json_encode($reservation)."\n", $force = false);
-
 }
 
 /**

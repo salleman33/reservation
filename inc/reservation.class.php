@@ -61,6 +61,8 @@ class PluginReservationReservation extends CommonDBTM
                   , $plugin_table
                $where";
 
+      Toolbox::logInFile('sylvain', "QUERY  : ".$query."\n", $force = false);
+
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
             while ($row = $DB->fetch_assoc($result)) {

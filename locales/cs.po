@@ -3,96 +3,99 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-29 16:54+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2018-04-29 16:18+0200\n"
+"PO-Revision-Date: 2018-03-30 14:32+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Poedit 2.0.4\n"
 
 #: front/config.form.php:37
 msgid "Setup"
-msgstr ""
+msgstr "Nastavení"
 
 #: front/config.form.php:40
 msgid "Please activate the plugin"
-msgstr ""
+msgstr "Zapněte zásuvný modul"
 
 #: front/menu.php:9
 msgid "Simplified interface"
-msgstr ""
+msgstr "Zjednodušené rozhraní"
 
 #: inc/config.class.php:52
+#, fuzzy
 msgid "Configuration"
-msgstr ""
+msgstr "Nastavení nástrojového tipu"
 
 #: inc/config.class.php:55
 msgid "Method used to send e-mails to users with late reservations"
 msgstr ""
+"Metoda použitá pro posílání e-mailům uživatelům kteří včas nevrátili zápůjčky"
 
 #: inc/config.class.php:57
 msgid "Automatic"
-msgstr ""
+msgstr "Automaticky"
 
 #: inc/config.class.php:58
 msgid "Manual"
 msgstr ""
 
 #: inc/config.class.php:65
+#, fuzzy
 msgid "Tab Configuration"
-msgstr ""
+msgstr "Nastavení nástrojového tipu"
 
 #: inc/config.class.php:72
 msgid "Current Reservation tab"
-msgstr ""
+msgstr "Panel stávající rezervace"
 
 #: inc/config.class.php:80
 msgid "Incoming Reservation tab"
-msgstr ""
+msgstr "Panel nacházející rezervace"
 
 #: inc/config.class.php:86
 msgid "ToolTip Configuration"
-msgstr ""
+msgstr "Nastavení nástrojového tipu"
 
 #: inc/config.class.php:93
 msgid "ToolTip"
-msgstr ""
+msgstr "Nástrojový tip"
 
 #: inc/config.class.php:101 inc/menu.class.php:278
 msgid "Comment"
-msgstr ""
+msgstr "Komentář"
 
 #: inc/config.class.php:108 inc/menu.class.php:38
 msgid "Location"
-msgstr ""
+msgstr "Umístění"
 
 #: inc/config.class.php:115 inc/menu.class.php:48
 msgid "Serial number"
-msgstr ""
+msgstr "Sériové číslo"
 
 #: inc/config.class.php:122 inc/menu.class.php:45
 msgid "Inventory number"
-msgstr ""
+msgstr "Inventární číslo"
 
 #: inc/config.class.php:129 inc/menu.class.php:42
 msgid "Group"
-msgstr ""
+msgstr "skupina"
 
 #: inc/config.class.php:136 inc/menu.class.php:53
 msgid "Manufacturer"
-msgstr ""
+msgstr "Výrobce"
 
 #: inc/config.class.php:136 inc/menu.class.php:53
 msgid "Model"
-msgstr ""
+msgstr "Model"
 
 #: inc/config.class.php:143 inc/menu.class.php:57
 msgid "Status"
@@ -101,150 +104,150 @@ msgstr ""
 #: inc/config.class.php:147 inc/menu.class.php:402
 msgctxt "button"
 msgid "Save"
-msgstr ""
+msgstr "Uložit"
 
 #: inc/menu.class.php:163
 msgid "Current Reservations"
-msgstr ""
+msgstr "Stávající rezervace"
 
 #: inc/menu.class.php:167
 msgid "Current and Incoming Reservations"
-msgstr ""
+msgstr "Stávající a nadcházející rezervace"
 
 #: inc/menu.class.php:170
 msgid "Available Hardware"
-msgstr ""
+msgstr "Hardware k kdispozici"
 
 #: inc/menu.class.php:269
+#, fuzzy
 msgid "Current and future reservations"
-msgstr ""
+msgstr "Stávající a nadcházející rezervace"
 
 #: inc/menu.class.php:271
 msgid "Reservations in the selected timeline"
-msgstr ""
+msgstr "Rezervace ve vybraném období"
 
 #: inc/menu.class.php:274
 msgid "User"
-msgstr ""
+msgstr "Uživatel"
 
 #: inc/menu.class.php:275
 msgid "Item"
-msgstr ""
+msgstr "Položka"
 
 #: inc/menu.class.php:276
 msgid "Begin"
-msgstr ""
+msgstr "Začátek"
 
 #: inc/menu.class.php:277
 msgid "End"
-msgstr ""
+msgstr "Konec"
 
 #: inc/menu.class.php:279
+#, fuzzy
 msgid "Moves"
-msgstr ""
+msgstr "Přesunout"
 
 #: inc/menu.class.php:280
 msgid "Checkout"
-msgstr ""
+msgstr "Uvolnění"
 
 #: inc/menu.class.php:281
 msgid "Action"
-msgstr ""
-
-#: inc/menu.class.php:371
-msgctxt "tooltip"
-msgid "Set As Returned"
-msgstr ""
+msgstr "Akce"
 
 #: inc/menu.class.php:380
 msgctxt "button"
 msgid "Add an item"
-msgstr ""
+msgstr "Přidat položku"
 
 #: inc/menu.class.php:389
 msgctxt "button"
 msgid "Add"
-msgstr ""
+msgstr "Přidat"
 
 #: inc/menu.class.php:394
 msgctxt "button"
 msgid "Replace an item"
-msgstr ""
+msgstr "Nahradit položku"
 
 #: inc/menu.class.php:410
+#, fuzzy
 msgid "Edit"
-msgstr ""
+msgstr "Upravit"
 
 #: inc/menu.class.php:410
 msgctxt "button"
 msgid "Edit"
-msgstr ""
+msgstr "Upravit"
 
 #: inc/menu.class.php:418
 msgctxt "tooltip"
 msgid "Send an e-mail for the late reservation"
-msgstr ""
+msgstr "Poslat e-mail kvůli nevrácené rezervaci"
 
 #: inc/menu.class.php:418
 msgctxt "button"
 msgid "Send an e-mail"
-msgstr ""
+msgstr "Poslat e-mail"
 
 #: inc/menu.class.php:420
 msgid "Last e-mail sent on"
-msgstr ""
+msgstr "Poslední e-mail poslán v"
 
 #: inc/menu.class.php:507
 msgid "Create new reservation"
-msgstr ""
+msgstr "Vytvořit novou rezervaci"
 
 #: inc/menu.class.php:581
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: inc/menu.class.php:587
 msgid "Previous"
-msgstr ""
+msgstr "Předchozí"
 
 #: inc/menu.class.php:590
 msgid "Start date"
-msgstr ""
+msgstr "Datum začátku"
 
 #: inc/menu.class.php:593
 msgctxt "button"
 msgid "Search"
-msgstr ""
+msgstr "Hledat"
 
 #: inc/menu.class.php:596
 msgid "Next"
-msgstr ""
+msgstr "Další"
 
 #: inc/menu.class.php:599
+#, fuzzy
 msgid "Reset"
-msgstr ""
+msgstr "Rezervace"
 
 #: inc/menu.class.php:603
 msgid "End date"
-msgstr ""
+msgstr "Datum konce"
 
 #: inc/menu.class.php:631
 msgid "Show all"
-msgstr ""
+msgstr "Zobrazit vše"
 
 #: inc/menu.class.php:635
 msgid "Reservations This Month"
-msgstr ""
+msgstr "Rezervace v tomto měsící"
 
 #: inc/reservation.class.php:21
 msgid "Reservation"
 msgid_plural "Reservations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Rezervace"
+msgstr[1] "Rezervace"
+msgstr[2] "Rezervací"
 
 #: inc/reservation.class.php:140
-#, php-format
+#, fuzzy, php-format
 msgid "%1$s sends email for the reservation %2$s"
-msgstr ""
+msgstr "Poslat e-mail pro rezervaci %1$s"
 
 #: inc/reservation.class.php:159
 #, php-format
@@ -262,8 +265,9 @@ msgid "%1$s switchs the reservation %2$s with item %3$s"
 msgstr ""
 
 #: inc/task.class.php:12
+#, fuzzy
 msgid "Reservation Conflict When Extended (plugin)"
-msgstr ""
+msgstr "Rezervace ve vybraném období"
 
 #: inc/task.class.php:13
 msgid "User Reservation Expired (plugin)"
@@ -271,34 +275,70 @@ msgstr ""
 
 #: inc/task.class.php:21
 msgid "Watch Reservations"
-msgstr ""
+msgstr "Sledovat rezervace"
 
 #: inc/task.class.php:21 inc/task.class.php:23
 msgid "plugin"
-msgstr ""
+msgstr "zásuvný modul"
 
 #: inc/task.class.php:23
 msgid "Send an e-mail to users with late reservations"
-msgstr ""
+msgstr "Poslat e-mail uživatelům, kteří nevrátili zapůjčené"
 
 #: inc/task.class.php:59
 msgid "Extending reservation"
-msgstr ""
+msgstr "Prodloužení rezervace"
 
 #: inc/task.class.php:143
 #, php-format
 msgid "Sending e-mail for reservation %1$s"
-msgstr ""
+msgstr "Poslat e-mail pro rezervaci %1$s"
 
 #: inc/task.class.php:144
 #, php-format
 msgid "Expected return time was : %1$s"
-msgstr ""
+msgstr "Očekávaný okamžik návrácení byl: %1$s"
 
 #: inc/task.class.php:146
 msgid "Sending an e-mail"
-msgstr ""
+msgstr "Poslat e-mail"
 
 #: inc/task.class.php:148
 msgid "Could not send notification"
-msgstr ""
+msgstr "Nedaří se poslat oznámení"
+
+#~ msgid "Using the configurable automatic action"
+#~ msgstr "Použít nastavitelnou automatickou akci"
+
+#~ msgid "Days when e-mails for late reservations are sent"
+#~ msgstr "Po kolika dnech posílat e-maily o nevrácených rezervacích"
+
+#~ msgid "Monday"
+#~ msgstr "pondělí"
+
+#~ msgid "Tuesday"
+#~ msgstr "úterý"
+
+#~ msgid "Wednesday"
+#~ msgstr "středa"
+
+#~ msgid "Thursday"
+#~ msgstr "čtvrtek"
+
+#~ msgid "Friday"
+#~ msgstr "pátek"
+
+#~ msgid "Saturday"
+#~ msgstr "sobota"
+
+#~ msgid "Sunday"
+#~ msgstr "neděle"
+
+#~ msgid "Resservation"
+#~ msgid_plural "Reservations"
+#~ msgstr[0] "Rezervace"
+#~ msgstr[1] "Rezervace"
+#~ msgstr[2] "Rezervací"
+
+#~ msgid "Current and future reservations in the selected timeline"
+#~ msgstr "Stávající a budoucí rezervace ve vybraném časovém období"

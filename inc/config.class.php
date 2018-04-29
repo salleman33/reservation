@@ -52,24 +52,24 @@ class PluginReservationConfig extends CommonDBTM
       echo "<th>" . __('Configuration') . "</th>";
       echo "<tr>";
       echo "<td>";
-      echo __('Method used to send e-mails to users with late reservations') . " : ";
+      echo __('Method used to send e-mails to users with late reservations', "reservation") . " : ";
       echo "<select name=\"mode_auto\">";
-      echo "<option value=\"1\" ". ($mode_auto ? 'selected="selected"' : '') .">".__('Automatic')."</option>";
-      echo "<option value=\"0\" ". ($mode_auto ? '' : 'selected="selected"') .">".__('Manual')."</option>";
+      echo "<option value=\"1\" ". ($mode_auto ? 'selected="selected"' : '') .">".__('Automatic', "reservation")."</option>";
+      echo "<option value=\"0\" ". ($mode_auto ? '' : 'selected="selected"') .">".__('Manual', "reservation")."</option>";
       echo "</select>";
       echo "</td>";
       echo "</tr>";
       echo "</table>";
 
       echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
-      echo "<th>" . ('Tab Configuration') . "</th>",
+      echo "<th>" . __('Tab Configuration', "reservation") . "</th>",
 
       $tabcurrent = $this->getConfigurationValue("tabcurrent", 1);
       echo "<tr>";
       echo "<input type=\"hidden\" name=\"tabcurrent\" value=\"0\">";
       echo "<td style=\"padding-left:20px;\">";
       echo "<input type=\"checkbox\" name=\"tabcurrent\" value=\"1\" " . ($tabcurrent ? 'checked' : '') . "> ";
-      echo __('Current Reservation tab') . "</td>";
+      echo __('Current Reservation tab', "reservation") . "</td>";
       echo "</tr>";
 
       $tabcoming = $this->getConfigurationValue("tabcoming");
@@ -77,20 +77,20 @@ class PluginReservationConfig extends CommonDBTM
       echo "<input type=\"hidden\" name=\"tabcoming\" value=\"0\">";
       echo "<td style=\"padding-left:20px;\">";
       echo "<input type=\"checkbox\" name=\"tabcoming\" value=\"1\" " . ($tabcoming ? 'checked' : '') . "> ";
-      echo __('Incoming Reservation tab') . "</td>";
+      echo __('Incoming Reservation tab', "reservation") . "</td>";
       echo "</tr>";
 
       echo "</table>";
 
       echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
-      echo "<th>" . __('ToolTip Configuration') . "</th>";
+      echo "<th>" . __('ToolTip Configuration', "reservation") . "</th>";
 
       $tooltip = $this->getConfigurationValue("tooltip");
       echo "<tr>";
       echo "<input type=\"hidden\" name=\"tooltip\" value=\"0\">";
       echo "<td> ";
       echo "<input type=\"checkbox\" name=\"tooltip\" value=\"1\" " . ($tooltip ? 'checked' : '') . "> ";
-      echo __('ToolTip') . "</td>";
+      echo __('ToolTip', "reservation") . "</td>";
       echo "</tr>";
 
       if ($tooltip) {
