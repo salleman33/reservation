@@ -5,6 +5,122 @@ if (!defined('GLPI_ROOT')) {
 }
 
 
+function getLinkforItem($item) {
+   $itemLink = $item->getFormUrl();
+   $argConcatenator = "?";
+   if (strpos($itemLink, '?') !== false) {
+      $argConcatenator = "&amp;";
+   }
+
+   echo "<a target='_blank' href='" . $itemLink . $argConcatenator . "id=" . $item->fields["id"] . "'>" . $item->fields["name"] . "</a>";
+
+}
+
+function getToolTipforItem($item) {
+   $config = new PluginReservationConfig();
+
+   $show_toolTip = $config->getConfigurationValue("tooltip");
+   if (!$show_toolTip) {
+      return;
+   }
+
+   $show_comment = $config->getConfigurationValue("comment");
+
+   $show_location = $config->getConfigurationValue("location");
+   $show_serial = $config->getConfigurationValue("serial");
+   $show_inventory = $config->getConfigurationValue("inventory");
+   $show_group = $config->getConfigurationValue("group");
+   $show_man_model = $config->getConfigurationValue("man_model");
+   $show_status = $config->getConfigurationValue("status");
+   $toolTip = "";
+   if ($show_comment && array_key_exists("comment", $item->fields)) {
+      $toolTip .= $item->fields["comment"];
+   }
+   if ($show_location && array_key_exists("locations_id", $item->fields)) {
+      $location = getLocationFromItem($item);
+      $toolTip .= "<br><b>" . __('Location') . " : </b>" . $location;
+   }
+   if ($show_group && array_key_exists("groups_id", $item->fields)) {
+      $group_name = getGroupFromItem($item);
+      $toolTip .= "<br><b>" . __('Group') . " : </b>" . $group_name;
+   }
+   if ($show_inventory && array_key_exists("otherserial", $item->fields)) {
+      $toolTip .= "<br><b>" . __('Inventory number') . " : </b>" . $item->fields["otherserial"];
+   }
+   if ($show_serial && array_key_exists("serial", $item->fields)) {
+      $toolTip .= "<br><b>" . __('Serial number') . " : </b>" . $item->fields["serial"];
+   }
+   if ($show_man_model) {
+      $typemodel = getModelFromItem($item);
+      $manufacturer = getManufacturerFromItem($item);
+      $toolTip .= "<br><b>" . __('Manufacturer') . " & " . __('Model') . " : </b>" . $manufacturer . " | " . $typemodel;
+   }
+   if ($show_status) {
+      $status = getStatusFromItem($item);
+      $toolTip .= "<br><b>" . __('Status')  . " : </b>" . $status;
+   }
+   $tooltip = nl2br($toolTip);
+   Html::showToolTip($tooltip, null);
+}
+
+function getGroupFromItem($item) {
+   $group_id = $item->fields["groups_id"];
+   $group_tmp = new Group();
+   $group_tmp->getFromDB($group_id);
+   return $group_tmp->getName();
+}
+
+function getLocationFromItem($item) {
+   $location_id = $item->fields["locations_id"];
+   $location_tmp = new Location();
+   $location_tmp->getFromDB($location_id);
+   return $location_tmp->getName();
+}
+
+function getStatusFromItem($item) {
+   $states_id = $item->fields["states_id"];
+   $states_tmp = new Location();
+   $states_tmp->getFromDB($states_id);
+   return $states_tmp->getName();
+}
+
+function getManufacturerFromItem($item) {
+   $manufacturer_id = $item->fields["manufacturers_id"];
+   $manufacturer_tmp = new Manufacturer();
+   $manufacturer_tmp->getFromDB($manufacturer_id);
+   return $manufacturer_tmp->getName();
+}
+
+function getModelFromItem($item) {
+   global $DB;
+   $typemodel = "N/A";
+   $modeltable = getSingular($item->getTable()) . "models";
+   if ($modeltable) {
+      $modelfield = getForeignKeyFieldForTable($modeltable);
+      if ($modelfield) {
+         if (!$item->isField($modelfield)) {
+            // field not found, trying other method
+            $modeltable = substr($item->getTable(), 0, -1) . "models";
+            $modelfield = getForeignKeyFieldForTable($modeltable);
+         }
+         if ($DB->tableExists($modeltable)) {
+            $query = "SELECT `$modeltable`.`name` AS model
+            FROM `$modeltable` WHERE
+            `$modeltable`.`id` = " . $item->fields[$modelfield];
+            if ($resmodel = $DB->query($query)) {
+               while ($rowModel = $DB->fetch_assoc($resmodel)) {
+                  $typemodel = $rowModel["model"];
+               }
+            }
+         }
+      }
+
+   }
+   return $typemodel;
+}
+
+
+
 class PluginReservationMenu extends CommonGLPI
 {
 
@@ -109,29 +225,45 @@ class PluginReservationMenu extends CommonGLPI
       $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
       $begin = $form_dates["begin"];
       $end = $form_dates["end"];
-      self::displayTabReservations($begin, $end);
-   }
 
+      $filters = [ "'".$begin."' < `end`", "'".$end."' > `begin`"];
+      $list = PluginReservationReservation::getAllReservations($filters);
+      $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
+      ksort($ReservationsByUser);
+
+      self::displayTabReservations($begin, $end, $ReservationsByUser, false);
+   }
 
 
    public static function displayTabContentForAllReservations() {
       $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
       $begin = $form_dates["begin"];
-      self::displayTabReservations($begin);
+      $end = $form_dates["end"];
+
+      $filters = [ "'".$begin."' < `end`"];
+      $list = PluginReservationReservation::getAllReservations($filters);
+      $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
+      ksort($ReservationsByUser);
+
+      self::displayTabReservations($begin, $end, $ReservationsByUser, true);
    }
 
-   private static function displayTabReservations($begin, $end = '') {
-      global $DB, $CFG_GLPI;
+   private static function displayTabReservations($begin, $end, $ReservationsByUser, $includeFuture) {
+      global $DB;
 
       $showentity = Session::isMultiEntitiesMode();
       $config = new PluginReservationConfig();
-      $includeFuture = $config->getConfigurationValue("tabcoming");
       $mode_auto = $config->getConfigurationValue("mode_auto");
+
 
       echo "<div class='center'>";
       echo "<table class='tab_cadre'>";
       echo "<thead>";
-      echo "<tr><th colspan='" . ($showentity ? "11" : "10") . "'>" . ($includeFuture ? __('Current and future reservations in the selected timeline') : __('Reservations in the selected timeline')) . "</th></tr>\n";
+      if ($includeFuture) {
+         echo "<tr><th colspan='" . ($mode_auto ? "10" : "11") . "'>" . __('Current and future reservations') . "</th></tr>\n";
+      } else {
+         echo "<tr><th colspan='" . ($mode_auto ? "10" : "11") . "'>" . __('Reservations in the selected timeline') . "</th></tr>\n";
+      }
       echo "<tr class='tab_bg_2'>";
       echo "<th>" . __('User') . "</a></th>";
       echo "<th colspan='2'>" . __('Item') . "</a></th>";
@@ -144,11 +276,6 @@ class PluginReservationMenu extends CommonGLPI
 
       echo "</tr></thead>";
       echo "<tbody>";
-
-      $filters = $end == '' ? [ "'".$begin."' < `end`"] : [ "'".$begin."' < `end`", "'".$end."' > `begin`"];
-      $list = PluginReservationReservation::getAllReservations($filters);
-      $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
-      ksort($ReservationsByUser);
 
       foreach ($ReservationsByUser as $reservation_user => $reservations_user_list) {
          usort($reservations_user_list, function ($a, $b) {
@@ -182,11 +309,11 @@ class PluginReservationMenu extends CommonGLPI
             // Toolbox::logInFile('sylvain', "ITEM : ".json_encode($item)."\n", $force = false);
 
             $color = "";
-            if ($reservation_user_info["begin"] > $end && $reservation_user_info["begin"] > date("Y-m-d H:i:s", time())) {
+            if ($reservation_user_info["begin"] > $end) {
                $color = "bgcolor=\"lightgrey\"";
             }
             //if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
-            if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time())) {
+            if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
 
                $color = "bgcolor=\"red\"";
             }
@@ -194,7 +321,6 @@ class PluginReservationMenu extends CommonGLPI
             // item
             echo "<td $color>";
             echo Html::link($item->fields['name'], $item->getFormURLWithID($item->fields['id']));
-            //getLinkforItem($item);
             echo "</td>";
             echo "<td $color>";
             getToolTipforItem($item);
@@ -390,7 +516,11 @@ class PluginReservationMenu extends CommonGLPI
 
    public function getFormDates() {
       //global $FORM_DATES;
-      $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+      $form_dates = [];
+
+      if (isset($_SESSION['glpi_plugin_reservation_form_dates'])) {
+         $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+      }
 
       $day = date("d", time());
       $month = date("m", time());

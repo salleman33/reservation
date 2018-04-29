@@ -70,6 +70,19 @@ function plugin_reservation_install() {
 
    }
 
+   // add existing reservations
+   $time = time();
+   $end = date("Y-m-d H:i:s", $time + $delay);
+   $query = "SELECT * 
+            FROM glpi_reservations
+            WHERE `end` >= '".$end."'";
+   $reservation = new Reservation();
+   foreach ($DB->request($query) as $data) {
+      $reservation->getFromDb($data['id']);
+      plugin_item_add_reservation($reservation);
+   }
+
+
    $cron = new CronTask;
 
    if ($cron->getFromDBbyName('PluginReservationTask', 'SurveilleResa')) { // plugin < 1.5.0
@@ -100,10 +113,10 @@ function plugin_reservation_install() {
  */
 function plugin_reservation_uninstall() {
    global $DB;
-   /*$tables = ["glpi_plugin_reservation_reservations", "glpi_plugin_reservation_configs"];
+   $tables = ["glpi_plugin_reservation_reservations", "glpi_plugin_reservation_configs"];
    foreach ($tables as $table) {
-      $DB->query("DROP TABLE IF EXISTS `$table`;");
-   }*/
+      $DB->query("DROP TABLE IF EXISTS `$table`");
+   }
    CronTask::unregister("Reservation");
    return true;
 }
@@ -113,14 +126,16 @@ function plugin_reservation_uninstall() {
  *
  * @return void
  */
-function plugin_item_add_reservation($item) {
+function plugin_item_add_reservation($reservation) {
    global $DB;
 
    $DB->insertOrDie('glpi_plugin_reservation_reservations', [
-      'reservations_id' => $item->fields['id'],
-      'baselinedate' => $item->fields['end']
+      'reservations_id' => $reservation->fields['id'],
+      'baselinedate' => $reservation->fields['end']
    ]
    );
+   Toolbox::logInFile('reservations_plugin', "plugin_item_add_reservation : ".json_encode($reservation)."\n", $force = false);
+
 }
 
 /**
@@ -128,19 +143,18 @@ function plugin_item_add_reservation($item) {
  *
  * @return void
  */
-function plugin_item_update_reservation($item) {
+function plugin_item_update_reservation($reservation) {
    global $DB;
 
-   $end = $item->fields['end'];
+   $end = $reservation->fields['end'];
 
-   $req = $DB->request('glpi_plugin_reservation_reservations', [
-      'FIELDS' => 'effectivedate',
-      'WHERE' => ['reservations_id' => $item->fields['id']]
-   ]);
+   $query = 'SELECT `effectivedate`
+            FROM glpi_plugin_reservation_reservations
+            WHERE `reservations_id` = '.$reservation->fields['id'];
    // maybe the reservation is over
    $resume = false;
-   if ($row = $req->next()) {
-      if ($end >= $row['effectivedate']) {
+   foreach ($DB->request($query) as $data) {
+      if ($end >= $data['effectivedate']) {
          $resume = true;
       }
    }
@@ -151,7 +165,7 @@ function plugin_item_update_reservation($item) {
             'baselinedate' => $end,
             'effectivedate' => 'NULL'
          ], [
-            'reservations_id' => $item->fields["id"]
+            'reservations_id' => $reservation->fields["id"]
          ]
       );
    } else {
@@ -159,10 +173,12 @@ function plugin_item_update_reservation($item) {
          'glpi_plugin_reservation_reservations', [
             'baselinedate' => $end
          ], [
-            'reservations_id' => $item->fields["id"]
+            'reservations_id' => $reservation->fields["id"]
          ]
       );
    }
+   Toolbox::logInFile('reservations_plugin', "plugin_item_update_reservation : ".json_encode($reservation)."\n", $force = false);
+
 }
 
 /**
@@ -170,11 +186,12 @@ function plugin_item_update_reservation($item) {
  *
  * @return void
  */
-function plugin_item_delete_reservation($item) {
+function plugin_item_purge_reservation($reservation) {
    global $DB;
+   Toolbox::logInFile('reservations_plugin', "plugin_item_purge_reservation : ".json_encode($reservation)."\n", $force = false);
    $DB->delete(
     'glpi_plugin_reservation_reservations', [
-       'reservations_id' => $item->fields["id"]
+       'reservations_id' => $reservation->fields["id"]
         ]
     );
 }

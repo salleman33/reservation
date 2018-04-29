@@ -83,7 +83,7 @@ class PluginReservationTask extends CommonDBTM
             if ($conflict['users_id'] == $res['users_id']) {
                $task->log("$formatName a créé une nouvelle reservation pour le meme materiel : " . $item->fields['name']);
                $new_comment = $reservation->fields['comment'];
-               $new_comment .= "\n prolongation du " .date("d-m-Y \à H:i:s", strtotime($time)). " : ".$conflict_reservation->fields['comment'];
+               $new_comment .= " ==" .date("d-m-Y", strtotime($time)). " ==> ".$conflict_reservation->fields['comment'];
 
                $query = "UPDATE `glpi_reservations` 
                         SET `end` = '".$conflict_reservation->fields["end"]."',
@@ -102,8 +102,9 @@ class PluginReservationTask extends CommonDBTM
                NotificationEvent::raiseEvent('plugin_reservation_conflict', $conflict_reservation);
             }
             $task->log("Suppression de la reservation  " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
-            $query = "DELETE FROM `glpi_reservations` WHERE `id`='" . $conflict_reservation->fields['id'] . "'";
-            $DB->query($query) or die("error on 'delete' into checkReservations : " . $DB->error());
+            $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
+            // $query = "DELETE FROM `glpi_reservations` WHERE `id`='" . $conflict_reservation->fields['id'] . "'";
+            // $DB->query($query) or die("error on 'delete' into checkReservations : " . $DB->error());
          }
 
          $task->setVolume($return++);
