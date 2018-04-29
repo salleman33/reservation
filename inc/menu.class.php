@@ -255,7 +255,6 @@ class PluginReservationMenu extends CommonGLPI
       $config = new PluginReservationConfig();
       $mode_auto = $config->getConfigurationValue("mode_auto");
 
-
       echo "<div class='center'>";
       echo "<table class='tab_cadre'>";
       echo "<thead>";

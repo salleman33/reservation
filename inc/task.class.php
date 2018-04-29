@@ -91,7 +91,6 @@ class PluginReservationTask extends CommonDBTM
                         WHERE `id`='" . $reservation->fields["id"] . "'";
                $DB->query($query) or die("error on 'update' into checkReservations conflict : " . $DB->error());
 
-
                //CommonGLPI::plugin_item_update_reservation($reservation);
                $query = "UPDATE `glpi_plugin_reservation_reservations`
                         SET `baselinedate` = '".$conflict_reservation->fields["end"]."'

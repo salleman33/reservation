@@ -82,7 +82,6 @@ function plugin_reservation_install() {
       plugin_item_add_reservation($reservation);
    }
 
-
    $cron = new CronTask;
 
    if ($cron->getFromDBbyName('PluginReservationTask', 'SurveilleResa')) { // plugin < 1.5.0
