@@ -6,4 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'JSqueeze' => array($vendorDir . '/patchwork/jsqueeze/class'),
+    'Dflydev\\DotAccessData' => array($vendorDir . '/dflydev/dot-access-data/src'),
 );

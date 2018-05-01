@@ -1,5 +1,10 @@
 {
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require-dev": {
         "glpi-project/coding-standard": "^0.7.0"
+    },
+    "require": {
+        "glpi-project/tools": "^0.1.4"
     }
 }
