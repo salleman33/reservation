@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-29 16:54+0200\n"
-"PO-Revision-Date: 2018-04-29 17:32+0200\n"
+"PO-Revision-Date: 2018-04-29 17:36+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -115,7 +115,7 @@ msgstr "Réservations actuelles et à venir"
 
 #: inc/menu.class.php:170
 msgid "Available Hardware"
-msgstr "Matériel disponible"
+msgstr "Matériels disponibles"
 
 #: inc/menu.class.php:269
 msgid "Current and future reservations"
