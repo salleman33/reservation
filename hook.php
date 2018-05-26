@@ -35,6 +35,21 @@ function plugin_reservation_install() {
       $DB->queryOrDie($query, $DB->error());
    }
 
+   // add existing reservations if necessary
+   $query = "SELECT * 
+            FROM glpi_reservations
+            WHERE `end` >= '".$end."'
+            AND glpi_reservations.id NOT IN 
+               (
+                  SELECT reservations_id
+                  FROM glpi_plugin_reservation_reservations
+               )";
+   $reservation = new Reservation();
+   foreach ($DB->request($query) as $data) {
+      $reservation->getFromDb($data['id']);
+      plugin_item_add_reservation($reservation);
+   }
+
    if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 1.5.0
       $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -67,18 +82,6 @@ function plugin_reservation_install() {
 
       $query = "DROP TABLE `glpi_plugin_reservation_configdayforauto`";
       $DB->queryOrDie($query, $DB->error());
-   }
-
-   // add existing reservations
-   $time = time();
-   $end = date("Y-m-d H:i:s", $time + $delay);
-   $query = "SELECT * 
-            FROM glpi_reservations
-            WHERE `end` >= '".$end."'";
-   $reservation = new Reservation();
-   foreach ($DB->request($query) as $data) {
-      $reservation->getFromDb($data['id']);
-      plugin_item_add_reservation($reservation);
    }
 
    $cron = new CronTask;
