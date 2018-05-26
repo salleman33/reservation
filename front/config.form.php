@@ -16,6 +16,9 @@ if ($plugin->isActivated("reservation")) {
       $PluginReservationConfig->setMailAutomaticAction($_POST["mode_auto"]);
       $PluginReservationConfig->setConfigurationValue("mode_auto", $_POST["mode_auto"]);
    }
+   if (isset($_POST["conflict_action"])) {
+      $PluginReservationConfig->setConfigurationValue("conflict_action", $_POST["conflict_action"]);
+   }
 
    foreach ($toolTipConfig as $config) {
       if (isset($_POST[$config])) {

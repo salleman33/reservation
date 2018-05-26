@@ -61,7 +61,8 @@ function plugin_reservation_install() {
       $DB->queryOrDie($query, $DB->error());
 
       $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
-                VALUES (\"mode_auto\",0)";
+                VALUES  (\"mode_auto\",0),
+                        (\"conflict_action\",\"delete\")";
 
       $DB->queryOrDie($query, $DB->error());
    }
@@ -74,6 +75,10 @@ function plugin_reservation_install() {
                     WHERE `name` = \"methode\"
                 )
                 WHERE `name` = \"mode_auto\"";
+
+      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
+                VALUES  (\"mode_auto\",0),
+                        (\"conflict_action\",\"delete\")";
 
       $DB->queryOrDie($query, $DB->error());
 

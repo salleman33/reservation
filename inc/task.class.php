@@ -53,7 +53,7 @@ class PluginReservationTask extends CommonDBTM
       $task->log("Until : " . $end);
 
       $reservations_list = PluginReservationReservation::getAllReservations(["`end` <= '".$end."'", 'effectivedate is null']);
-      //Toolbox::logInFile('sylvain', "reservations_list : ".json_encode($reservations_list)."\n", $force = false);
+      //Toolbox::logInFile('reservations_plugin', "reservations_list : ".json_encode($reservations_list)."\n", $force = false);
 
       foreach ($reservations_list as $res) {
          $task->log(__('Extending reservation', 'reservation') . " : " . $res['reservations_id']);
@@ -91,7 +91,6 @@ class PluginReservationTask extends CommonDBTM
                         WHERE `id`='" . $reservation->fields["id"] . "'";
                $DB->query($query) or die("error on 'update' into checkReservations conflict : " . $DB->error());
 
-               //CommonGLPI::plugin_item_update_reservation($reservation);
                $query = "UPDATE `glpi_plugin_reservation_reservations`
                         SET `baselinedate` = '".$conflict_reservation->fields["end"]."'
                         WHERE `reservations_id`='" . $reservation->fields["id"] . "'";
@@ -100,17 +99,33 @@ class PluginReservationTask extends CommonDBTM
                $task->log("conflit avec la reservation " . $conflict_reservation->fields['id'] . " du materiel " . $item->fields['name'] . " par " . $formatName . " (du " . date("d-m-Y \à H:i:s", strtotime($conflict['begin'])) . " au " . date("d-m-Y \à H:i:s", strtotime($conflict['end']).")"));
                NotificationEvent::raiseEvent('plugin_reservation_conflict', $conflict_reservation);
             }
-            $task->log("Suppression de la reservation  " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
-            $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
-            // $query = "DELETE FROM `glpi_reservations` WHERE `id`='" . $conflict_reservation->fields['id'] . "'";
-            // $DB->query($query) or die("error on 'delete' into checkReservations : " . $DB->error());
+            $PluginReservationConfig = new PluginReservationConfig();
+            $conflict_action = $PluginReservationConfig->getConfigurationValue("conflict_action");
+            switch ($conflict_action) {
+               case "delete":
+                  deleteConflictedReservation($conflict_reservation);
+                  $task->log("Suppression de la reservation  " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
+                  $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
+                  break;
+               case "delay":
+                  if ($conflict_reservation->fields["end"] <= $end) {
+                     $task->log("Impossible de retarder le debut de la reservation " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
+                     $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
+                     break;
+                  }
+                  $query = "UPDATE `glpi_reservations`
+                        SET `begin` = '".$end."'
+                        WHERE `id`='" . $conflict_reservation->fields["id"] . "'";
+                  $DB->query($query) or die("error on 'update' into checkReservations conflict to delay start of a reservation : " . $DB->error());
+                  $task->log("Retardement du debut de la reservation  " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
+                  break;
+            }
          }
 
          $task->setVolume($return++);
       }
       return $return;
    }
-
 
    public static function cronSendMailLateReservations($task) {
       $res = self::sendMailLateReservations($task);

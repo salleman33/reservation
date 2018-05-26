@@ -61,7 +61,7 @@ class PluginReservationReservation extends CommonDBTM
                   , $plugin_table
                $where";
 
-      Toolbox::logInFile('sylvain', "QUERY  : ".$query."\n", $force = false);
+      // Toolbox::logInFile('reservations_plugin', "QUERY  : ".$query."\n", $force = false);
 
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
@@ -148,7 +148,7 @@ class PluginReservationReservation extends CommonDBTM
       global $DB, $CFG_GLPI;
 
       $tablename = getTableForItemType(__CLASS__);
-      // Toolbox::logInFile('sylvain', "checkoutReservation RETURN : ".$tablename."\n", $force = false);
+      // Toolbox::logInFile('reservations_plugin', "checkoutReservation RETURN : ".$tablename."\n", $force = false);
       $query = "UPDATE `".$tablename."` 
                SET `effectivedate` = '" . date("Y-m-d H:i:s", time()) . "' 
                WHERE `reservations_id` = '" . $reservation_id . "';";
@@ -177,7 +177,7 @@ class PluginReservationReservation extends CommonDBTM
       $input['end']                 = $resa->fields['end'];
       $input['users_id']            = $resa->fields['users_id'];
       unset($rr->fields["id"]);
-      Toolbox::logInFile('sylvain', "addItemToResa INPUT : ".json_encode($input)."\n", $force = false);
+      Toolbox::logInFile('reservations_plugin', "addItemToResa INPUT : ".json_encode($input)."\n", $force = false);
       if ($newID = $rr->add($input)) {
          Event::log($newID, "reservation", 4, "inventory",
                   sprintf(__('%1$s adds the reservation %2$s for item %3$s'),

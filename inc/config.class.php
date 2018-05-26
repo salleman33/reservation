@@ -42,6 +42,7 @@ class PluginReservationConfig extends CommonDBTM
 
    public function showForm() {
       $mode_auto = $this->getConfigurationValue("mode_auto");
+      $conflict_action = $this->getConfigurationValue("conflict_action");
 
       echo "<form method='post' action='" . $this->getFormURL() . "'>";
 
@@ -56,6 +57,16 @@ class PluginReservationConfig extends CommonDBTM
       echo "<select name=\"mode_auto\">";
       echo "<option value=\"1\" ". ($mode_auto ? 'selected="selected"' : '') .">".__('Automatic', "reservation")."</option>";
       echo "<option value=\"0\" ". ($mode_auto ? '' : 'selected="selected"') .">".__('Manual', "reservation")."</option>";
+      echo "</select>";
+      echo "</td>";
+      echo "</tr>";
+
+      echo "<tr>";
+      echo "<td>";
+      echo __('Method used when there is a conflicted reservation', "reservation") . " : ";
+      echo "<select name=\"conflict_action\">";
+      echo "<option value=\"delete\" ". ($conflict_action == 'delete' ? 'selected="selected"' : '') .">".__('Delete the conflicted reservation', "reservation")."</option>";
+      echo "<option value=\"delay\" ". ($conflict_action == 'delay' ? 'selected="selected"' : '') .">".__('Delay the start of the conflicted reservation', "reservation")."</option>";
       echo "</select>";
       echo "</td>";
       echo "</tr>";

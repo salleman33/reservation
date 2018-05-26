@@ -232,7 +232,7 @@ class PluginReservationMenu extends CommonGLPI
       $list = PluginReservationReservation::getAllReservations($filters);
       $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
       ksort($ReservationsByUser);
-      Toolbox::logInFile('sylvain', "reservations_list : ".json_encode($list)."\n", $force = false);
+      //Toolbox::logInFile('reservations_plugin', "reservations_list : ".json_encode($list)."\n", $force = false);
 
       self::displayTabReservations($begin, $end, $ReservationsByUser, false);
    }
