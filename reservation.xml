@@ -54,12 +54,14 @@ It also brings some simplified actions on bookings like:
     <license>        <![CDATA[GPL v2+]]></license>
     <tags>
         <fr>
-            <tag>reservation</tag>
+            <tag>reservations</tag>
             <tag>acquittement</tag>
+            <tag>gestion</tag>
         </fr>
         <en>
-            <tag>reservation</tag>
+            <tag>reservations</tag>
             <tag>acknowledgment</tag>
+            <tag>gestion</tag>
         </en>
     </tags>
 </root>
