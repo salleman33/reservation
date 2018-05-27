@@ -7,7 +7,7 @@
  */
 function plugin_reservation_install() {
    global $DB, $CFG_GLPI;
-   if (TableExists("glpi_plugin_reservation_manageresa")) { //UPDATE plugin < 1.5.0
+   if (TableExists("glpi_plugin_reservation_manageresa")) { //UPDATE plugin < 2.0.0
       $query = "ALTER TABLE `glpi_plugin_reservation_manageresa`
                 CHANGE `resaid` `reservations_id` int(11) NOT NULL,
                 DROP COLUMN `matid`,
@@ -21,7 +21,7 @@ function plugin_reservation_install() {
       $DB->queryOrDie($query, $DB->error());
    }
 
-   if (!TableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 1.5.0
+   if (!TableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_reservations` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `reservations_id` int(11) NOT NULL,
@@ -50,7 +50,7 @@ function plugin_reservation_install() {
       plugin_item_add_reservation($reservation);
    }
 
-   if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 1.5.0
+   if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `name` VARCHAR(20) NOT NULL,
@@ -67,7 +67,13 @@ function plugin_reservation_install() {
       $DB->queryOrDie($query, $DB->error());
    }
 
-   if (TableExists("glpi_plugin_reservation_config")) { //UPDATE plugin < 1.5.0
+   if (TableExists("glpi_plugin_reservation_config")) { //UPDATE plugin < 2.0.0
+      $query = "ALTER TABLE `glpi_plugin_reservation_config`
+                MODIFY `name` VARCHAR(20) NOT NULL,
+                MODIFY `value` VARCHAR(20) NOT NULL";
+
+      $DB->queryOrDie($query, $DB->error());
+
       $query = "UPDATE `glpi_plugin_reservation_configs`
                 SET `value` = (
                     SELECT `value`
@@ -91,7 +97,7 @@ function plugin_reservation_install() {
 
    $cron = new CronTask;
 
-   if ($cron->getFromDBbyName('PluginReservationTask', 'SurveilleResa')) { // plugin < 1.5.0
+   if ($cron->getFromDBbyName('PluginReservationTask', 'SurveilleResa')) { // plugin < 2.0.0
       CronTask::unregister("Reservation");
    }
 
