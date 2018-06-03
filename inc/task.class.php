@@ -108,16 +108,16 @@ class PluginReservationTask extends CommonDBTM
                   $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
                   break;
                case "delay":
-                  if ($conflict_reservation->fields["end"] <= $end) {
-                     $task->log("Impossible de retarder le debut de la reservation " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
-                     $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
-                     break;
-                  }
-                  $query = "UPDATE `glpi_reservations`
-                        SET `begin` = '".$end."'
-                        WHERE `id`='" . $conflict_reservation->fields["id"] . "'";
-                  $DB->query($query) or die("error on 'update' into checkReservations conflict to delay start of a reservation : " . $DB->error());
-                  $task->log("Retardement du debut de la reservation  " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
+                  // if ($conflict_reservation->fields["end"] <= $end) {
+                  //    $task->log("Impossible de retarder le debut de la reservation " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
+                  //    $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
+                  //    break;
+                  // }
+                  // $query = "UPDATE `glpi_reservations`
+                  //       SET `begin` = '".$end."'
+                  //       WHERE `id`='" . $conflict_reservation->fields["id"] . "'";
+                  // $DB->query($query) or die("error on 'update' into checkReservations conflict to delay start of a reservation : " . $DB->error());
+                  // $task->log("Retardement du debut de la reservation  " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
                   break;
             }
          }

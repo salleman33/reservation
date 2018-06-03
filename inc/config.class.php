@@ -66,7 +66,7 @@ class PluginReservationConfig extends CommonDBTM
       echo __('Method used when there is a conflicted reservation', "reservation") . " : ";
       echo "<select name=\"conflict_action\">";
       echo "<option value=\"delete\" ". ($conflict_action == 'delete' ? 'selected="selected"' : '') .">".__('Delete the conflicted reservation', "reservation")."</option>";
-      echo "<option value=\"delay\" ". ($conflict_action == 'delay' ? 'selected="selected"' : '') .">".__('Delay the start of the conflicted reservation', "reservation")."</option>";
+      // echo "<option value=\"delay\" ". ($conflict_action == 'delay' ? 'selected="selected"' : '') .">".__('Delay the start of the conflicted reservation', "reservation")."</option>";
       echo "</select>";
       echo "</td>";
       echo "</tr>";
