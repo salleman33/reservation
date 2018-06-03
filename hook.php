@@ -38,7 +38,7 @@ function plugin_reservation_install() {
    // add existing reservations if necessary
    $query = "SELECT * 
             FROM glpi_reservations
-            WHERE `end` >= '".$end."'
+            WHERE `end` >= NOW()
             AND glpi_reservations.id NOT IN 
                (
                   SELECT reservations_id
