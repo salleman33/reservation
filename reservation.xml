@@ -9,22 +9,26 @@
             <en>Provides a different management of reservations. Also facilitates actions on reservations</en>
         </short>
         <long>
-            <fr>Ce plugin propose une gestion différente des réservations de matériel : 
-⋅⋅* acquittement des retours de matériels
-⋅⋅* prolongation automatique des réservations de matériels non rendus
-⋅⋅* envoi de mail aux emprunteurs si la réservation est arrivée à expiration
+            <fr>Ce plugin propose une gestion différente des réservations de matériel :
+
+- acquittement des retours de matériels
+- prolongation automatique des réservations de matériels non rendus
+- envoi de mail aux emprunteurs si la réservation est arrivée à expiration
 
 Il apporte également quelques actions simplifiées sur les réservations comme : 
-⋅⋅* ajouter un matériel à une réservation existante
-⋅⋅* remplacer un matériel par un autre.</fr>
+
+- ajouter un matériel à une réservation existante
+- remplacer un matériel par un autre.</fr>
             <en>This plugin offers a different management of the material reservations :
-⋅⋅* acknowledgment of material returns
-⋅⋅* automatic extension of non-returned material reservations
-⋅⋅* sending mail to borrowers if the reservation has expired
+
+- acknowledgment of material returns
+- automatic extension of non-returned material reservations
+- sending mail to borrowers if the reservation has expired
 
 It also brings some simplified actions on bookings like :
-⋅⋅* add a material to an existing reservation
-⋅⋅* replace one material with another.</en>
+
+- add a material to an existing reservation
+- replace one material with another.</en>
         </long>
     </description>
     <homepage>https://plmlab.math.cnrs.fr/sylvain.allemand/reservation</homepage>
