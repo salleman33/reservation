@@ -1,6 +1,6 @@
 <root>
-    <name>Reservation</name>
-    <key>reservation</key>
+    <name>Reservation test</name>
+    <key>reservationtest</key>
     <state>beta</state>
     <logo>https://plmlab.math.cnrs.fr/sylvain.allemand/reservation/raw/master/logo.png</logo>
     <description>
