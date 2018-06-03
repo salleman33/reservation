@@ -418,7 +418,7 @@ class PluginReservationMenu extends CommonGLPI
                   echo "<li><a class=\"bouton\" title=\"" . _sx('tooltip', 'Send an e-mail for the late reservation', "reservation") . "\" href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?mailuser=" . $reservation_user_info['reservations_id'] . "\">" . _sx('button', 'Send an e-mail', "reservation") . "</a></li>";
                   if (isset($reservation_user_info['mailingdate'])) {
                      echo "<li>" . __('Last e-mail sent on', "reservation") . " </li>";
-                     echo "<li>" . date(self::getDateFormat()." \à H:i:s", strtotime($reservation_user_info['mailingdate'])) . "</li>";
+                     echo "<li>" . date(self::getDateFormat()." H:i:s", strtotime($reservation_user_info['mailingdate'])) . "</li>";
                   }
                }
                echo "</ul>";
