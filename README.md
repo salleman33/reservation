@@ -1,4 +1,4 @@
-# Reservations 
+# Reservation
 
 Ce plugin propose une gestion différente des réservations de matériel :
 
