@@ -43,6 +43,10 @@ It also brings some simplified actions on bookings like :
             <num>2.0.0</num>
             <compatibility>9.3</compatibility>
         </version>
+        <version>
+            <num>1.4.2</num>
+            <compatibility>9.2</compatibility>
+        </version>
     </versions>
     <langs>
         <lang>fr_FR</lang>
