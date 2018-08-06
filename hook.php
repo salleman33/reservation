@@ -49,19 +49,26 @@ function plugin_reservation_install() {
       $reservation->getFromDb($data['id']);
       plugin_item_add_reservation($reservation);
    }
+
+
+   if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 2.0.0
+      $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
+               `id` int(11) NOT NULL AUTO_INCREMENT,
+               `name` VARCHAR(20) NOT NULL,
+               `value` VARCHAR(20) NOT NULL,
+               PRIMARY KEY (`id`),
+               UNIQUE (`name`)
+               )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+      $DB->queryOrDie($query, $DB->error());
+
+      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
+               VALUES  (\"mode_auto\",0),
+                        (\"conflict_action\",\"delete\")";
+
+      $DB->queryOrDie($query, $DB->error());
+   }
    
    if (TableExists("glpi_plugin_reservation_config")) { //UPDATE plugin < 2.0.0
-      $query = "ALTER TABLE `glpi_plugin_reservation_config`
-                MODIFY `name` VARCHAR(20) NOT NULL,
-                MODIFY `value` VARCHAR(20) NOT NULL";
-
-      $DB->queryOrDie($query, $DB->error());
-    
-      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
-                VALUES  (\"mode_auto\",0),
-                        (\"conflict_action\",\"delete\")";
-      $DB->queryOrDie($query, $DB->error());
-
       $query = "UPDATE `glpi_plugin_reservation_configs`
                 SET `value` = (
                     SELECT `value`
@@ -77,24 +84,6 @@ function plugin_reservation_install() {
       $query = "DROP TABLE `glpi_plugin_reservation_configdayforauto`";
       $DB->queryOrDie($query, $DB->error());
    }
-
-   if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 2.0.0
-      $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
-                `id` int(11) NOT NULL AUTO_INCREMENT,
-                `name` VARCHAR(20) NOT NULL,
-                `value` VARCHAR(20) NOT NULL,
-                PRIMARY KEY (`id`),
-                UNIQUE (`name`)
-                )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-      $DB->queryOrDie($query, $DB->error());
-
-      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
-                VALUES  (\"mode_auto\",0),
-                        (\"conflict_action\",\"delete\")";
-
-      $DB->queryOrDie($query, $DB->error());
-   }
-
 
    $cron = new CronTask;
 
