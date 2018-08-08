@@ -87,7 +87,7 @@ class PluginReservationTask extends CommonDBTM
 
                $query = "UPDATE `glpi_reservations` 
                         SET `end` = '".$conflict_reservation->fields["end"]."',
-                           `comment` = '".$new_comment."'
+                           `comment` = '".$DB->escape($new_comment)."'
                         WHERE `id`='" . $reservation->fields["id"] . "'";
                $DB->query($query) or die("error on 'update' into checkReservations conflict : " . $DB->error());
 
