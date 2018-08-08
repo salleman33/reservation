@@ -246,7 +246,7 @@ $where " . "ORDER BY username,
                 	$task->log(" l'utilisateur ".$user_id." (current : ".$current_user_id.") a reservé de nouveau le matos ".$row['id'].", on supprime la nouvelle reservation numero ".$row['resaid'] );
                 	$query = "UPDATE `glpi_reservations` SET `end` = '". $row['end']."' WHERE `id`='" . $currentResa . "';";
                 	$DB->query($query) or die("error on 'update date end' into glpi_reservations lors du cron : " . $DB->error());
-                	$query = "UPDATE `glpi_reservations` SET `comment` = concat(comment,' //// ". $row['comment']. "') WHERE `id`='" . $currentResa. "';";
+                	$query = "UPDATE `glpi_reservations` SET `comment` = concat(comment,' //// ". $DB->escape($row['comment']). "') WHERE `id`='" . $currentResa. "';";
                 	$DB->query($query) or die("error on 'update comment' into glpi_reservations lors du cron : " . $DB->error());
                 	$query = "DELETE FROM `glpi_reservations` WHERE `id`='" . $row['resaid'] . "';";
                 	$DB->query($query) or die("error on 'delete' into glpi_reservations lors du cron : " . $DB->error());
