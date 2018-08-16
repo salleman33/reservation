@@ -14,7 +14,7 @@ class ReservationAPIRest extends API {
      }
 
     function call() {
-
+        return $this->inlineDocumentation("apirest.md");
     }
 
 }
