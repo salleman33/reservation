@@ -23,6 +23,7 @@ function plugin_init_reservation() {
    Plugin::registerClass('PluginReservationConfig');
    Plugin::registerClass('PluginReservationReservation');
    Plugin::registerClass('PluginReservationTask');
+   Plugin::registerClass('PluginReservationApi');
 
    // Notifications
    $PLUGIN_HOOKS['item_get_events']['reservation'] =
@@ -44,7 +45,7 @@ function plugin_version_reservation() {
       'version' => PLUGIN_VERSION,
       'author' => 'Sylvain Allemand',
       'license' => 'GLPv3',
-      'homepage' => 'https://plmlab.math.cnrs.fr/sylvain.allemand/reservations',
+      'homepage' => 'https://github.com/salleman33/reservation',
       'requirements' => [
          'glpi' => [
             'min' => '9.3',
