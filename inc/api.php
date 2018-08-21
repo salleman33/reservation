@@ -19,8 +19,199 @@ class PluginReservationApi extends API {
   }
 
   public function call() {
-    Toolbox::logInFile('reservations_plugin', "TEST API \n", $force = false);
-    return $this->inlineDocumentation("plugins/reservation/apirest.md");
+    //parse http request and find parts
+    $this->request_uri  = $_SERVER['REQUEST_URI'];
+    $this->verb         = $_SERVER['REQUEST_METHOD'];
+    $path_info          = (isset($_SERVER['PATH_INFO'])) ? str_replace("api/", "", trim($_SERVER['PATH_INFO'], '/')) : '';
+    $this->url_elements = explode('/', $path_info);
+
+    // retrieve requested resource
+    $resource      = trim(strval($this->url_elements[0]));
+    $is_inline_doc = (strlen($resource) == 0) || ($resource == "api");
+
+    // Add headers for CORS
+    $this->cors($this->verb);
+
+    // retrieve paramaters (in body, query_string, headers)
+    $this->parseIncomingParams($is_inline_doc);
+
+
+    // show debug if required
+    if (isset($this->parameters['debug'])) {
+      $this->debug = $this->parameters['debug'];
+      if (empty($this->debug)) {
+	$this->debug = 1;
+      }
+      if ($this->debug >= 2) {
+	$this->showDebug();
+      }
+    }
+
+    // retrieve session (if exist)
+    $this->retrieveSession();
+    $this->initApi();
+    $this->manageUploadedFiles();
+
+    // retrieve param who permit session writing
+    if (isset($this->parameters['session_write'])) {
+      $this->session_write = (bool)$this->parameters['session_write'];
+    }
+
+    // inline documentation (api/)
+    if ($is_inline_doc) {
+      return $this->inlineDocumentation("plugins/reservation/apirest.md");
+
+    } else if ($resource === "initSession") {
+      // ## DECLARE ALL ENDPOINTS ##
+      // login into glpi
+      $this->session_write = true;
+	#Toolbox::logInFile('reservations_plugin', "TESTTESTTEST11 : ".json_encode($_SESSION)."\n");
+      return $this->returnResponse($this->initSession($this->parameters));
+
+    } else if ($resource === "killSession") {
+	    $this->retrieveSession($this->parameters);
+      // logout from glpi
+      $this->session_write = true;
+      return $this->returnResponse($this->killSession());
+
+    } else if ($resource === "checkoutItem") {
+      $id                = $this->getId();	
+      $additionalheaders = [];
+      $code              = 200;
+
+      switch ($this->verb) {
+      default:
+      case "GET": 
+	$response = "Use PUT request !";
+	break;
+      case "PUT":
+	if (!isset($this->parameters['input'])) {
+	  $this->messageBadArrayError();
+	}
+	// if id is passed by query string, add it into input parameter
+	$input = (array) ($this->parameters['input']);
+	if (($id > 0) && !isset($input['id'])) {
+	  $this->parameters['input']->id = $id;
+	}
+
+	$time = time();
+	$now = date("Y-m-d H:i:s", $time);
+	$current_reservation = PluginReservationReservation::getAllReservations(["`begin` <= '".$now."'", "`end` >= '".$now."'", "reservationitems_id = ".$this->parameters['input']->id]);
+	if (count($current_reservation) == 0) {
+	  $response = [$this->parameters['input']->id => false, 'message'    => __("Item is not currently reserved", "reservation")];
+	  break;
+	}
+
+	$reservation = [];
+	$reservation['input']['id'] = $current_reservation[0]['id'];
+	$reservation['input']['end'] = $now;
+	$this->parameters['input'] = $reservation['input'];
+	
+	#Toolbox::logInFile('reservations_plugin', "call API PARAMETERS APRES :  !".json_encode($this->parameters)."\n", $force = false);
+	$response = $this->updateItems("Reservation", $this->parameters);
+	break;
+      }
+      return $this->returnResponse($response, $code, $additionalheaders);
+    }
+
+    $this->messageLostError();
+  }
+
+
+  
+
+  #private function checkoutItems($params = []) {
+  #  $this->initEndpoint();
+
+  #  $input    = isset($params['input']) ? $params["input"] : null;
+  #  $item = new ReservationItem();
+
+  #  if (is_object($input)) {
+  #    $input = [$input];
+  #    $isMultiple = false;
+  #  } else {
+  #    $isMultiple = true;
+  #  }
+
+  #  if (is_array($input)) {
+  #    $idCollection = [];
+  #    $failed       = 0;
+  #    $index        = 0;
+  #    foreach ($input as $object) {
+  #      $current_res = [];
+  #      if (isset($object->id)) {
+  #        if (!$item->getFromDB($object->id)) {
+  #          $failed++;
+  #          $current_res = [$object->id => false, 'message'   => __("Item not found")];
+  #          $idCollection[] = $current_res;
+  #          continue;
+  #        }
+
+  #        //check rights
+  #        if (!Reservation::canCreate()) {
+  #      	  #return $_SESSION["glpiactiveprofile"]["reservation"];
+  #  Toolbox::logInFile('reservations_plugin', "call API PAS LES DROITS !".var_dump($_SESSION)."\n", $force = false);
+  #          $failed++;
+  #          $current_res = [$object->id => false, 'message'    => __("You don't have permission to perform this action.")];
+  #        } else {
+  #          //update item
+  #          $object = Toolbox::sanitize((array)$object);
+  #          try {
+  #            PluginReservationReservation::checkoutReservation($object->fields["id"]);
+  #          } catch(Exception $e) {
+  #            $failed++;
+  #          }
+  #          $current_res = [$item->fields["id"] => "checkout !", 'message'=> $this->getGlpiLastMessage()];
+  #        }
+
+  #      }
+
+  #      // attach fileupload answer
+  #      if (isset($params['upload_result']) && isset($params['upload_result'][$index])) {
+  #        $current_res['upload_result'] = $params['upload_result'][$index];
+  #      }
+
+
+  #      // append current result to final collection
+  #      $idCollection[] = $current_res;
+  #      $index++;
+  #    }
+
+  #    if ($isMultiple) {
+  #      if ($failed == count($input)) {
+  #        $this->returnError($idCollection, 400, "ERROR_GLPI_UPDATE", false);
+  #      } else if ($failed > 0) {
+  #        $this->returnError($idCollection, 207, "ERROR_GLPI_PARTIAL_UPDATE", false);
+  #      }
+  #    } else {
+  #      if ($failed > 0) {
+  #        $this->returnError($idCollection[0]['message'], 400, "ERROR_GLPI_UPDATE", false);
+  #      } else { 
+  #        return $idCollection; // Return collection, even if the request affects a single item
+  #      }
+  #    }
+  #    return $idCollection;
+
+  #  } else {
+  #    $this->messageBadArrayError();
+  #  }
+  #}
+
+  private function getId() {
+    $id = isset($this->url_elements[1]) && is_numeric($this->url_elements[1])
+      ?intval($this->url_elements[1])
+      :false;
+
+    $additional_id = isset($this->url_elements[3]) && is_numeric($this->url_elements[3])
+      ?intval($this->url_elements[3])
+      :false;
+
+    if ($additional_id || isset($this->parameters['parent_itemtype'])) {
+      $this->parameters['parent_id'] = $id;
+      $id = $additional_id;
+    }
+
+    return $id;
   }
 
   public function parseIncomingParams($is_inline_doc = false) {
