@@ -44,7 +44,7 @@ function plugin_version_reservation() {
       'version' => PLUGIN_VERSION,
       'author' => 'Sylvain Allemand',
       'license' => 'GLPv3',
-      'homepage' => 'https://plmlab.math.cnrs.fr/sylvain.allemand/reservations',
+      'homepage' => 'https://github.com/salleman33/reservation',
       'requirements' => [
          'glpi' => [
             'min' => '9.3',
