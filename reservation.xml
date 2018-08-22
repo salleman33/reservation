@@ -5,20 +5,22 @@
     <logo>https://github.com/salleman33/reservation/raw/master/logo.png</logo>
     <description>
         <short>
-            <fr>Apporte une gestion differente des reservations. Permet egalement d'effectuer facilement des actions sur les reservations.</fr>
+            <cs>Poskytuje odlišnou správu rezervací. Také dociluje akcí při rezervacích</cs>
             <en>Provides a different management of reservations. Also facilitates actions on reservations</en>
+            <fr>Apporte une gestion differente des reservations. Permet egalement d'effectuer facilement des actions sur les reservations.</fr>
         </short>
         <long>
-            <fr>Ce plugin propose une gestion différente des réservations de matériel :
+            <cs>Tento zásuvný modul nabízí odlišnou správu rezervací materiálu:
 
-- acquittement des retours de matériels
-- prolongation automatique des réservations de matériels non rendus
-- envoi de mail aux emprunteurs si la réservation est arrivée à expiration
+- potvrzování vrácení materiálu
+- automatické prodlužování rezervací nevráceného materiálu
+- posílání e-mailů vypůjčitelům když platnost rezervace skončila
 
-Il apporte également quelques actions simplifiées sur les réservations comme : 
+Také přináší některé zjednodušující akce pro zápůjčky jako:
 
-- ajouter un matériel à une réservation existante
-- remplacer un matériel par un autre.</fr>
+- přidání materiálu do existující rezervace
+- nahrazení jednoho materiálu jiným.</cs>
+            
             <en>This plugin offers a different management of the material reservations :
 
 - acknowledgment of material returns
@@ -29,6 +31,17 @@ It also brings some simplified actions on bookings like :
 
 - add a material to an existing reservation
 - replace one material with another.</en>
+            
+            <fr>Ce plugin propose une gestion différente des réservations de matériel :
+
+- acquittement des retours de matériels
+- prolongation automatique des réservations de matériels non rendus
+- envoi de mail aux emprunteurs si la réservation est arrivée à expiration
+
+Il apporte également quelques actions simplifiées sur les réservations comme : 
+
+- ajouter un matériel à une réservation existante
+- remplacer un matériel par un autre.</fr>
         </long>
     </description>
     <homepage>https://github.com/salleman33/reservation</homepage>
@@ -53,9 +66,9 @@ It also brings some simplified actions on bookings like :
         </version>
     </versions>
     <langs>
-        <lang>fr_FR</lang>
-        <lang>en_GB</lang>
         <lang>cs_CZ</lang>
+        <lang>en_GB</lang>
+        <lang>fr_FR</lang>
     </langs>
     <license>GLPv3</license>
     <screenshots>
@@ -63,16 +76,21 @@ It also brings some simplified actions on bookings like :
         <screenshot>https://github.com/salleman33/reservation/raw/master/pics/screenshot_b2.png</screenshot>
     </screenshots>
     <tags>
-        <fr>
-            <tag>réservations</tag>
-            <tag>acquittement</tag>
-            <tag>gestion</tag>
-        </fr>
+        <cs>
+            <tag>rezervace</tag>
+            <tag>potvrzování</tag>
+            <tag>správa</tag>
+        </cs>
         <en>
             <tag>reservations</tag>
             <tag>acknowledgment</tag>
             <tag>management</tag>
         </en>
+        <fr>
+            <tag>réservations</tag>
+            <tag>acquittement</tag>
+            <tag>gestion</tag>
+        </fr>
     </tags>
 </root>
 
