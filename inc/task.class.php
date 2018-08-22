@@ -103,7 +103,6 @@ class PluginReservationTask extends CommonDBTM
             $conflict_action = $PluginReservationConfig->getConfigurationValue("conflict_action");
             switch ($conflict_action) {
                case "delete":
-                  deleteConflictedReservation($conflict_reservation);
                   $task->log("Suppression de la reservation  " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
                   $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
                   break;
