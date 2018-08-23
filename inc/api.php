@@ -65,7 +65,6 @@ class PluginReservationApi extends API {
       // ## DECLARE ALL ENDPOINTS ##
       // login into glpi
       $this->session_write = true;
-	#Toolbox::logInFile('reservations_plugin', "TESTTESTTEST11 : ".json_encode($_SESSION)."\n");
       return $this->returnResponse($this->initSession($this->parameters));
 
     } else if ($resource === "killSession") {
@@ -106,9 +105,7 @@ class PluginReservationApi extends API {
 	$obj_reservation = (object) array('id' => $reservation_id, 'end' => $now);
 	$this->parameters['input'] = [$obj_reservation];
 	
-	Toolbox::logInFile('reservations_plugin', "call API PARAMETERS APRES :  !".json_encode($this->parameters)."\n", $force = false);
 	$res = $this->updateItems("Reservation", $this->parameters);
-	Toolbox::logInFile('reservations_plugin', "RESPONSE :  !".json_encode($res[0][$reservation_id])."\n", $force = false);
 	if ($res[0][$reservation_id]) {
 	  PluginReservationReservation::checkoutReservation($reservation_id);
 	  $response = [$input['id'] => true, "message" => "OK"];
@@ -124,86 +121,6 @@ class PluginReservationApi extends API {
 
     $this->messageLostError();
   }
-
-
-  
-
-  #private function checkoutItems($params = []) {
-  #  $this->initEndpoint();
-
-  #  $input    = isset($params['input']) ? $params["input"] : null;
-  #  $item = new ReservationItem();
-
-  #  if (is_object($input)) {
-  #    $input = [$input];
-  #    $isMultiple = false;
-  #  } else {
-  #    $isMultiple = true;
-  #  }
-
-  #  if (is_array($input)) {
-  #    $idCollection = [];
-  #    $failed       = 0;
-  #    $index        = 0;
-  #    foreach ($input as $object) {
-  #      $current_res = [];
-  #      if (isset($object->id)) {
-  #        if (!$item->getFromDB($object->id)) {
-  #          $failed++;
-  #          $current_res = [$object->id => false, 'message'   => __("Item not found")];
-  #          $idCollection[] = $current_res;
-  #          continue;
-  #        }
-
-  #        //check rights
-  #        if (!Reservation::canCreate()) {
-  #      	  #return $_SESSION["glpiactiveprofile"]["reservation"];
-  #  Toolbox::logInFile('reservations_plugin', "call API PAS LES DROITS !".var_dump($_SESSION)."\n", $force = false);
-  #          $failed++;
-  #          $current_res = [$object->id => false, 'message'    => __("You don't have permission to perform this action.")];
-  #        } else {
-  #          //update item
-  #          $object = Toolbox::sanitize((array)$object);
-  #          try {
-  #            PluginReservationReservation::checkoutReservation($object->fields["id"]);
-  #          } catch(Exception $e) {
-  #            $failed++;
-  #          }
-  #          $current_res = [$item->fields["id"] => "checkout !", 'message'=> $this->getGlpiLastMessage()];
-  #        }
-
-  #      }
-
-  #      // attach fileupload answer
-  #      if (isset($params['upload_result']) && isset($params['upload_result'][$index])) {
-  #        $current_res['upload_result'] = $params['upload_result'][$index];
-  #      }
-
-
-  #      // append current result to final collection
-  #      $idCollection[] = $current_res;
-  #      $index++;
-  #    }
-
-  #    if ($isMultiple) {
-  #      if ($failed == count($input)) {
-  #        $this->returnError($idCollection, 400, "ERROR_GLPI_UPDATE", false);
-  #      } else if ($failed > 0) {
-  #        $this->returnError($idCollection, 207, "ERROR_GLPI_PARTIAL_UPDATE", false);
-  #      }
-  #    } else {
-  #      if ($failed > 0) {
-  #        $this->returnError($idCollection[0]['message'], 400, "ERROR_GLPI_UPDATE", false);
-  #      } else { 
-  #        return $idCollection; // Return collection, even if the request affects a single item
-  #      }
-  #    }
-  #    return $idCollection;
-
-  #  } else {
-  #    $this->messageBadArrayError();
-  #  }
-  #}
 
   private function getId() {
     $id = isset($this->url_elements[1]) && is_numeric($this->url_elements[1])
