@@ -102,13 +102,21 @@ class PluginReservationApi extends API {
 	  break;
 	}
 
-	$reservation = [];
-	$reservation['input']['id'] = $current_reservation[0]['id'];
-	$reservation['input']['end'] = $now;
-	$this->parameters['input'] = $reservation['input'];
+	$reservation_id = $current_reservation[0]['reservations_id'];
+	$obj_reservation = (object) array('id' => $reservation_id, 'end' => $now);
+	$this->parameters['input'] = [$obj_reservation];
 	
-	#Toolbox::logInFile('reservations_plugin', "call API PARAMETERS APRES :  !".json_encode($this->parameters)."\n", $force = false);
-	$response = $this->updateItems("Reservation", $this->parameters);
+	Toolbox::logInFile('reservations_plugin', "call API PARAMETERS APRES :  !".json_encode($this->parameters)."\n", $force = false);
+	$res = $this->updateItems("Reservation", $this->parameters);
+	Toolbox::logInFile('reservations_plugin', "RESPONSE :  !".json_encode($res[0][$reservation_id])."\n", $force = false);
+	if ($res[0][$reservation_id]) {
+	  PluginReservationReservation::checkoutReservation($reservation_id);
+	  $response = [$input['id'] => true, "message" => "OK"];
+	} else {
+	  $response = [$input['id'] => false, "message" => $res[0]['message']];
+	}
+
+	  
 	break;
       }
       return $this->returnResponse($response, $code, $additionalheaders);
