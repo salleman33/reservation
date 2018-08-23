@@ -23,6 +23,7 @@ function plugin_init_reservation() {
    Plugin::registerClass('PluginReservationConfig');
    Plugin::registerClass('PluginReservationReservation');
    Plugin::registerClass('PluginReservationTask');
+   Plugin::registerClass('PluginReservationApi');
 
    // Notifications
    $PLUGIN_HOOKS['item_get_events']['reservation'] =
