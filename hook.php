@@ -7,7 +7,7 @@
  */
 function plugin_reservation_install() {
    global $DB, $CFG_GLPI;
-   if (TableExists("glpi_plugin_reservation_manageresa")) { //UPDATE plugin < 2.0.0
+   if ($DB->tableExists("glpi_plugin_reservation_manageresa")) { //UPDATE plugin < 2.0.0
       $query = "ALTER TABLE `glpi_plugin_reservation_manageresa`
                 CHANGE `resaid` `reservations_id` int(11) NOT NULL,
                 DROP COLUMN `matid`,
@@ -21,7 +21,7 @@ function plugin_reservation_install() {
       $DB->queryOrDie($query, $DB->error());
    }
 
-   if (!TableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 2.0.0
+   if (!$DB->tableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_reservations` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `reservations_id` int(11) NOT NULL,
@@ -36,10 +36,10 @@ function plugin_reservation_install() {
    }
 
    // add existing reservations if necessary
-   $query = "SELECT * 
+   $query = "SELECT *
             FROM glpi_reservations
             WHERE `end` >= NOW()
-            AND glpi_reservations.id NOT IN 
+            AND glpi_reservations.id NOT IN
                (
                   SELECT reservations_id
                   FROM glpi_plugin_reservation_reservations
@@ -50,8 +50,7 @@ function plugin_reservation_install() {
       plugin_item_add_reservation($reservation);
    }
 
-
-   if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 2.0.0
+   if (!$DB->tableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
                `id` int(11) NOT NULL AUTO_INCREMENT,
                `name` VARCHAR(20) NOT NULL,
@@ -67,8 +66,14 @@ function plugin_reservation_install() {
 
       $DB->queryOrDie($query, $DB->error());
    }
-   
-   if (TableExists("glpi_plugin_reservation_config")) { //UPDATE plugin < 2.0.0
+
+   if ($DB->tableExists("glpi_plugin_reservation_config")) { //UPDATE plugin < 2.0.0
+      $query = "ALTER TABLE `glpi_plugin_reservation_config`
+                MODIFY `name` VARCHAR(20) NOT NULL,
+                MODIFY `value` VARCHAR(20) NOT NULL";
+
+      $DB->queryOrDie($query, $DB->error());
+
       $query = "UPDATE `glpi_plugin_reservation_configs`
                 SET `value` = (
                     SELECT `value`
@@ -76,6 +81,12 @@ function plugin_reservation_install() {
                     WHERE `name` = \"methode\"
                 )
                 WHERE `name` = \"mode_auto\"";
+      $DB->queryOrDie($query, $DB->error());
+
+      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
+                VALUES  (\"mode_auto\",0),
+                        (\"conflict_action\",\"delete\")";
+
       $DB->queryOrDie($query, $DB->error());
       
       $query = "DROP TABLE `glpi_plugin_reservation_config`";
@@ -195,5 +206,3 @@ function plugin_item_purge_reservation($reservation) {
         ]
     );
 }
-
-
