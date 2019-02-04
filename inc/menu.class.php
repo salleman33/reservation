@@ -53,8 +53,10 @@ function getToolTipforItem($item) {
       $toolTip .= "<br><b>" . __('Manufacturer') . " & " . __('Model') . " : </b>" . $manufacturer . " | " . $typemodel;
    }
    if ($show_status) {
-      $status = getStatusFromItem($item);
-      $toolTip .= "<br><b>" . __('Status')  . " : </b>" . $status;
+      if ($item->isField("states_id")) {
+         $status = getStatusFromItem($item);
+         $toolTip .= "<br><b>" . __('Status')  . " : </b>" . $status;
+      }
    }
    $tooltip = nl2br($toolTip);
    Html::showToolTip($tooltip, null);
