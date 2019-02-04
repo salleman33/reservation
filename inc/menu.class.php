@@ -76,7 +76,7 @@ function getLocationFromItem($item) {
 
 function getStatusFromItem($item) {
    $states_id = $item->fields["states_id"];
-   $states_tmp = new Location();
+   $states_tmp = new State();
    $states_tmp->getFromDB($states_id);
    return $states_tmp->getName();
 }
