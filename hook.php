@@ -7,21 +7,10 @@
  */
 function plugin_reservation_install() {
    global $DB, $CFG_GLPI;
-   if ($DB->tableExists("glpi_plugin_reservation_manageresa")) { //UPDATE plugin < 2.0.0
-      $query = "ALTER TABLE `glpi_plugin_reservation_manageresa`
-                CHANGE `resaid` `reservations_id` int(11) NOT NULL,
-                DROP COLUMN `matid`,
-                CHANGE `date_return` `effectivedate` datetime,
-                CHANGE `date_theorique` `baselinedate` datetime NOT NULL,
-                DROP COLUMN `itemtype`,
-                CHANGE `dernierMail` `mailingdate` datetime";
 
-      $DB->queryOrDie($query, $DB->error());
-      $query = "RENAME TABLE `glpi_plugin_reservation_manageresa` TO `glpi_plugin_reservation_reservations`";
-      $DB->queryOrDie($query, $DB->error());
-   }
+   $migration = new Migration(221);
 
-   if (!$DB->tableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 2.0.0
+   if (!TableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_reservations` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `reservations_id` int(11) NOT NULL,
@@ -50,11 +39,11 @@ function plugin_reservation_install() {
       plugin_item_add_reservation($reservation);
    }
 
-   if (!$DB->tableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 2.0.0
+   if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
                `id` int(11) NOT NULL AUTO_INCREMENT,
-               `name` VARCHAR(20) NOT NULL,
-               `value` VARCHAR(20) NOT NULL,
+               `name` VARCHAR(255) NOT NULL,
+               `value` VARCHAR(255) NOT NULL,
                PRIMARY KEY (`id`),
                UNIQUE (`name`)
                )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
@@ -64,33 +53,6 @@ function plugin_reservation_install() {
                VALUES  (\"mode_auto\",0),
                         (\"conflict_action\",\"delete\")";
 
-      $DB->queryOrDie($query, $DB->error());
-   }
-
-   if ($DB->tableExists("glpi_plugin_reservation_config")) { //UPDATE plugin < 2.0.0
-      $query = "ALTER TABLE `glpi_plugin_reservation_config`
-                MODIFY `name` VARCHAR(20) NOT NULL,
-                MODIFY `value` VARCHAR(20) NOT NULL";
-      $DB->queryOrDie($query, $DB->error());
-
-      $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
-                VALUES  (\"mode_auto\",0),
-                        (\"conflict_action\",\"delete\")";
-      $DB->queryOrDie($query, $DB->error());
-
-      $query = "UPDATE `glpi_plugin_reservation_configs`
-                SET `value` = (
-                    SELECT `value`
-                    FROM `glpi_plugin_reservation_config`
-                    WHERE `name` = \"methode\"
-                )
-                WHERE `name` = \"mode_auto\"";
-      $DB->queryOrDie($query, $DB->error());      
-      
-      $query = "DROP TABLE `glpi_plugin_reservation_config`";
-      $DB->queryOrDie($query, $DB->error());
-
-      $query = "DROP TABLE `glpi_plugin_reservation_configdayforauto`";
       $DB->queryOrDie($query, $DB->error());
    }
 
@@ -113,6 +75,9 @@ function plugin_reservation_install() {
                         DAY_TIMESTAMP,
                         ['hourmin' => 23, 'hourmax' => 24, 'mode' => 2, 'logs_lifetime' => 30, 'state' => 0]);
    }
+
+   //execute the whole migration
+   $migration->executeMigration();
 
    return true;
 }
