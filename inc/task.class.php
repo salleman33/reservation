@@ -141,7 +141,6 @@ class PluginReservationTask extends CommonDBTM
       $now = date("Y-m-d H:i:s", $time);
 
       $config = new PluginReservationConfig();
-      $week = $config->getConfigurationWeek();
       $errlocale = setlocale(LC_TIME, 'fr_FR.utf8', 'fra');
       if (!$errlocale) {
          $task->log("setlocale failed");
@@ -150,9 +149,9 @@ class PluginReservationTask extends CommonDBTM
       $reservations_list = PluginReservationReservation::getAllReservations(["`baselinedate` < '".$now."'", 'effectivedate is null']);
 
       foreach ($reservations_list as $reservation) {
-         $res = new Reservation();
-         $res->getFromDB($reservation['reservations_id']);
-         if (NotificationEvent::raiseEvent('plugin_reservation_expiration', $reservation)) {
+         $resObj = new Reservation();
+         $resObj->getFromDB($reservation['reservations_id']);
+         if (NotificationEvent::raiseEvent('plugin_reservation_expiration', $resObj)) {
             $task->setVolume($result++);
             $logtext = sprintf(__('Sending e-mail for reservation %1$s'), $reservation['reservations_id']);
             $logtext = $logtext . sprintf(__('Expected return time was : %1$s'), $reservation['baselinedate']);
