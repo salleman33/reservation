@@ -52,7 +52,7 @@ function getToolTipforItem($item) {
       $manufacturer = getManufacturerFromItem($item);
       $toolTip .= "<br><b>" . __('Manufacturer') . " & " . __('Model') . " : </b>" . $manufacturer . " | " . $typemodel;
    }
-   if ($show_status) {
+   if ($show_status && $item->isField("states_id")) {
       $status = getStatusFromItem($item);
       $toolTip .= "<br><b>" . __('Status')  . " : </b>" . $status;
    }
@@ -76,7 +76,7 @@ function getLocationFromItem($item) {
 
 function getStatusFromItem($item) {
    $states_id = $item->fields["states_id"];
-   $states_tmp = new Location();
+   $states_tmp = new State();
    $states_tmp->getFromDB($states_id);
    return $states_tmp->getName();
 }
