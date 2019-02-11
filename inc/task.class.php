@@ -3,6 +3,9 @@
 
 $DEBUG = true;
 
+use Glpi\Event;
+
+
 /**
  *
  */
@@ -100,7 +103,7 @@ class PluginReservationTask extends CommonDBTM
 
             // same user ?
             if ($conflict['users_id'] == $res['users_id']) {
-               $task->log("$formatName a créé une nouvelle reservation pour le meme materiel : " . $item->fields['name']);
+               $task->log("$formatName created a new reservation for the same item : " . $item->fields['name']);
                $new_comment = "(".$reservation->fields['comment'].")";
                $new_comment .= " ==(" .date("d-m-Y", $time). ")==> ".$conflict_reservation->fields['comment'];
 
@@ -115,20 +118,20 @@ class PluginReservationTask extends CommonDBTM
                         WHERE `reservations_id`='" . $reservation->fields["id"] . "'";
                $DB->query($query) or die("error on 'update' into checkReservations conflict : " . $DB->error());
             } else {
-               $task->log("conflit avec la reservation " . $conflict_reservation->fields['id'] . " du materiel " . $item->fields['name'] . " par " . $formatName . " (du " . date("d-m-Y \à H:i:s", strtotime($conflict['begin'])) . " au " . date("d-m-Y \à H:i:s", strtotime($conflict['end']).")"));
+               $task->log("conflit for reservation " . $conflict_reservation->fields['id'] . " ontiem " . $item->fields['name'] . " used by " . $formatName . " (from " . date("d-m-Y \à H:i:s", strtotime($conflict['begin'])) . " to " . date("d-m-Y \à H:i:s", strtotime($conflict['end']).")"));
                NotificationEvent::raiseEvent('plugin_reservation_conflict_new_user', $conflict_reservation, ['other_user_id' => $res['users_id']]);
-               NotificationEvent::raiseEvent('plugin_reservation_conflict_previous_user', $res, ['other_user_id' => $conflict['users_id']]);
+               NotificationEvent::raiseEvent('plugin_reservation_conflict_previous_user', $reservation, ['other_user_id' => $conflict['users_id']]);
             }
             $PluginReservationConfig = new PluginReservationConfig();
             $conflict_action = $PluginReservationConfig->getConfigurationValue("conflict_action");
             switch ($conflict_action) {
                case "delete":
-                  $task->log("Suppression de la reservation  " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
+                  $task->log("Deleting reservation " . $conflict_reservation->fields['id'] . " on item ". $item->fields['name']);
                   $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
                   break;
                case "delay":
                   if ($conflict_reservation->fields["end"] <= $end) {
-                     $task->log("Impossible de retarder le debut de la reservation " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
+                     $task->log("Could not delay reservation " . $conflict_reservation->fields['id'] . " on item ". $item->fields['name']);
                      $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
                      break;
                   }
@@ -136,7 +139,7 @@ class PluginReservationTask extends CommonDBTM
                         SET `begin` = '".$end."'
                         WHERE `id`='" . $conflict_reservation->fields["id"] . "'";
                   $DB->query($query) or die("error on 'update' into checkReservations conflict to delay start of a reservation : " . $DB->error());
-                  $task->log("Retardement du debut de la reservation  " . $conflict_reservation->fields['id'] . " du materiel ". $item->fields['name']);
+                  $task->log("Delaying reservation " . $conflict_reservation->fields['id'] . " on item ". $item->fields['name']);
                   break;
             }
          }
@@ -161,7 +164,6 @@ class PluginReservationTask extends CommonDBTM
       $now = date("Y-m-d H:i:s", $time);
 
       $config = new PluginReservationConfig();
-      $week = $config->getConfigurationWeek();
       $errlocale = setlocale(LC_TIME, 'fr_FR.utf8', 'fra');
       if (!$errlocale) {
          $task->log("setlocale failed");
@@ -172,7 +174,7 @@ class PluginReservationTask extends CommonDBTM
       foreach ($reservations_list as $reservation) {
          $res = new Reservation();
          $res->getFromDB($reservation['reservations_id']);
-         if (NotificationEvent::raiseEvent('plugin_reservation_expiration', $reservation)) {
+         if (NotificationEvent::raiseEvent('plugin_reservation_expiration', $res)) {
             $task->setVolume($result++);
             $logtext = sprintf(__('Sending e-mail for reservation %1$s'), $reservation['reservations_id']);
             $logtext = $logtext . sprintf(__('Expected return time was : %1$s'), $reservation['baselinedate']);
