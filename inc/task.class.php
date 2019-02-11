@@ -9,13 +9,12 @@ $DEBUG = true;
 class PluginReservationTask extends CommonDBTM
 {
    public static function addEvents(NotificationTargetReservation $target) {
-      $target->events['plugin_reservation_conflict'] = __("Reservation Conflict When Extended (plugin)", "reservation");
+      $target->events['plugin_reservation_conflict_new_user'] = __("Reservation Conflict When Extended, new user (plugin)", "reservation");
+      $target->events['plugin_reservation_conflict_previous_user'] = __("Reservation Conflict When Extended, previous user (plugin)", "reservation");
       $target->events['plugin_reservation_expiration'] = __("User Reservation Expired (plugin)", "reservation");
    }
 
    public static function addData(NotificationTargetReservation $target) {
-     
-
       $target->data['##reservation.otheruser##']   = "";
       if (isset($target->options['other_user_id']))
       {
@@ -30,33 +29,7 @@ class PluginReservationTask extends CommonDBTM
       $target->addTagToList(['tag' => 'reservation.otheruser',
       'label' => __('Writer'),
       'value'  => true,
-      'events' => ['plugin_reservation_conflict']]);
-
-
-      $tags_except_alert = ['reservation.user'        => __('Writer'),
-      'reservation.begin'       => __('Start date'),
-      'reservation.end'         => __('End date'),
-      'reservation.comment'     => __('Comments'),
-      'reservation.item.entity' => __('Entity'),
-      'reservation.item.name'   => __('Associated item'),
-      'reservation.item.tech'   => __('Technician in charge of the hardware')];
-
-foreach ($tags_except_alert as $tag => $label) {
-$target->addTagToList(['tag'    => $tag,
-        'label'  => $label,
-        'value'  => true,
-        'events' => ['plugin_reservation_conflict']]);
-
-        $tag_alert = ['reservation.expirationdate' => __('End date'),
-        'reservation.entity'         => __('Entity')];
-
-        foreach ($tag_alert as $tag => $label) {
-         $target->addTagToList(['tag'    => $tag,
-                                   'label'  => $label,
-                                   'value'  => true,
-                                   'events' => 0]);
-      }
-}
+      'events' => ['plugin_reservation_conflict_new_user','plugin_reservation_conflict_previous_user']]);
    }
 
    public static function cronInfo($name) {
@@ -143,8 +116,8 @@ $target->addTagToList(['tag'    => $tag,
                $DB->query($query) or die("error on 'update' into checkReservations conflict : " . $DB->error());
             } else {
                $task->log("conflit avec la reservation " . $conflict_reservation->fields['id'] . " du materiel " . $item->fields['name'] . " par " . $formatName . " (du " . date("d-m-Y \à H:i:s", strtotime($conflict['begin'])) . " au " . date("d-m-Y \à H:i:s", strtotime($conflict['end']).")"));
-               NotificationEvent::raiseEvent('plugin_reservation_conflict', $conflict_reservation, ['other_user_id' => $res['users_id']]);
-               NotificationEvent::raiseEvent('plugin_reservation_conflict', $res, ['other_user_id' => $conflict['users_id']]);
+               NotificationEvent::raiseEvent('plugin_reservation_conflict_new_user', $conflict_reservation, ['other_user_id' => $res['users_id']]);
+               NotificationEvent::raiseEvent('plugin_reservation_conflict_previous_user', $res, ['other_user_id' => $conflict['users_id']]);
             }
             $PluginReservationConfig = new PluginReservationConfig();
             $conflict_action = $PluginReservationConfig->getConfigurationValue("conflict_action");
