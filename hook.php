@@ -114,6 +114,14 @@ function plugin_reservation_install() {
                         ['hourmin' => 23, 'hourmax' => 24, 'mode' => 2, 'logs_lifetime' => 30, 'state' => 0]);
    }
 
+   // update event to new event type to preserve previous behaviour
+   $query = "UPDATE `glpi_notifications`
+   SET
+      `event` = \"plugin_reservation_conflict_new_user\"
+   WHERE
+      `event` = \"plugin_reservation_conflict\"";
+   $DB->queryOrDie($query, $DB->error());
+
    return true;
 }
 
