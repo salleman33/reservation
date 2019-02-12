@@ -391,7 +391,7 @@ class PluginReservationMenu extends CommonGLPI
             echo "</div></li>";
 
             // switch item
-            echo "<li><span class=\"bouton\" id=\"bouton_replace" . $reservation_user_info['reservations_id'] . "\" onclick=\"javascript:afficher_cacher('replace" . $reservation_user_info['reservations_id'] . "');\">" . _sx('button', 'Replace an item') . "</span>
+            echo "<li><span class=\"bouton\" id=\"bouton_replace" . $reservation_user_info['reservations_id'] . "\" onclick=\"javascript:afficher_cacher('replace" . $reservation_user_info['reservations_id'] . "');\">" . _sx('button', 'Replace an item', 'reservation') . "</span>
             <div id=\"replace" . $reservation_user_info['reservations_id'] . "\" style=\"display:none;\">
             <form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
             echo '<select name="switch_item">';
@@ -466,7 +466,7 @@ class PluginReservationMenu extends CommonGLPI
 
          if (!$filtered_array) {
             continue;
-         }
+	 }
          echo "<td valign=\"top\">";
 
          $item = getItemForItemtype($itemtype);
@@ -519,6 +519,7 @@ class PluginReservationMenu extends CommonGLPI
     *
     */
    public function getFormDates() {
+      global $CFG_GLPI;
       $form_dates = [];
 
       if (isset($_SESSION['glpi_plugin_reservation_form_dates'])) {
@@ -528,10 +529,14 @@ class PluginReservationMenu extends CommonGLPI
       $day = date("d", time());
       $month = date("m", time());
       $year = date("Y", time());
-      $begin_time = time();
 
-      $form_dates["begin"] = date("Y-m-d H:i:s", $begin_time);
-      $form_dates['end'] = date("Y-m-d H:i:s", mktime(23, 59, 59, $month, $day, $year));
+      $planning_begin = $CFG_GLPI['planning_begin'];
+      $planning_end = $CFG_GLPI['planning_end'];
+      $planning_begin_time = explode(":", $planning_begin);
+      $planning_end_time = explode(":", $planning_end);
+
+      $form_dates["begin"] = date("Y-m-d H:i:s", mktime($planning_begin_time[0], $planning_begin_time[1], 00, $month, $day, $year));
+      $form_dates['end'] = date("Y-m-d H:i:s", mktime($planning_end_time[0], $planning_end_time[1], 00, $month, $day, $year));
 
       if (isset($_POST['date_begin'])) {
          $form_dates["begin"] = $_POST['date_begin'];
