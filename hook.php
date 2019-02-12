@@ -10,7 +10,7 @@ function plugin_reservation_install() {
 
    $migration = new Migration(221);
 
-   if (!TableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 2.0.0
+   if (!$DB->tableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_reservations` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `reservations_id` int(11) NOT NULL,
@@ -39,7 +39,7 @@ function plugin_reservation_install() {
       plugin_item_add_reservation($reservation);
    }
 
-   if (!TableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 2.0.0
+   if (!$DB->tableExists("glpi_plugin_reservation_configs")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_configs` (
                `id` int(11) NOT NULL AUTO_INCREMENT,
                `name` VARCHAR(255) NOT NULL,
