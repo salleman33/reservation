@@ -138,7 +138,7 @@ class PluginReservationReservation extends CommonDBTM
       $query = "UPDATE `".$tablename."` SET `mailingdate`= '" . date("Y-m-d H:i:s", time()) . "' WHERE `reservations_id` = " . $reservation_id;
       $DB->query($query) or die("error on 'update' in sendMail: " . $DB->error());
 
-      Event::log($reservation_id, "reservation", 4, "inventory",
+      Glpi\Event::log($reservation_id, "reservation", 4, "inventory",
                   sprintf(__('%1$s sends email for the reservation %2$s'),
                            $_SESSION["glpiname"], $reservation_id));
       Toolbox::logInFile('reservations_plugin', "sendMail : ".$reservation_id."\n", $force = false);
@@ -157,7 +157,7 @@ class PluginReservationReservation extends CommonDBTM
       $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", time()) . "' WHERE `id`='" . $reservation_id . "';";
       $DB->query($query) or die("error on checkoutReservation 2 : " . $DB->error());
 
-      Event::log($reservation_id, "reservation", 4, "inventory",
+      Glpi\Event::log($reservation_id, "reservation", 4, "inventory",
                   sprintf(__('%1$s marks the reservation %2$s as returned'),
                            $_SESSION["glpiname"], $reservation_id));
       Toolbox::logInFile('reservations_plugin', "checkoutReservation : ".$reservation_id."\n", $force = false);
@@ -179,7 +179,7 @@ class PluginReservationReservation extends CommonDBTM
       unset($rr->fields["id"]);
       Toolbox::logInFile('reservations_plugin', "addItemToResa INPUT : ".json_encode($input)."\n", $force = false);
       if ($newID = $rr->add($input)) {
-         Event::log($newID, "reservation", 4, "inventory",
+         Glpi\Event::log($newID, "reservation", 4, "inventory",
                   sprintf(__('%1$s adds the reservation %2$s for item %3$s'),
                            $_SESSION["glpiname"], $newID, $item_id));
       }
@@ -191,7 +191,7 @@ class PluginReservationReservation extends CommonDBTM
 
       $query = "UPDATE `glpi_reservations` SET `reservationitems_id`='" . $item_id . "' WHERE `id`='" . $reservation_id . "';";
       $DB->query($query) or die("error on 'update' in replaceResa / hash: " . $DB->error());
-      Event::log($reservation_id, "reservation", 4, "inventory",
+      Glpi\Event::log($reservation_id, "reservation", 4, "inventory",
                   sprintf(__('%1$s switchs the reservation %2$s with item %3$s'),
                           $_SESSION["glpiname"], $reservation_id, $item_id));
       Toolbox::logInFile('reservations_plugin', "switchItemToResa : ".$item_id. " <=> ".$reservation_id."\n", $force = false);
