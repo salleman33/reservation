@@ -1,37 +1,31 @@
 # Reservation
 
-Ce plugin propose une gestion différente des réservations de matériel :
+This plugin offers a different management of the material reservations :
 
-- acquittement des retours de matériel
-- prolongation automatique des réservations de matériels non rendus
-- envoi de mail aux emprunteurs si la réservation est arrivée à expiration
+- acknowledgment of material returns
+- automatic extension of non-returned material reservations
+- sending mail to borrowers if the reservation has expired
 
-Il apporte également quelques actions simplifiées sur les réservations comme :
+It also brings some simplified actions on bookings like :
 
-- ajouter un matériel à une réservation existante
-- remplacer un matériel par un autre
+- add a material to an existing reservation
+- replace one material with another.
 
-## Description du plugin Réservation 
+## Description
 
-Le plugin Réservation offre une nouvelle fonctionnalité pour mieux gérer les réservations : L'acquittement des retours.
-Ce plugin s'adresse aux responsables des réservations/administrateurs de GLPI. Il leur propose une vision synthétique des réservations en cours et à venir.
-Il permet d'acquitter le retour d'un matériel. Si jamais la réservation d'un matériel touche à sa fin mais que le matériel n'a pas été marqué comme étant rendu, la réservation est prolongée automatiquement. Les réservations dont la date de retour théorique de retour est dépassée apparaissent en rouge !
+The Reservation plugin offers a new feature to better manage reservations: Acknowledgment of returns.
+This plugin is for managers of GLPI reservations / administrators. It offers them a synthetic vision of current and future reservation.
+It allows to acquit the return of a material. If the reservation of a material is ended but the material has not been marked as returned, the reservation is extended automatically. Reservation whose return date has been exceeded will appear in red !
 
-La colonne "Mouvement" permet d'identifier rapidement les flux des matériels réservés. Une flèche rouge indique que le matériel sera emprunté aujourd'hui. une flèche verte indique qu'un matériel sera retourné aujourd'hui.
+## How it works ?
 
-## Comment ça marche ? 
+There are 2 automatic actions : 
+- checkReservations : it automatically extends reservations 
+- sendMailLateReservations : it automatically sends mail to user with ended reservations (enable auto mode in the plugin configuration)
 
-Il y a deux taches automatiques :
-la première permet de surveiller les réservations : Elle se lance à interval regulier et regarde si une réservation va se terminer prochainement. S'il y en a une, elle la prolonge automatiquement. Tant qu'un matériel n'est pas marqué comme rendu, la réservation se prolonge indéfiniment. Une réservation prolongée est marquée en rouge dans l'interface du plugin !
-Si le prolongement automatique d'une réservation rentre en conflit avec une autre, cette dernière est supprimée afin de permettre le prolongement automatique. Un mail est envoyé aux responsables pour signaler ce problème.
+Use the notification events :
+- Reservation Conflict When Extended, new user (plugin) : when there is a conflict to extends a reservation. ##reservation.user## is the next user, ##reservation.otheruser## is the current user 
+- Reservation Conflict When Extended, previous user (plugin) : when there is a conflict to extends a reservation. ##reservation.user## is the current user, ##reservation.otheruser## is the next user
+- User Reservation Expired (plugin) : for automatic mode
 
-Si vous choisissez le mode automatique, vous pouvez utiliser la tache automatique pour envoyer un mail aux utilisateurs dont la réservation est expirée.
-Pour activer le mode automatique, il faut aller dans la configuration du plugin (menu Configuration > Plugins > Reservation) puis choisir le mode auto.
-La tache se lance par défaut le soir à 23H.
-ATTENTION ! Il vous faut créer vous même les modèles de notification ET les notifications (choisir le type Réservations. Deux événements sont disponibles : "Conflit pour la prolongation d'une réservation" et "expiration d'une réservation d'un utilisateur") !
-
-## Modification rapide d'une réservation 
-
-Le plugin permet aussi d'ajouter ou remplacer un matériel dans une réservation existante.
-
-**Pour les taches automatiques, pensez à augmenter le nombre limite de tache pouvant etre executées en meme temps (par defaut à 2).**
+** For automatic actions, consider increasing the limit number of actions that can be run at the same time (default is 2). **
