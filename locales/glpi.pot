@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-29 16:54+0200\n"
+"POT-Creation-Date: 2019-02-13 18:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,87 +18,107 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: front/config.form.php:37
+#: front/config.form.php:40
 msgid "Setup"
 msgstr ""
 
-#: front/config.form.php:40
+#: front/config.form.php:43
 msgid "Please activate the plugin"
 msgstr ""
 
-#: front/menu.php:9
+#: front/menu.php:6
 msgid "Simplified interface"
 msgstr ""
 
-#: inc/config.class.php:52
+#: inc/api.php:18
+msgid "Reservation Plugin Rest API"
+msgstr ""
+
+#: inc/api.php:100
+msgid "Item is not currently reserved"
+msgstr ""
+
+#: inc/config.class.php:53
 msgid "Configuration"
 msgstr ""
 
-#: inc/config.class.php:55
+#: inc/config.class.php:56
 msgid "Method used to send e-mails to users with late reservations"
 msgstr ""
 
-#: inc/config.class.php:57
+#: inc/config.class.php:58
 msgid "Automatic"
 msgstr ""
 
-#: inc/config.class.php:58
+#: inc/config.class.php:59
 msgid "Manual"
 msgstr ""
 
-#: inc/config.class.php:65
+#: inc/config.class.php:66
+msgid "Method used when there is a conflicted reservation"
+msgstr ""
+
+#: inc/config.class.php:68
+msgid "Delete the conflicted reservation"
+msgstr ""
+
+#: inc/config.class.php:69
+msgid "Delay the start of the conflicted reservation"
+msgstr ""
+
+#: inc/config.class.php:76
 msgid "Tab Configuration"
 msgstr ""
 
-#: inc/config.class.php:72
+#: inc/config.class.php:83
 msgid "Current Reservation tab"
 msgstr ""
 
-#: inc/config.class.php:80
+#: inc/config.class.php:91
 msgid "Incoming Reservation tab"
 msgstr ""
 
-#: inc/config.class.php:86
+#: inc/config.class.php:97
 msgid "ToolTip Configuration"
 msgstr ""
 
-#: inc/config.class.php:93
+#: inc/config.class.php:104
 msgid "ToolTip"
 msgstr ""
 
-#: inc/config.class.php:101 inc/menu.class.php:278
+#: inc/config.class.php:112 inc/menu.class.php:279
 msgid "Comment"
 msgstr ""
 
-#: inc/config.class.php:108 inc/menu.class.php:38
+#: inc/config.class.php:119 inc/menu.class.php:38
 msgid "Location"
 msgstr ""
 
-#: inc/config.class.php:115 inc/menu.class.php:48
+#: inc/config.class.php:126 inc/menu.class.php:48
 msgid "Serial number"
 msgstr ""
 
-#: inc/config.class.php:122 inc/menu.class.php:45
+#: inc/config.class.php:133 inc/menu.class.php:45
 msgid "Inventory number"
 msgstr ""
 
-#: inc/config.class.php:129 inc/menu.class.php:42
+#: inc/config.class.php:140 inc/menu.class.php:42
 msgid "Group"
 msgstr ""
 
-#: inc/config.class.php:136 inc/menu.class.php:53
+#: inc/config.class.php:147 inc/menu.class.php:53
 msgid "Manufacturer"
 msgstr ""
 
-#: inc/config.class.php:136 inc/menu.class.php:53
+#: inc/config.class.php:147 inc/menu.class.php:53
 msgid "Model"
 msgstr ""
 
-#: inc/config.class.php:143 inc/menu.class.php:57
+#: inc/config.class.php:154 inc/menu.class.php:57
 msgid "Status"
 msgstr ""
 
-#: inc/config.class.php:147 inc/menu.class.php:402
+#: inc/config.class.php:158 inc/menu.class.php:402
 msgctxt "button"
 msgid "Save"
 msgstr ""
@@ -115,39 +135,39 @@ msgstr ""
 msgid "Available Hardware"
 msgstr ""
 
-#: inc/menu.class.php:269
+#: inc/menu.class.php:270
 msgid "Current and future reservations"
 msgstr ""
 
-#: inc/menu.class.php:271
+#: inc/menu.class.php:272
 msgid "Reservations in the selected timeline"
 msgstr ""
 
-#: inc/menu.class.php:274
+#: inc/menu.class.php:275
 msgid "User"
 msgstr ""
 
-#: inc/menu.class.php:275
+#: inc/menu.class.php:276
 msgid "Item"
 msgstr ""
 
-#: inc/menu.class.php:276
+#: inc/menu.class.php:277
 msgid "Begin"
 msgstr ""
 
-#: inc/menu.class.php:277
+#: inc/menu.class.php:278
 msgid "End"
 msgstr ""
 
-#: inc/menu.class.php:279
+#: inc/menu.class.php:280
 msgid "Moves"
 msgstr ""
 
-#: inc/menu.class.php:280
+#: inc/menu.class.php:281
 msgid "Checkout"
 msgstr ""
 
-#: inc/menu.class.php:281
+#: inc/menu.class.php:282
 msgid "Action"
 msgstr ""
 
@@ -198,40 +218,40 @@ msgstr ""
 msgid "Create new reservation"
 msgstr ""
 
-#: inc/menu.class.php:581
+#: inc/menu.class.php:598
 msgid "Date"
 msgstr ""
 
-#: inc/menu.class.php:587
+#: inc/menu.class.php:604
 msgid "Previous"
 msgstr ""
 
-#: inc/menu.class.php:590
+#: inc/menu.class.php:607
 msgid "Start date"
 msgstr ""
 
-#: inc/menu.class.php:593
+#: inc/menu.class.php:610
 msgctxt "button"
 msgid "Search"
 msgstr ""
 
-#: inc/menu.class.php:596
+#: inc/menu.class.php:613
 msgid "Next"
 msgstr ""
 
-#: inc/menu.class.php:599
+#: inc/menu.class.php:616
 msgid "Reset"
 msgstr ""
 
-#: inc/menu.class.php:603
+#: inc/menu.class.php:620
 msgid "End date"
 msgstr ""
 
-#: inc/menu.class.php:631
+#: inc/menu.class.php:648
 msgid "Show all"
 msgstr ""
 
-#: inc/menu.class.php:635
+#: inc/menu.class.php:652
 msgid "Reservations This Month"
 msgstr ""
 
@@ -241,22 +261,22 @@ msgid_plural "Reservations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/reservation.class.php:140
+#: inc/reservation.class.php:142
 #, php-format
 msgid "%1$s sends email for the reservation %2$s"
 msgstr ""
 
-#: inc/reservation.class.php:159
+#: inc/reservation.class.php:161
 #, php-format
 msgid "%1$s marks the reservation %2$s as returned"
 msgstr ""
 
-#: inc/reservation.class.php:181
+#: inc/reservation.class.php:183
 #, php-format
 msgid "%1$s adds the reservation %2$s for item %3$s"
 msgstr ""
 
-#: inc/reservation.class.php:193
+#: inc/reservation.class.php:195
 #, php-format
 msgid "%1$s switchs the reservation %2$s with item %3$s"
 msgstr ""
@@ -285,20 +305,20 @@ msgstr ""
 msgid "Extending reservation"
 msgstr ""
 
-#: inc/task.class.php:143
+#: inc/task.class.php:156
 #, php-format
 msgid "Sending e-mail for reservation %1$s"
 msgstr ""
 
-#: inc/task.class.php:144
+#: inc/task.class.php:157
 #, php-format
 msgid "Expected return time was : %1$s"
 msgstr ""
 
-#: inc/task.class.php:146
+#: inc/task.class.php:159
 msgid "Sending an e-mail"
 msgstr ""
 
-#: inc/task.class.php:148
+#: inc/task.class.php:161
 msgid "Could not send notification"
 msgstr ""
