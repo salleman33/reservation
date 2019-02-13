@@ -1,10 +1,6 @@
 <?php
 
-
-$DEBUG = true;
-
 use Glpi\Event;
-
 
 /**
  *
@@ -179,7 +175,7 @@ class PluginReservationTask extends CommonDBTM
             $logtext = sprintf(__('Sending e-mail for reservation %1$s'), $reservation['reservations_id']);
             $logtext = $logtext . sprintf(__('Expected return time was : %1$s'), $reservation['baselinedate']);
             $task->log($logtext);
-            Glpi\Event::log($reservation['reservations_id'], "Reservation", 4, "inventory", __('Sending an e-mail'));
+            Event::log($reservation['reservations_id'], "Reservation", 4, "inventory", __('Sending an e-mail'));
          } else {
             $task->log(__('Could not send notification'));
          }
