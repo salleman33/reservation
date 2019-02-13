@@ -2,11 +2,10 @@
 
 include '../../../inc/includes.php';
 
-
-if ($_SESSION["glpiactiveprofile"]["interface"] == "central") {
-   Html::header(PluginReservationMenu::getTypeName(2), $_SERVER['PHP_SELF'], "plugins", "pluginreservationmenu", "reservation");
-} else {
+if (Session::getCurrentInterface() == "helpdesk") {
    Html::helpHeader(__('Simplified interface'), $_SERVER['PHP_SELF'], $_SESSION["glpiname"]);
+} else {
+   Html::header(PluginReservationMenu::getTypeName(2), $_SERVER['PHP_SELF'], "plugins", "pluginreservationmenu", "reservation");
 }
 
 // Check if plugin is activated...
