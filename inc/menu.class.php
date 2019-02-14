@@ -495,7 +495,7 @@ class PluginReservationMenu extends CommonGLPI
             getToolTipforItem($item);
             echo "</td>";
 
-            echo "<td><a title=\"Show Calendar\" href='../../../front/reservation.php?reservationitems_id=" . $reservation_item['id'] . "'>" . "<img title=\"\" alt=\"\" src=\"../../../pics/reservation-3.png\"></a></td>";
+            echo "<td><a title=\"Show Calendar\" href='../../../front/reservation.php?reservationitems_id=" . $reservation_item['id'] . "'><i class=\"far fa-calendar-alt\"></i></a></td>";
             echo "</tr>\n";
          }
          echo "</table>\n";
