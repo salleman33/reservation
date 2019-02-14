@@ -540,7 +540,11 @@ class PluginReservationMenu extends CommonGLPI
       $planning_end_date = date("Y-m-d H:i:s", mktime($planning_end_time[0], $planning_end_time[1], 00, $month, $day, $year));
 
       $form_dates["begin"] = date("Y-m-d H:i:s", $begin_time);
-      $form_dates['end'] = $planning_end_date;
+      if ($planning_end_date > date("Y-m-d H:i:s", time())) {
+	 $form_dates['end'] = $planning_end_date;
+      } else {
+	 $form_dates['end'] = date("Y-m-d H:i:s", mktime(23, 59, 00, $month, $day, $year));
+      }
 
       if (isset($_POST['date_begin'])) {
          $form_dates["begin"] = $_POST['date_begin'];
