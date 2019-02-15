@@ -74,7 +74,9 @@ class PluginReservationTask extends CommonDBTM
       //Toolbox::logInFile('reservations_plugin', "reservations_list : ".json_encode($reservations_list)."\n", $force = false);
 
       foreach ($reservations_list as $res) {
-         $task->log(__('Extending reservation', 'reservation') . " : " . $res['reservations_id']);
+	 // bug with GLPI 9.4 ?
+	 // $task->log(__('Extending reservation', 'reservation') . " : " . $res['reservations_id']);
+         $task->log("Extending reservation : " . $res['reservations_id']);
 
          $reservation = new Reservation();
          $reservation->getFromDB($res['reservations_id']);
