@@ -81,7 +81,7 @@ function plugin_reservation_install() {
    SET
       `event` = \"plugin_reservation_conflict_new_user\"
    WHERE
-      `event` = \"plugin_reservation_conflict\"";
+      `event` = \"plugin_reservation_conflit\"";
    $DB->queryOrDie($query, $DB->error());
 
    //execute the whole migration
