@@ -27,8 +27,9 @@ class PluginReservationTask extends CommonDBTM
    public static function addTarget(NotificationTargetReservation $target) {
       $target->addTagToList(['tag' => 'reservation.otheruser',
       'label' => __('Writer'),
-      'value'  => true,
-      'events' => ['plugin_reservation_conflict_new_user','plugin_reservation_conflict_previous_user']]);
+      'value'  => true]);
+      // can't be done in GLPI 9.4
+      //'events' => ['plugin_reservation_conflict_new_user','plugin_reservation_conflict_previous_user']]);
    }
 
    public static function cronInfo($name) {
