@@ -8,7 +8,8 @@
 function plugin_reservation_install() {
    global $DB, $CFG_GLPI;
 
-   $migration = new Migration(222);
+   $version   = plugin_version_reservation();
+   $migration = new Migration($version['version']);
 
    if (!$DB->tableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_reservations` (

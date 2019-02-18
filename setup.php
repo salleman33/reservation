@@ -1,6 +1,7 @@
 <?php
 
-define('PLUGIN_VERSION', '2.1.1');
+define('PLUGIN_RESERVATION_GLPI_MIN_VERSION', '9.3');
+define('PLUGIN_VERSION', '2.1.3');
 
 /**
  * Init the hooks of the plugins - Needed
@@ -52,8 +53,7 @@ function plugin_version_reservation() {
       'homepage' => 'https://github.com/salleman33/reservation',
       'requirements' => [
          'glpi' => [
-            'min' => '9.3',
-            'dev' => true,
+            'min' => PLUGIN_RESERVATION_GLPI_MIN_VERSION,
          ],
       ],
    ];
