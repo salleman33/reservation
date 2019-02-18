@@ -20,7 +20,7 @@ function plugin_reservation_install() {
                 `mailingdate` datetime,
                 PRIMARY KEY (`id`),
                 KEY `reservations_id` (`reservations_id`)
-                ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+                ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 
       $DB->queryOrDie($query, $DB->error());
    }
@@ -47,7 +47,7 @@ function plugin_reservation_install() {
                `value` VARCHAR(255) NOT NULL,
                PRIMARY KEY (`id`),
                UNIQUE (`name`)
-               )ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+               ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
       $DB->queryOrDie($query, $DB->error());
 
       $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
