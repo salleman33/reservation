@@ -106,17 +106,8 @@ class PluginReservationApi extends API {
 	}
 
 	$reservation_id = $current_reservation[0]['reservations_id'];
-	$obj_reservation = (object) array('id' => $reservation_id, 'end' => $now);
-	$this->parameters['input'] = [$obj_reservation];
-	
-	$res = $this->updateItems("Reservation", $this->parameters);
-	if ($res[0][$reservation_id]) {
-	  PluginReservationReservation::checkoutReservation($reservation_id);
-	  $response = [$input['id'] => $item->fields['name'], "success" => true, "message" => "OK"];
-	} else {
-	  $response = [$input['id'] => $item->fields['name'], "success" => false, "message" => $res[0]['message']];
-	}
-
+	PluginReservationReservation::checkoutReservation($reservation_id);
+	$response = [$input['id'] => $item->fields['name'], "success" => true, "message" => "OK"];
 	  
 	break;
       }
