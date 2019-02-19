@@ -96,8 +96,12 @@ class PluginReservationApi extends API {
 	$time = time();
 	$now = date("Y-m-d H:i:s", $time);
 	$current_reservation = PluginReservationReservation::getAllReservations(["`begin` <= '".$now."'", "`end` >= '".$now."'", "reservationitems_id = ".$this->parameters['input']->id]);
+	$reservationitems = new ReservationItem();
+	$reservationitems->getFromDB($this->parameters['input']->id);
+	$item = $reservationitems->getConnexityItem($reservationitems->fields['itemtype'], 'items_id');
+	#Toolbox::logInFile('reservations_plugin', "API : ".$this->parameters['input']->id. " <=> ".$reservationitems->fields['id']."\n", $force = false);
 	if (count($current_reservation) == 0) {
-	  $response = [$this->parameters['input']->id => false, 'message'    => __("Item is not currently reserved", "reservation")];
+	  $response = [$this->parameters['input']->id => $item->fields['name'], "success" => false, 'message'    => __("Item is not currently reserved", "reservation")];
 	  break;
 	}
 
@@ -108,9 +112,9 @@ class PluginReservationApi extends API {
 	$res = $this->updateItems("Reservation", $this->parameters);
 	if ($res[0][$reservation_id]) {
 	  PluginReservationReservation::checkoutReservation($reservation_id);
-	  $response = [$input['id'] => true, "message" => "OK"];
+	  $response = [$input['id'] => $item->fields['name'], "success" => true, "message" => "OK"];
 	} else {
-	  $response = [$input['id'] => false, "message" => $res[0]['message']];
+	  $response = [$input['id'] => $item->fields['name'], "success" => false, "message" => $res[0]['message']];
 	}
 
 	  
