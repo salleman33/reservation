@@ -21,11 +21,11 @@ It allows to acquit the return of a material. If the reservation of a material i
 
 There are 2 automatic actions : 
 - checkReservations : it automatically extends reservations 
-- sendMailLateReservations : it automatically sends mail to user with ended reservations (enable auto mode in the plugin configuration)
+- sendMailLateReservations : it automatically sends mail to user with ended reservations (enable auto mode in the plugin configuration). **You have to create and use the notification "User Reservation Expired (plugin)" and a new notification template for it.**
 
 Use the notification events :
 - Reservation Conflict When Extended, new user (plugin) : when there is a conflict to extends a reservation. ##reservation.user## is the next user, ##reservation.otheruser## is the current user 
 - Reservation Conflict When Extended, previous user (plugin) : when there is a conflict to extends a reservation. ##reservation.user## is the current user, ##reservation.otheruser## is the next user
 - User Reservation Expired (plugin) : for automatic mode
 
-** For automatic actions, consider increasing the limit number of actions that can be run at the same time (default is 2). **
+**For automatic actions, consider increasing the limit number of actions that can be run at the same time (default is 2).**
