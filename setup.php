@@ -1,6 +1,6 @@
 <?php
 
-define('PLUGIN_VERSION', '2.1.1');
+define('PLUGIN_VERSION', '2.1.2');
 
 /**
  * Init the hooks of the plugins - Needed
