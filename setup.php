@@ -23,6 +23,7 @@ function plugin_init_reservation() {
    Plugin::registerClass('PluginReservationMenu');
    Plugin::registerClass('PluginReservationConfig');
    Plugin::registerClass('PluginReservationReservation');
+   Plugin::registerClass('PluginReservationCategory');
    Plugin::registerClass('PluginReservationTask');
    Plugin::registerClass('PluginReservationApi');
 

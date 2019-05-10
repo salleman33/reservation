@@ -1,8 +1,7 @@
 <?php
-
 // Définition de la variable GLPI_ROOT obligatoire pour l'instanciation des class
 define('GLPI_ROOT', getAbsolutePath());
-// Récupération du fichier includes de GLPI, permet l'accès au cœur
+// // Récupération du fichier includes de GLPI, permet l'accès au cœur
 include GLPI_ROOT . "inc/includes.php";
 
 include GLPI_ROOT . "plugins/reservation/inc/includes.php";
@@ -16,8 +15,14 @@ if ($plugin->isActivated("reservation")) {
       $PluginReservationConfig->setMailAutomaticAction($_POST["mode_auto"]);
       $PluginReservationConfig->setConfigurationValue("mode_auto", $_POST["mode_auto"]);
    }
+   if (isset($_POST["mode_duration_added"])) {
+      $PluginReservationConfig->setConfigurationValue("mode_duration_added", $_POST["mode_duration_added"]);
+   }
    if (isset($_POST["conflict_action"])) {
       $PluginReservationConfig->setConfigurationValue("conflict_action", $_POST["conflict_action"]);
+   }
+   if (isset($_POST["custom_itemtype"])) {
+      $PluginReservationConfig->setConfigurationValue("custom_itemtype", $_POST["custom_itemtype"]);
    }
 
    foreach ($toolTipConfig as $config) {
