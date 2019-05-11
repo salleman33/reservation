@@ -65,6 +65,7 @@ var dndHandler = {
 
          draggedElement.parentNode.removeChild(draggedElement); // Suppression de l'élément d'origine
 
+         // positionnement du nom de la categorie dans la valeur de l'input hidden
          categoryName = /^[a-zA-Z]+\_([a-zA-Z0-9]+)$/.exec(target.id)[1];
          var input = clonedElement.getElementsByTagName('input')[0];
          input.value=categoryName;
@@ -82,9 +83,16 @@ function createCategoryEnter() {
 }
 
 function deleteCategory(category) {
+   var categorieOther = document.getElementById("categoryItems_other");
    var element = document.getElementById("categoryItems_"+category);
    while (element.firstChild) {
-      // deplacer les items de la liste dans celle par defaut ! 
+      if (/^item[0-9]+$/.test(element.firstChild.id)) {
+         clonedElement = element.firstChild.cloneNode(true);
+         var input = clonedElement.getElementsByTagName('input')[0];
+         input.value="other";
+
+         clonedElement = categorieOther.appendChild(clonedElement);         
+      }         
       element.removeChild(element.firstChild);
    }
    element.parentNode.removeChild(element);
