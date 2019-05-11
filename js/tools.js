@@ -57,12 +57,17 @@ var dndHandler = {
             target = target.parentNode;
          }
 
-         target.className = 'dropper'; // Application du style par défaut
+         
 
+         target.className = 'dropper'; // Application du style par défaut
          clonedElement = target.appendChild(clonedElement); // Ajout de l'élément cloné à la zone de drop actuelle
          dndHandler.applyDragEvents(clonedElement); // Nouvelle application des événements qui ont été perdus lors du cloneNode()
 
          draggedElement.parentNode.removeChild(draggedElement); // Suppression de l'élément d'origine
+
+         categoryName = /^[a-zA-Z]+\_([a-zA-Z0-9]+)$/.exec(target.id)[1];
+         var input = clonedElement.getElementsByTagName('input')[0];
+         input.value=categoryName;
 
       });
 
@@ -77,8 +82,9 @@ function createCategoryEnter() {
 }
 
 function deleteCategory(category) {
-   var element = document.getElementById("divCategory"+category);
+   var element = document.getElementById("categoryItems_"+category);
    while (element.firstChild) {
+      // deplacer les items de la liste dans celle par defaut ! 
       element.removeChild(element.firstChild);
    }
    element.parentNode.removeChild(element);
@@ -86,9 +92,9 @@ function deleteCategory(category) {
 
 function createCategory() {
      
-   titleField = document.getElementById('newCategorieTitle');
+   titleField = document.getElementById('newCategoryTitle');
    titleValue = titleField.value;
-   if(titleValue.length == 0) {
+   if(!/^([a-zA-Z0-9]+)$/.test(titleValue)) {
       titleField.style.backgroundColor = "red";
       return;
    }   
@@ -107,11 +113,11 @@ function createCategory() {
 
    var div = document.createElement("div");
    div.setAttribute('class', 'dropper');
-   div.setAttribute("id", "divCategory"+titleValue);
+   div.setAttribute("id", "categoryItems_"+titleValue);
    div.appendChild(p);
    div.appendChild(del);
    dndHandler.applyDropEvents(div);
-   document.getElementById("categoriesDiv").appendChild(div);   
+   document.getElementById("categoriesContainer").appendChild(div);   
 }
 
 

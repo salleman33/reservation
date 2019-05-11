@@ -243,16 +243,18 @@ class PluginReservationConfig extends CommonDBTM
       $menu .= '<tr>';
 
       $menu .= '<td>';
-      $menu .= '<input class="noEnterSubmit" onkeydown="createCategoryEnter()" type="text" id="newCategorieTitle" size="15"  title="Please enter a type">';
+      $menu .= '<input class="noEnterSubmit" onkeydown="createCategoryEnter()" type="text" id="newCategoryTitle" size="15"  title="Please enter a type">';
       $menu .= '<button type="button" onclick="createCategory()">'. _sx('button', 'create', "reservation").'</button>';
-      $menu .= '<div style="clear: left;" id="categoriesDiv"></div>';
+      $menu .= '<div style="clear: left;" id="categoriesContainer"></div>';
       $menu .= '</td>';
 
-      $menu .= '<td><div class="dropper">';
+      $menu .= '<td><div class="dropper" id="categoryItems_other">';
       // Toolbox::logInFile('reservations_plugin', "TEST ITEMTYPE RESULT : ".json_encode($list)."\n", $force = false);
       $listReservationItems = $this->getReservationItems();
       foreach ($listReservationItems as $item) {
-         $menu .= '<div class="draggable" id="item'.$item['id'].'">' . $item['name'] . '</div>';
+         $menu .= '<div class="draggable" id="item'.$item['id'].'">' . $item['name'];
+         $menu .= '<input type="hidden" name="item'.$item['id'].'" value="other">';
+         $menu .= '</div>';
       }      
       $menu .= '</div>';
       $menu .= '<div style="clear: left;"></div>';

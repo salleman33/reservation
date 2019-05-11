@@ -59,9 +59,14 @@ color: black;
 .draggable {
     /* display: inline-block; */
     margin: 5px 10px 5px 10px;
+    height: 2em;
     border: 1px solid #3D110F;
     text-align: center;
+    vertical-align: middle;
+    line-height: 2em; 
     cursor: move;
     transition: all 200ms linear;
-    user-select: none;
+    user-select: none;          
 }
+
+
