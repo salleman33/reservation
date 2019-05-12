@@ -119,7 +119,7 @@ class PluginReservationConfig extends CommonDBTM
       echo "</tr>";
       if($custom_itemtype) {
          echo '<tr class="tab_bg_2">';
-         echo $this->configItemType();
+         echo $this->showConfigCategoriesForm();
          echo "</tr>";
       }
       echo "</table>";
@@ -233,10 +233,11 @@ class PluginReservationConfig extends CommonDBTM
       return $result;
    }
 
-   private function configItemType() {   
+   private function showConfigCategoriesForm() {   
       $menu = "<table class='tab_cadre_fixe'  cellpadding='2'>";
+      $menu .= "<input type=\"hidden\" name=\"configCategoriesForm\">";
       $menu .= "<th colspan=\"2\">" . __('ItemType customisation', "reservation") . "</th>";
-      $menu .= '<tr >';      
+      $menu .= '<tr>';      
       $menu .= "<td>". __('Make your own itemtype !', "reservation") . "</td>";
       $menu .= "<td>". __('You have to put all items on a custom type :', "reservation") . "</td>";
       $menu .= "</tr>";
@@ -248,12 +249,13 @@ class PluginReservationConfig extends CommonDBTM
       $menu .= '<div style="clear: left;" id="categoriesContainer"></div>';
       $menu .= '</td>';
 
-      $menu .= '<td><div class="dropper" id="categoryItems_other">';
+      $menu .= '<td><div class="dropper" id="itemsCategory_other">';
+      $menu .= '<input type="hidden" name="category_other">';
       // Toolbox::logInFile('reservations_plugin', "TEST ITEMTYPE RESULT : ".json_encode($list)."\n", $force = false);
       $listReservationItems = $this->getReservationItems();
       foreach ($listReservationItems as $item) {
-         $menu .= '<div class="draggable" id="item'.$item['id'].'">' . $item['name'];
-         $menu .= '<input type="hidden" name="item'.$item['id'].'" value="other">';
+         $menu .= '<div class="draggable" id="item_'.$item['id'].'">' . $item['name'];
+         $menu .= '<input type="hidden" name="item_'.$item['id'].'" value="other">';
          $menu .= '</div>';
       }      
       $menu .= '</div>';
@@ -263,6 +265,12 @@ class PluginReservationConfig extends CommonDBTM
       $menu .= "</table>";
 
       return $menu;
+   }
+
+   public function applyCategoriesConfig($POST) {
+      Toolbox::logInFile('reservations_plugin', "TEST POST DATA : ".json_encode($POST)."\n", $force = false);
+
+
    }
 
 }

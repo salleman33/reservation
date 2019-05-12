@@ -9,14 +9,6 @@ function afficher_cacher(id) {
    return true;
 }
 
-{/* <div class="dropper">
-        
-<div class="draggable">#3</div>
-<div class="draggable">#4</div>
-
-</div> */}
-
-
 
 var dndHandler = {
 
@@ -78,15 +70,15 @@ var dndHandler = {
 
 function createCategoryEnter() {
    if(event.key === 'Enter') {
-      createCategory();        
+      createCategory();
    } 
 }
 
 function deleteCategory(category) {
-   var categorieOther = document.getElementById("categoryItems_other");
-   var element = document.getElementById("categoryItems_"+category);
+   var categorieOther = document.getElementById("itemsCategory_other");
+   var element = document.getElementById("itemsCategory_"+category);
    while (element.firstChild) {
-      if (/^item[0-9]+$/.test(element.firstChild.id)) {
+      if (/^item_[0-9]+$/.test(element.firstChild.id)) {
          clonedElement = element.firstChild.cloneNode(true);
          var input = clonedElement.getElementsByTagName('input')[0];
          input.value="other";
@@ -119,11 +111,16 @@ function createCategory() {
    del.setAttribute('class', 'categoryClose');
    del.setAttribute('onclick', 'deleteCategory(\''+titleValue+'\')');
 
+   var input = document.createElement("input");
+   input.setAttribute('type', 'hidden');
+   input.setAttribute('name', 'category_'+titleValue);
+
    var div = document.createElement("div");
    div.setAttribute('class', 'dropper');
-   div.setAttribute("id", "categoryItems_"+titleValue);
+   div.setAttribute("id", "itemsCategory_"+titleValue);
+   div.appendChild(input);
    div.appendChild(p);
-   div.appendChild(del);
+   div.appendChild(del);   
    dndHandler.applyDropEvents(div);
    document.getElementById("categoriesContainer").appendChild(div);   
 }

@@ -24,6 +24,9 @@ if ($plugin->isActivated("reservation")) {
    if (isset($_POST["custom_itemtype"])) {
       $PluginReservationConfig->setConfigurationValue("custom_itemtype", $_POST["custom_itemtype"]);
    }
+   if (isset($_POST['configCategoriesForm'])) {
+      $PluginReservationConfig->applyCategoriesConfig($_POST);
+   }
 
    foreach ($toolTipConfig as $config) {
       if (isset($_POST[$config])) {
