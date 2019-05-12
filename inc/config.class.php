@@ -9,7 +9,8 @@ include GLPI_ROOT . "/plugins/reservation/inc/includes.php";
 class PluginReservationConfig extends CommonDBTM
 {
 
-   public function getConfigurationValue($name, $defaultValue = 0) {
+   public function getConfigurationValue($name, $defaultValue = 0)
+   {
       global $DB;
       $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE `name`='" . $name . "'";
       $value = $defaultValue;
@@ -21,10 +22,10 @@ class PluginReservationConfig extends CommonDBTM
          }
       }
       return $value;
-
    }
 
-   public function setConfigurationValue($name, $value = '') {
+   public function setConfigurationValue($name, $value = '')
+   {
       global $DB;
 
       if ($value != '') {
@@ -33,7 +34,8 @@ class PluginReservationConfig extends CommonDBTM
       }
    }
 
-   public function setMailAutomaticAction($value = 1) {
+   public function setMailAutomaticAction($value = 1)
+   {
       global $DB;
 
       $query = "UPDATE `glpi_crontasks` SET state='" . $value . "' WHERE name = 'sendMailLateReservations'";
@@ -41,7 +43,8 @@ class PluginReservationConfig extends CommonDBTM
    }
 
 
-   public function showForm() {
+   public function showForm()
+   {
       $mode_auto = $this->getConfigurationValue("mode_auto");
       $mode_duration_added = $this->getConfigurationValue("mode_duration_added", 'default');
       $conflict_action = $this->getConfigurationValue("conflict_action");
@@ -56,13 +59,13 @@ class PluginReservationConfig extends CommonDBTM
 
       echo '<tr class="tab_bg_2">';
       echo "<td>";
-      echo __('Duration added to reservations expiring and not checkout', "reservation"); 
+      echo __('Duration added to reservations expiring and not checkout', "reservation");
       echo "<br>";
-      echo __('By defaut, use value of "step for the hours (minutes)" defined in General Setup > Assistance)', "reservation"). " : ";
+      echo __('By defaut, use value of "step for the hours (minutes)" defined in General Setup > Assistance)', "reservation") . " : ";
       echo "<select name=\"mode_duration_added\">";
-      echo "<option value=\"default\" ". ($mode_duration_added == 'default' ? 'selected="selected"' : '') .">".__('Default', "reservation")."</option>";
-      for($h = 1; $h <= 8; $h++) {
-         echo "<option value=\"".$h."\" ". ($mode_duration_added == $h ? 'selected="selected"' : '') .">".$h." ".__('hour', "reservation")."</option>";
+      echo "<option value=\"default\" " . ($mode_duration_added == 'default' ? 'selected="selected"' : '') . ">" . __('Default', "reservation") . "</option>";
+      for ($h = 1; $h <= 8; $h++) {
+         echo "<option value=\"" . $h . "\" " . ($mode_duration_added == $h ? 'selected="selected"' : '') . ">" . $h . " " . __('hour', "reservation") . "</option>";
       }
       echo "</select>";
       echo "</td>";
@@ -72,8 +75,8 @@ class PluginReservationConfig extends CommonDBTM
       echo "<td>";
       echo __('Method used to send e-mails to users with late reservations', "reservation") . " : ";
       echo "<select name=\"mode_auto\">";
-      echo "<option value=\"1\" ". ($mode_auto ? 'selected="selected"' : '') .">".__('Automatic', "reservation")."</option>";
-      echo "<option value=\"0\" ". ($mode_auto ? '' : 'selected="selected"') .">".__('Manual', "reservation")."</option>";
+      echo "<option value=\"1\" " . ($mode_auto ? 'selected="selected"' : '') . ">" . __('Automatic', "reservation") . "</option>";
+      echo "<option value=\"0\" " . ($mode_auto ? '' : 'selected="selected"') . ">" . __('Manual', "reservation") . "</option>";
       echo "</select>";
       echo "</td>";
       echo "</tr>";
@@ -82,8 +85,8 @@ class PluginReservationConfig extends CommonDBTM
       echo "<td>";
       echo __('Method used when there is a conflicted reservation', "reservation") . " : ";
       echo "<select name=\"conflict_action\">";
-      echo "<option value=\"delete\" ". ($conflict_action == 'delete' ? 'selected="selected"' : '') .">".__('Delete the conflicted reservation', "reservation")."</option>";
-      echo "<option value=\"delay\" ". ($conflict_action == 'delay' ? 'selected="selected"' : '') .">".__('Delay the start of the conflicted reservation', "reservation")."</option>";
+      echo "<option value=\"delete\" " . ($conflict_action == 'delete' ? 'selected="selected"' : '') . ">" . __('Delete the conflicted reservation', "reservation") . "</option>";
+      echo "<option value=\"delay\" " . ($conflict_action == 'delay' ? 'selected="selected"' : '') . ">" . __('Delay the start of the conflicted reservation', "reservation") . "</option>";
       echo "</select>";
       echo "</td>";
       echo "</tr>";
@@ -117,7 +120,7 @@ class PluginReservationConfig extends CommonDBTM
       echo "<input type=\"checkbox\" name=\"custom_itemtype\" value=\"1\" " . ($custom_itemtype ? 'checked' : '') . "> ";
       echo __('Use custom itemtype', "reservation") . "</td>";
       echo "</tr>";
-      if($custom_itemtype) {
+      if ($custom_itemtype) {
          echo '<tr class="tab_bg_2">';
          echo $this->showConfigCategoriesForm();
          echo "</tr>";
@@ -191,7 +194,8 @@ class PluginReservationConfig extends CommonDBTM
       Html::closeForm();
    }
 
-   private function getReservationItems() {
+   private function getReservationItems()
+   {
       global $DB, $CFG_GLPI;
 
       $result = [];
@@ -217,47 +221,52 @@ class PluginReservationConfig extends CommonDBTM
                    WHERE `glpi_reservationitems`.`is_active` = '1'
                          AND `glpi_reservationitems`.`is_deleted` = '0'
                          AND `$itemtable`.`is_deleted` = '0'
-                         $where ".
-                         getEntitiesRestrictRequest(" AND", $itemtable, '',
-                                                    $_SESSION['glpiactiveentities'],
-                                                    $item->maybeRecursive())."
+                         $where " .
+            getEntitiesRestrictRequest(
+               " AND",
+               $itemtable,
+               '',
+               $_SESSION['glpiactiveentities'],
+               $item->maybeRecursive()
+            ) . "
                    ORDER BY `$itemtable`.`entities_id`,
                             `$itemtable`.`name` ASC";
 
          if ($res = $DB->query($query)) {
             while ($row = $DB->fetch_assoc($res)) {
-               $result[] = array_merge($row, ['itemtype'=>$itemtype]);
+               $result[] = array_merge($row, ['itemtype' => $itemtype]);
             }
          }
       }
       return $result;
    }
 
-   private function showConfigCategoriesForm() {   
+   private function showConfigCategoriesForm()
+   {
       $menu = "<table class='tab_cadre_fixe'  cellpadding='2'>";
       $menu .= "<input type=\"hidden\" name=\"configCategoriesForm\">";
       $menu .= "<th colspan=\"2\">" . __('ItemType customisation', "reservation") . "</th>";
-      $menu .= '<tr>';      
-      $menu .= "<td>". __('Make your own itemtype !', "reservation") . "</td>";
-      $menu .= "<td>". __('You have to put all items on a custom type :', "reservation") . "</td>";
+      $menu .= '<tr>';
+      $menu .= "<td>" . __('Make your own itemtype !', "reservation") . "</td>";
+      $menu .= "<td>" . __('You have to put all items on a custom type :', "reservation") . "</td>";
       $menu .= "</tr>";
       $menu .= '<tr>';
 
       $menu .= '<td>';
       $menu .= '<input class="noEnterSubmit" onkeydown="createCategoryEnter()" type="text" id="newCategoryTitle" size="15"  title="Please enter a type">';
-      $menu .= '<button type="button" onclick="createCategory()">'. _sx('button', 'create', "reservation").'</button>';
+      $menu .= '<button type="button" onclick="createCategory()">' . _sx('button', 'create', "reservation") . '</button>';
       $menu .= '<div style="clear: left;" id="categoriesContainer"></div>';
       $menu .= '</td>';
 
       $menu .= '<td><div class="dropper" id="itemsCategory_other">';
-      $menu .= '<input type="hidden" name="category_other">';
+      $menu .= '<input type="hidden" name="category_other" value="other">';
       // Toolbox::logInFile('reservations_plugin', "TEST ITEMTYPE RESULT : ".json_encode($list)."\n", $force = false);
       $listReservationItems = $this->getReservationItems();
       foreach ($listReservationItems as $item) {
-         $menu .= '<div class="draggable" id="item_'.$item['id'].'">' . $item['name'];
-         $menu .= '<input type="hidden" name="item_'.$item['id'].'" value="other">';
+         $menu .= '<div class="draggable" id="item_' . $item['id'] . '">' . $item['name'];
+         $menu .= '<input type="hidden" name="item_' . $item['id'] . '" value="other">';
          $menu .= '</div>';
-      }      
+      }
       $menu .= '</div>';
       $menu .= '<div style="clear: left;"></div>';
       $menu .= '</td>';
@@ -267,10 +276,20 @@ class PluginReservationConfig extends CommonDBTM
       return $menu;
    }
 
-   public function applyCategoriesConfig($POST) {
-      Toolbox::logInFile('reservations_plugin', "TEST POST DATA : ".json_encode($POST)."\n", $force = false);
-
-
+   public function applyCategoriesConfig($POST)
+   {
+      Toolbox::logInFile('reservations_plugin', "TEST POST DATA : " . json_encode($POST) . "\n", $force = false);
+      $categories = [];
+      $items = [];
+      foreach ($POST as $key => $val) {
+         if (preg_match('/^item_([0-9])+$/', $key, $match)) { 
+            $items[$match[1]] = $val;
+         }
+         if (preg_match('/^category_([a-zA-Z0-9]+)$/', $key, $match)) {
+            array_push($categories, $val);
+         }      
+      }
+      Toolbox::logInFile('reservations_plugin', "TEST CATEGORIES RESULT : " . json_encode($categories) . "\n", $force = false);
+      Toolbox::logInFile('reservations_plugin', "TEST ITEMS RESULT : " . json_encode($items) . "\n", $force = false);
    }
-
 }

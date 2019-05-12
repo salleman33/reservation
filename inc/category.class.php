@@ -48,4 +48,30 @@ class PluginReservationCategory extends CommonDBTM
       }
       return $res;
    }
+
+   /**
+    * add a category in database
+    */
+   public static function addCategory($name) {
+      global $DB;
+
+      $DB->insertOrDie('glpi_plugin_reservation_categories', [
+         'name' => $name,
+      ]
+      );
+      Toolbox::logInFile('reservations_plugin', "addCategory : ".json_encode($name)."\n", $force = false);
+   }
+   
+   /**
+    * delete a category in database
+    */
+   public static function deleteCategory($name) {
+      global $DB;
+
+      $DB->deleteOrDie('glpi_plugin_reservation_categories', [
+         'name' => $name,
+      ]
+      );
+      Toolbox::logInFile('reservations_plugin', "deleteCategory : ".json_encode($name)."\n", $force = false);
+   }
 }

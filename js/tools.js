@@ -91,6 +91,7 @@ function deleteCategory(category) {
 }
 
 function createCategory() {
+   // TODO : verifier si la categorie n'existe pas deja ! 
      
    titleField = document.getElementById('newCategoryTitle');
    titleValue = titleField.value;
@@ -114,6 +115,7 @@ function createCategory() {
    var input = document.createElement("input");
    input.setAttribute('type', 'hidden');
    input.setAttribute('name', 'category_'+titleValue);
+   input.setAttribute('value', titleValue);
 
    var div = document.createElement("div");
    div.setAttribute('class', 'dropper');
