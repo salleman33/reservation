@@ -24,46 +24,59 @@ color: black;
 }
 
 .categoryTitle {
-    position:absolute;
+    /* position:absolute;
     margin:0;
     padding:5px;
     top:0;
-    left:0;
-    cursor: default;
+    left:0; */
+    cursor: default; 
 }
 .categoryClose {
-    position:absolute;
+    /* position:absolute;
     margin:0;
-    padding:5px;
+    padding:5px; */
     color:red;
-    top:0;
-    right:0;
+    /* top:0;
+    right:0; */
     cursor: pointer;
+    width: 15px;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .dropper {
     position:relative;
-    min-height: 100px;
+    min-height: 200px;
     min-width: 100px;
-    float: left;
-    border: 2px solid #111;
-    padding-top: 15px;
-    padding-bottom: 15px;
+    /* float: left; */
+    /* padding-top: 15px;
+    padding-bottom: 15px; */
     margin-right: 20px;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     transition: all 200ms linear;
+
+    margin: 10px auto;
+    margin-right: auto;
+    border: 0;
+    text-align: left;
+    font-size: 11px;
+    width: 95%;
+    background-color: #ffffff;
+    box-shadow: 0px 1px 2px 1px #D2D2D2;
+    border-spacing: 0;
 }
 
 .drop_hover {
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8) inset;
+    box-shadow: 3px 4px 5px 4px rgba(0, 0, 0, 0.8);
+    /* box-shadow: 0 0 30px rgba(0, 0, 0, 0.8) inset; */
 }
 
 .draggable {
     /* display: inline-block; */
-    margin: 5px 10px 5px 10px;
+    /* margin: 5px 10px 5px 10px;
     height: 2em;
-    border: 1px solid #3D110F;
-    text-align: center;
+    border: 1px solid #3D110F; */
+    /* text-align: center; */
     vertical-align: middle;
     line-height: 2em; 
     cursor: move;

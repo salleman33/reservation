@@ -11,10 +11,11 @@ class PluginReservationCategory extends CommonDBTM
    /**
     * @param $nb  integer  for singular or plural
     **/
-    public static function getTypeName($nb = 0) {
+   public static function getTypeName($nb = 0)
+   {
       return _n('Category', 'Categories', $nb, 'reservation');
    }
-   
+
 
    /**
     * @return array categories of items
@@ -52,29 +53,35 @@ class PluginReservationCategory extends CommonDBTM
    /**
     * add a category in database
     */
-   public static function addCategory($name) {
+   public static function addCategory($name)
+   {
       global $DB;
       $categories_table = getTableForItemType(__CLASS__);
 
-      $DB->insertOrDie($categories_table, [
-         'name' => $name,
-      ]
+      $DB->insertOrDie(
+         $categories_table,
+         [
+            'name' => $name,
+         ]
       );
-      $_SESSION['glpi_use_mode'] && Toolbox::logInFile('reservations_plugin', "DEBUG : ".json_encode($categories_table)."\n", $force = false);
+      $_SESSION['glpi_use_mode'] && Toolbox::logInFile('reservations_plugin', "DEBUG : " . json_encode($categories_table) . "\n", $force = false);
 
       // Toolbox::logInFile('reservations_plugin', "addCategory : ".json_encode($name)."\n", $force = false);
    }
-   
+
    /**
     * delete a category in database
     */
-   public static function deleteCategory($name) {
+   public static function deleteCategory($name)
+   {
       global $DB;
       $categories_table = getTableForItemType(__CLASS__);
 
-      $DB->deleteOrDie($categories_table, [
-         'name' => $name,
-      ]
+      $DB->deleteOrDie(
+         $categories_table,
+         [
+            'name' => $name,
+         ]
       );
       // Toolbox::logInFile('reservations_plugin', "deleteCategory : ".json_encode($name)."\n", $force = false);
    }
@@ -82,7 +89,8 @@ class PluginReservationCategory extends CommonDBTM
    /**
     * update categories in database
     */
-   public static function updateCategories($newList) {
+   public static function updateCategories($newList)
+   {
       $currentList = PluginReservationCategory::getCategoriesNames();
 
       foreach (array_diff($newList, $currentList) as $toAdd) {
@@ -95,10 +103,34 @@ class PluginReservationCategory extends CommonDBTM
       }
    }
 
+   public function applyCategoriesConfig($POST)
+   {
+      $categories = [];
+      $items = [];
+      foreach ($POST as $key => $val) {
+         if (preg_match('/^item_([0-9])+$/', $key, $match)) {
+            if (array_key_exists($val, $items)) {
+               array_push($items[$val], $match[1]);
+            } else {
+               $items[$val] = [];
+               array_push($items[$val], $match[1]);
+            }
+         }
+         if (preg_match('/^category_([a-zA-Z0-9]+)$/', $key, $match)) {
+            array_push($categories, $val);
+         }
+      }
+
+      $_SESSION['glpi_use_mode'] && Toolbox::logInFile('reservations_plugin', "TEST ITEM RESULT : " . json_encode($items) . "\n", $force = false);
+      PluginReservationCategory::updateCategories($categories);
+      PluginReservationCategory::updateCategoriesItems($items);
+   }
+
    /**
     * update categories in database
     */
-   public static function updateCategoriesItems($list_items_by_categories) {
+   public static function updateCategoriesItems($list_items_by_categories)
+   {
       global $DB;
 
       foreach ($list_items_by_categories as $category_name => $category_items) {
@@ -109,26 +141,28 @@ class PluginReservationCategory extends CommonDBTM
             $items = new PluginReservationCategory_Item();
             $items_table = $items->getTable();
 
-            if(!$items->getFromDBByCrit(['reservationitems_id' => $item_id])) {
-               $DB->insertOrDie($items_table, [
-                  'categories_id' => $category->getId(),
-                  'reservationitems_id' => $item_id,
-                  'priority' => 0,
-               ]
+            if (!$items->getFromDBByCrit(['reservationitems_id' => $item_id])) {
+               $DB->insertOrDie(
+                  $items_table,
+                  [
+                     'categories_id' => $category->getId(),
+                     'reservationitems_id' => $item_id,
+                     'priority' => 0,
+                  ]
                );
             } else {
-               $DB->updateOrDie($items_table, [
-                  'categories_id' => $category->getId(),
-                  'priority' => 0,
-               ],
-               [
-                  'reservationitems_id' => $item_id,
-               ]);
+               $DB->updateOrDie(
+                  $items_table,
+                  [
+                     'categories_id' => $category->getId(),
+                     'priority' => 0,
+                  ],
+                  [
+                     'reservationitems_id' => $item_id,
+                  ]
+               );
             }
          }
       }
    }
-
-  
-   
 }

@@ -76,17 +76,21 @@ function createCategoryEnter() {
 
 function deleteCategory(category) {
    var categorieOther = document.getElementById("itemsCategory_notcategorised");
+   
    var element = document.getElementById("itemsCategory_"+category);
-   while (element.firstChild) {
-      if (/^item_[0-9]+$/.test(element.firstChild.id)) {
-         clonedElement = element.firstChild.cloneNode(true);
+   var tbody = element.firstChild;
+   while (tbody.firstChild) {
+      if (/^item_[0-9]+$/.test(tbody.firstChild.id)) {
+         
+         clonedElement = tbody.firstChild.cloneNode(true);
          var input = clonedElement.getElementsByTagName('input')[0];
          input.value="notcategorised";
          dndHandler.applyDragEvents(clonedElement);
          clonedElement = categorieOther.appendChild(clonedElement);         
       }         
-      element.removeChild(element.firstChild);
+      tbody.removeChild(tbody.firstChild);
    }
+   element.removeChild(tbody);
    element.parentNode.removeChild(element);
 }
 
@@ -102,27 +106,30 @@ function createCategory() {
    titleField.style.backgroundColor = "initial";
    titleField.value = "";
    
-   var p = document.createElement("p");
-   p.appendChild(document.createTextNode(titleValue));
-   p.setAttribute('class', 'categoryTitle');
-   var del = document.createElement("div");
+   var table = document.createElement("table");
+
+   var th = document.createElement("th");
+   th.appendChild(document.createTextNode(titleValue));
+   th.setAttribute('class', 'categoryTitle');
+   table.appendChild(th);
+
+   var del = document.createElement("td");
    del.appendChild(document.createTextNode("X"));
    del.setAttribute('class', 'categoryClose');
    del.setAttribute('onclick', 'deleteCategory(\''+titleValue+'\')');
+   table.appendChild(del);
 
    var input = document.createElement("input");
    input.setAttribute('type', 'hidden');
    input.setAttribute('name', 'category_'+titleValue);
    input.setAttribute('value', titleValue);
+   table.appendChild(input);
+   table.setAttribute('class', 'dropper');
+   table.setAttribute("id", "itemsCategory_"+titleValue);
 
-   var div = document.createElement("div");
-   div.setAttribute('class', 'dropper');
-   div.setAttribute("id", "itemsCategory_"+titleValue);
-   div.appendChild(input);
-   div.appendChild(p);
-   div.appendChild(del);   
-   dndHandler.applyDropEvents(div);
-   document.getElementById("categoriesContainer").appendChild(div);   
+  
+   dndHandler.applyDropEvents(table);
+   document.getElementById("categoriesContainer").appendChild(table);   
 }
 
 

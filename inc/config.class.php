@@ -199,80 +199,27 @@ class PluginReservationConfig extends CommonDBTM
    {
       global $DB, $CFG_GLPI;
 
-      $result = [];
+      $res = [];
+      $items = new PluginReservationCategory_Item();
+      $table = $items->getTable();
 
-     
-         global $DB;
- 
-       $res = [];
-       $items = new PluginReservationCategory_Item();
-       $table = $items->getTable();
-       
- 
-       
-       $query = "SELECT `glpi_reservationitems`.`id`
-              FROM `glpi_reservationitems`, `$table`
-              WHERE NOT EXISTS 
+      $query = "SELECT `glpi_reservationitems`.`id`
+               FROM `glpi_reservationitems`, `$table`
+               WHERE NOT EXISTS 
                (
                   SELECT 1 
                   FROM `$table`
                   WHERE `glpi_reservationitems`.`id` = `$table`.reservationitems_id
-              )" ;
- 
-      //  Toolbox::logInFile('reservations_plugin', "QUERY  : ".$query."\n", $force = false);
- 
-       if ($result = $DB->query($query)) {
-          if ($DB->numrows($result) > 0) {
-             while ($row = $DB->fetch_assoc($result)) {
-                $res[] = $row;
-             }
-          }
-       }
-      
-       return $res;
+               )";
 
-
-
-
-       
-      //    if (!($item = getItemForItemtype($itemtype))) {
-      //       continue;
-      //    }
-      //    $itemtable = getTableForItemType($itemtype);
-      //    $left = "";
-      //    $where = "";
-
-      //    $query = "SELECT `glpi_reservationitems`.`id`,
-      //                     `glpi_reservationitems`.`comment`,
-      //                     `$itemtable`.`name` AS name,
-      //                     `$itemtable`.`entities_id` AS entities_id,
-      //                     `glpi_reservationitems`.`items_id` AS items_id
-      //              FROM `glpi_reservationitems`
-      //              INNER JOIN `$itemtable`
-      //                   ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
-      //                       AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
-      //              $left
-      //              WHERE `glpi_reservationitems`.`is_active` = '1'
-      //                    AND `glpi_reservationitems`.`is_deleted` = '0'
-      //                    AND `$itemtable`.`is_deleted` = '0'
-      //                    $where " .
-      //       getEntitiesRestrictRequest(
-      //          " AND",
-      //          $itemtable,
-      //          '',
-      //          $_SESSION['glpiactiveentities'],
-      //          $item->maybeRecursive()
-      //       ) . "
-      //              ORDER BY `$itemtable`.`entities_id`,
-      //                       `$itemtable`.`name` ASC";
-
-      //    if ($res = $DB->query($query)) {
-      //       while ($row = $DB->fetch_assoc($res)) {
-      //          $result[] = array_merge($row, ['itemtype' => $itemtype]);
-      //       }
-      //    }
-      // }
-      // return $result;
+      if ($result = $DB->query($query)) {
+         if ($DB->numrows($result) > 0) {
+            while ($row = $DB->fetch_assoc($result)) {
+               $res[] = $row;
+            }
+         }
+      }
+      return $res;
    }
 
    private function showConfigCategoriesForm()
@@ -295,47 +242,44 @@ class PluginReservationConfig extends CommonDBTM
          if ($categoryName === "notcategorised") {
             continue;
          }
-         $menu .= '<div class="dropper" id="itemsCategory_' . $categoryName . '">';
-         $menu .= '<p class="categoryTitle">' . $categoryName . '</p>';
-         $menu .= '<div onclick="deleteCategory(\''.$categoryName.'\')" class="categoryClose" >X</div>';
+         $menu .= '<table class="dropper" id="itemsCategory_' . $categoryName . '">';
+         $menu .= '<th class="categoryTitle">' . $categoryName . '</th>';
+         $menu .= '<td onclick="deleteCategory(\'' . $categoryName . '\')" class="categoryClose" >X</td>';
 
          $menu .= '<input type="hidden" name="category_' . $categoryName . '" value="' . $categoryName . '">';
          $listItemsCategory = PluginReservationCategory_Item::getReservationItemsForCategory($categoryName);
          foreach ($listItemsCategory as $item) {
             $name = PluginReservationCategory_Item::getItemNameFromId($item['id']);
-            Toolbox::logInFile('reservations_plugin', "ITEM CATEGORIZED: ".json_encode($name)."\n", $force = false);
 
-            $menu .= '<div class="draggable" id="item_' . $item['id'] . '">' . $name;
-            $menu .= '<input type="hidden" name="item_' . $item['id'] . '" value="'.$categoryName.'">';
-            $menu .= '</div>';
+            $menu .= '<tr class="draggable" id="item_' . $item['id'] . '"><td>' . $name;
+            $menu .= '<input type="hidden" name="item_' . $item['id'] . '" value="' . $categoryName . '">';
+            $menu .= '</td></tr>';
          }
-         $menu .= '</div>';
+         $menu .= '</table>';
       }
       $menu .= '</div>';
       $menu .= '</td>';
 
-      $menu .= '<td><div class="dropper" id="itemsCategory_notcategorised">';
+      $menu .= '<td><table class="dropper" id="itemsCategory_notcategorised">';
+      $menu .= '<th class="categoryTitle">' . __('Reservable item') . '</th>';
       $menu .= '<input type="hidden" name="category_notcategorised" value="notcategorised">';
-      // Toolbox::logInFile('reservations_plugin', "TEST ITEMTYPE RESULT : ".json_encode($list)."\n", $force = false);
       $listItemsCategory = PluginReservationCategory_Item::getReservationItemsForCategory("notcategorised");
       foreach ($listItemsCategory as $item) {
          $name = PluginReservationCategory_Item::getItemNameFromId($item['id']);
-          Toolbox::logInFile('reservations_plugin', "ITEM NOT CATEGORIZED: ".json_encode($name)."\n", $force = false);
 
-         $menu .= '<div class="draggable" id="item_' . $item['id'] . '">' . $name;
+         $menu .= '<tr class="draggable" id="item_' . $item['id'] . '"><td>' . $name;
          $menu .= '<input type="hidden" name="item_' . $item['id'] . '" value="notcategorised">';
-         $menu .= '</div>';
+         $menu .= '</td></tr>';
       }
       $listReservationItemsNotCategorised = $this->getReservationItemsNotCategorised();
       foreach ($listReservationItemsNotCategorised as $item) {
          $name = PluginReservationCategory_Item::getItemNameFromId($item['id']);
-          Toolbox::logInFile('reservations_plugin', "ITEM NOT CATEGORIZED: ".json_encode($name)."\n", $force = false);
 
-         $menu .= '<div class="draggable" id="item_' . $item['id'] . '">' . $name;
+         $menu .= '<tr class="draggable" id="item_' . $item['id'] . '"><td>' . $name;
          $menu .= '<input type="hidden" name="item_' . $item['id'] . '" value="notcategorised">';
-         $menu .= '</div>';
+         $menu .= '</td></tr>';
       }
-      $menu .= '</div>';
+      $menu .= '</table>';
       $menu .= '<div style="clear: left;"></div>';
       $menu .= '</td>';
       $menu .= "</tr>";
@@ -344,30 +288,5 @@ class PluginReservationConfig extends CommonDBTM
       return $menu;
    }
 
-   public function applyCategoriesConfig($POST)
-   {
-      $categories = [];
-      $items = [];
-      foreach ($POST as $key => $val) {
-         if (preg_match('/^item_([0-9])+$/', $key, $match)) { 
-            if (array_key_exists($val,$items)) {
-               array_push($items[$val],$match[1]);
-            }
-            else {
-               $items[$val] = [];
-               array_push($items[$val],$match[1]);
-            }
-            
-         }
-         if (preg_match('/^category_([a-zA-Z0-9]+)$/', $key, $match)) {
-            array_push($categories, $val);
-         }      
-      }
-
-      $_SESSION['glpi_use_mode'] && Toolbox::logInFile('reservations_plugin', "TEST ITEM RESULT : ".json_encode($items)."\n", $force = false);
-      PluginReservationCategory::updateCategories($categories);
-      PluginReservationCategory::updateCategoriesItems($items);
-
-      
-   }
+   
 }

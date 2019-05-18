@@ -25,7 +25,7 @@ if ($plugin->isActivated("reservation")) {
       $PluginReservationConfig->setConfigurationValue("custom_categories", $_POST["custom_categories"]);
    }
    if (isset($_POST['configCategoriesForm'])) {
-      $PluginReservationConfig->applyCategoriesConfig($_POST);
+      PluginReservationCategory::applyCategoriesConfig($_POST);
    }
 
    foreach ($toolTipConfig as $config) {

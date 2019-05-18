@@ -23,8 +23,9 @@ class PluginReservationCategory_Item extends CommonDBChild
     * @param $ID         ID of the item
     *
     * @return true if succeed else false
-   **/
-  function getFromDBbyItem($category_id, $ID) {
+    **/
+   function getFromDBbyItem($category_id, $ID)
+   {
 
       return $this->getFromDBByCrit([
          $this->getTable() . '.categories_id'  => $category_id,
@@ -32,42 +33,41 @@ class PluginReservationCategory_Item extends CommonDBChild
       ]);
    }
 
-      /**
+   /**
     * @return array items for a category
     */
-    public static function getReservationItemsForCategory($name = '')
-    {
-       global $DB;
- 
-       $res = [];
-       $table = getTableForItemType(__CLASS__);
-       $category = new PluginReservationCategory();
-       $category->getFromDBByCrit(['name' => $name]);
-       $category_id = $category->getId();
- 
-       
-       
-       $query = "SELECT `glpi_reservationitems`.`id`
+   public static function getReservationItemsForCategory($name = '')
+   {
+      global $DB;
+
+      $res = [];
+      $table = getTableForItemType(__CLASS__);
+      $category = new PluginReservationCategory();
+      $category->getFromDBByCrit(['name' => $name]);
+      $category_id = $category->getId();
+
+
+
+      $query = "SELECT `glpi_reservationitems`.`id`
               FROM `glpi_reservationitems`, `$table`
               WHERE `glpi_reservationitems`.`id` = `$table`.reservationitems_id
-              AND `$table`.`categories_id` = $category_id" ;
- 
-      //  Toolbox::logInFile('reservations_plugin', "QUERY  : ".$query."\n", $force = false);
- 
-       if ($result = $DB->query($query)) {
-          if ($DB->numrows($result) > 0) {
-             while ($row = $DB->fetch_assoc($result)) {
-                $res[] = $row;
-             }
-          }
-       }
-       return $res;
-    }
+              AND `$table`.`categories_id` = $category_id";
+
+      if ($result = $DB->query($query)) {
+         if ($DB->numrows($result) > 0) {
+            while ($row = $DB->fetch_assoc($result)) {
+               $res[] = $row;
+            }
+         }
+      }
+      return $res;
+   }
 
 
- 
 
-   public static function getItemNameFromId($id) {
+
+   public static function getItemNameFromId($id)
+   {
       global $DB;
       $name = '';
       $itemtype = '';
@@ -80,8 +80,8 @@ class PluginReservationCategory_Item extends CommonDBChild
                ";
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) == 1) {
-            $itemtype = $DB->result($result,0,"itemtype");
-            $items_id = $DB->result($result,0,"items_id");
+            $itemtype = $DB->result($result, 0, "itemtype");
+            $items_id = $DB->result($result, 0, "items_id");
          }
       }
 
@@ -92,11 +92,9 @@ class PluginReservationCategory_Item extends CommonDBChild
                ";
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) == 1) {
-            $name = $DB->result($result,0,"name");
+            $name = $DB->result($result, 0, "name");
          }
       }
       return $name;
-
-
    }
 }
