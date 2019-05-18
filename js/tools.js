@@ -75,14 +75,14 @@ function createCategoryEnter() {
 }
 
 function deleteCategory(category) {
-   var categorieOther = document.getElementById("itemsCategory_other");
+   var categorieOther = document.getElementById("itemsCategory_notcategorised");
    var element = document.getElementById("itemsCategory_"+category);
    while (element.firstChild) {
       if (/^item_[0-9]+$/.test(element.firstChild.id)) {
          clonedElement = element.firstChild.cloneNode(true);
          var input = clonedElement.getElementsByTagName('input')[0];
-         input.value="other";
-
+         input.value="notcategorised";
+         dndHandler.applyDragEvents(clonedElement);
          clonedElement = categorieOther.appendChild(clonedElement);         
       }         
       element.removeChild(element.firstChild);
@@ -95,7 +95,7 @@ function createCategory() {
      
    titleField = document.getElementById('newCategoryTitle');
    titleValue = titleField.value;
-   if(!/^([a-zA-Z0-9]+)$/.test(titleValue)) {
+   if(!/^([a-zA-Z0-9]+)$/.test(titleValue) || titleValue === 'notcategorised') {
       titleField.style.backgroundColor = "red";
       return;
    }   
@@ -105,10 +105,8 @@ function createCategory() {
    var p = document.createElement("p");
    p.appendChild(document.createTextNode(titleValue));
    p.setAttribute('class', 'categoryTitle');
-   p.style.cursor = 'default';
    var del = document.createElement("div");
    del.appendChild(document.createTextNode("X"));
-   del.style.cursor = 'pointer';
    del.setAttribute('class', 'categoryClose');
    del.setAttribute('onclick', 'deleteCategory(\''+titleValue+'\')');
 

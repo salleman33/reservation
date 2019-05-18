@@ -21,8 +21,8 @@ if ($plugin->isActivated("reservation")) {
    if (isset($_POST["conflict_action"])) {
       $PluginReservationConfig->setConfigurationValue("conflict_action", $_POST["conflict_action"]);
    }
-   if (isset($_POST["custom_itemtype"])) {
-      $PluginReservationConfig->setConfigurationValue("custom_itemtype", $_POST["custom_itemtype"]);
+   if (isset($_POST["custom_categories"])) {
+      $PluginReservationConfig->setConfigurationValue("custom_categories", $_POST["custom_categories"]);
    }
    if (isset($_POST['configCategoriesForm'])) {
       $PluginReservationConfig->applyCategoriesConfig($_POST);

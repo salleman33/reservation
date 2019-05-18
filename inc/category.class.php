@@ -19,7 +19,7 @@ class PluginReservationCategory extends CommonDBTM
    /**
     * @return array categories of items
     */
-   public static function getCategories($filters = [])
+   public static function getCategoriesNames($filters = [])
    {
       global $DB;
 
@@ -33,7 +33,7 @@ class PluginReservationCategory extends CommonDBTM
       //    $where .= " AND " . $filter;
       // }
 
-      $query = "SELECT *
+      $query = "SELECT name
              FROM $categories_table
              $where";
 
@@ -42,7 +42,7 @@ class PluginReservationCategory extends CommonDBTM
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
             while ($row = $DB->fetch_assoc($result)) {
-               $res[] = $row;
+               $res[] = $row['name'];
             }
          }
       }
@@ -54,12 +54,15 @@ class PluginReservationCategory extends CommonDBTM
     */
    public static function addCategory($name) {
       global $DB;
+      $categories_table = getTableForItemType(__CLASS__);
 
-      $DB->insertOrDie('glpi_plugin_reservation_categories', [
+      $DB->insertOrDie($categories_table, [
          'name' => $name,
       ]
       );
-      Toolbox::logInFile('reservations_plugin', "addCategory : ".json_encode($name)."\n", $force = false);
+      $_SESSION['glpi_use_mode'] && Toolbox::logInFile('reservations_plugin', "DEBUG : ".json_encode($categories_table)."\n", $force = false);
+
+      // Toolbox::logInFile('reservations_plugin', "addCategory : ".json_encode($name)."\n", $force = false);
    }
    
    /**
@@ -67,11 +70,65 @@ class PluginReservationCategory extends CommonDBTM
     */
    public static function deleteCategory($name) {
       global $DB;
+      $categories_table = getTableForItemType(__CLASS__);
 
-      $DB->deleteOrDie('glpi_plugin_reservation_categories', [
+      $DB->deleteOrDie($categories_table, [
          'name' => $name,
       ]
       );
-      Toolbox::logInFile('reservations_plugin', "deleteCategory : ".json_encode($name)."\n", $force = false);
+      // Toolbox::logInFile('reservations_plugin', "deleteCategory : ".json_encode($name)."\n", $force = false);
    }
+
+   /**
+    * update categories in database
+    */
+   public static function updateCategories($newList) {
+      $currentList = PluginReservationCategory::getCategoriesNames();
+
+      foreach (array_diff($newList, $currentList) as $toAdd) {
+         // Toolbox::logInFile('reservations_plugin', "category to Add : ".json_encode($toAdd)."\n", $force = false);
+         PluginReservationCategory::addCategory($toAdd);
+      }
+      foreach (array_diff($currentList, $newList) as $toDelete) {
+         // Toolbox::logInFile('reservations_plugin', "category to Delete : ".json_encode($toDelete)."\n", $force = false);
+         PluginReservationCategory::deleteCategory($toDelete);
+      }
+   }
+
+   /**
+    * update categories in database
+    */
+   public static function updateCategoriesItems($list_items_by_categories) {
+      global $DB;
+
+      foreach ($list_items_by_categories as $category_name => $category_items) {
+         $category = new PluginReservationCategory();
+         $category->getFromDBByCrit(['name' => $category_name]);
+
+         foreach ($category_items as $item_id) {
+            $items = new PluginReservationCategory_Item();
+            $items_table = $items->getTable();
+
+            if(!$items->getFromDBByCrit(['reservationitems_id' => $item_id])) {
+               $DB->insertOrDie($items_table, [
+                  'categories_id' => $category->getId(),
+                  'reservationitems_id' => $item_id,
+                  'priority' => 0,
+               ]
+               );
+            } else {
+               $DB->updateOrDie($items_table, [
+                  'categories_id' => $category->getId(),
+                  'priority' => 0,
+               ],
+               [
+                  'reservationitems_id' => $item_id,
+               ]);
+            }
+         }
+      }
+   }
+
+  
+   
 }
