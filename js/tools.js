@@ -29,6 +29,9 @@ var dndHandler = {
 
    applyDropEvents: function (dropper) {
 
+      console.log(dropper.getElementsByTagName('tbody')[0]);
+      dropper.getElementsByTagName('tbody')[0].sortable();
+
       dropper.addEventListener('dragover', function (e) {
          e.preventDefault(); // On autorise le drop d'éléments
          this.className = 'dropper drop_hover'; // Et on applique le style adéquat à notre zone de drop quand un élément la survole
@@ -47,12 +50,11 @@ var dndHandler = {
 
          while (target.className.indexOf('dropper') == -1) { // Cette boucle permet de remonter jusqu'à la zone de drop parente
             target = target.parentNode;
-         }
-
-         
+         }  
 
          target.className = 'dropper'; // Application du style par défaut
-         clonedElement = target.appendChild(clonedElement); // Ajout de l'élément cloné à la zone de drop actuelle
+         tbody = target.getElementsByTagName('tbody')[0];
+         clonedElement = tbody.appendChild(clonedElement); // Ajout de l'élément cloné à la zone de drop actuelle
          dndHandler.applyDragEvents(clonedElement); // Nouvelle application des événements qui ont été perdus lors du cloneNode()
 
          draggedElement.parentNode.removeChild(draggedElement); // Suppression de l'élément d'origine
@@ -62,6 +64,10 @@ var dndHandler = {
          var input = clonedElement.getElementsByTagName('input')[0];
          input.value=categoryName;
 
+         // maj des index
+         for (var i = 0; i < tbody.childNodes.length; i++) {
+            tbody.childNodes[i].getElementsByClassName('index')[0].innerHTML = i + 1;    
+         }
       });
 
    }
@@ -75,18 +81,19 @@ function createCategoryEnter() {
 }
 
 function deleteCategory(category) {
-   var categorieOther = document.getElementById("itemsCategory_notcategorised");
+   var categorieOther = document.getElementById("itemsCategory_notcategorized");
    
    var element = document.getElementById("itemsCategory_"+category);
-   var tbody = element.firstChild;
+   var tbody = element.getElementsByTagName('tbody')[0];
    while (tbody.firstChild) {
       if (/^item_[0-9]+$/.test(tbody.firstChild.id)) {
          
          clonedElement = tbody.firstChild.cloneNode(true);
          var input = clonedElement.getElementsByTagName('input')[0];
-         input.value="notcategorised";
+         input.value="notcategorized";
          dndHandler.applyDragEvents(clonedElement);
-         clonedElement = categorieOther.appendChild(clonedElement);         
+
+         clonedElement = categorieOther.getElementsByTagName('tbody')[0].appendChild(clonedElement);         
       }         
       tbody.removeChild(tbody.firstChild);
    }
@@ -99,7 +106,7 @@ function createCategory() {
      
    titleField = document.getElementById('newCategoryTitle');
    titleValue = titleField.value;
-   if(!/^([a-zA-Z0-9]+)$/.test(titleValue) || titleValue === 'notcategorised') {
+   if(!/^([a-zA-Z0-9]+)$/.test(titleValue) || titleValue === 'notcategorized') {
       titleField.style.backgroundColor = "red";
       return;
    }   
@@ -131,6 +138,28 @@ function createCategory() {
    dndHandler.applyDropEvents(table);
    document.getElementById("categoriesContainer").appendChild(table);   
 }
+
+// var fixHelperModified = function(e, tr) {
+//    var $originals = tr.children();
+//    var $helper = tr.clone();
+//    $helper.children().each(function(index) {
+//        $(this).width($originals.eq(index).width());
+//    });
+//    return $helper;
+// },
+
+
+// $(".dropper tbody").sortable({
+//    helper: fixHelperModified,
+//    stop: updateIndex
+// }).disableSelection();
+
+// $(".dropper tbody").sortable();
+
+// $(function  () {
+//    $("tbody.dropper").sortable();
+//  });
+
 
 
 (function () {   

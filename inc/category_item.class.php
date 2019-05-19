@@ -4,7 +4,7 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
-include GLPI_ROOT . "/plugins/reservation/inc/includes.php";
+include_once GLPI_ROOT . "/plugins/reservation/inc/includes.php";
 
 class PluginReservationCategory_Item extends CommonDBChild
 {
@@ -65,7 +65,10 @@ class PluginReservationCategory_Item extends CommonDBChild
 
 
 
-
+   /**
+    * Get the name of the reservationitem
+    * @param $id integer the reservationitem id
+    */
    public static function getItemNameFromId($id)
    {
       global $DB;
@@ -96,5 +99,16 @@ class PluginReservationCategory_Item extends CommonDBChild
          }
       }
       return $name;
+   }
+
+   /**
+    * Get the comment of the reservationitem
+    * @param $id integer the reservationitem id
+    */
+   public static function getItemCommentFromId($id)
+   {
+      $item = new ReservationItem();
+      $item->getFromDB($id);
+      return $item->fields['comment'];
    }
 }

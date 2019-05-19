@@ -4,7 +4,7 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
-include GLPI_ROOT . "/plugins/reservation/inc/includes.php";
+include_once GLPI_ROOT . "/plugins/reservation/inc/includes.php";
 
 class PluginReservationConfig extends CommonDBTM
 {
@@ -195,36 +195,9 @@ class PluginReservationConfig extends CommonDBTM
       Html::closeForm();
    }
 
-   private function getReservationItemsNotCategorised()
-   {
-      global $DB, $CFG_GLPI;
-
-      $res = [];
-      $items = new PluginReservationCategory_Item();
-      $table = $items->getTable();
-
-      $query = "SELECT `glpi_reservationitems`.`id`
-               FROM `glpi_reservationitems`, `$table`
-               WHERE NOT EXISTS 
-               (
-                  SELECT 1 
-                  FROM `$table`
-                  WHERE `glpi_reservationitems`.`id` = `$table`.reservationitems_id
-               )";
-
-      if ($result = $DB->query($query)) {
-         if ($DB->numrows($result) > 0) {
-            while ($row = $DB->fetch_assoc($result)) {
-               $res[] = $row;
-            }
-         }
-      }
-      return $res;
-   }
-
    private function showConfigCategoriesForm()
    {
-      $currentCategories = PluginReservationCategory::getCategoriesNames();
+      $config_categories = PluginReservationCategory::getCategoriesConfig();
       $menu = "<table class='tab_cadre_fixe'  cellpadding='2'>";
       $menu .= "<input type=\"hidden\" name=\"configCategoriesForm\">";
       $menu .= "<th colspan=\"2\">" . __('Categories customisation', "reservation") . "</th>";
@@ -238,48 +211,34 @@ class PluginReservationConfig extends CommonDBTM
       $menu .= '<input class="noEnterSubmit" onkeydown="createCategoryEnter()" type="text" id="newCategoryTitle" size="15"  title="Please enter a type">';
       $menu .= '<button type="button" onclick="createCategory()">' . _sx('button', 'create', "reservation") . '</button>';
       $menu .= '<div style="clear: left;" id="categoriesContainer">';
-      foreach ($currentCategories as $categoryName) {
-         if ($categoryName === "notcategorised") {
+
+      
+      foreach ($config_categories as $category_name => $category_items) {  
+         $it = 0;     
+         if ($category_name === "notcategorized") {
             continue;
          }
-         $menu .= '<table class="dropper" id="itemsCategory_' . $categoryName . '">';
-         $menu .= '<th class="categoryTitle">' . $categoryName . '</th>';
-         $menu .= '<td onclick="deleteCategory(\'' . $categoryName . '\')" class="categoryClose" >X</td>';
-
-         $menu .= '<input type="hidden" name="category_' . $categoryName . '" value="' . $categoryName . '">';
-         $listItemsCategory = PluginReservationCategory_Item::getReservationItemsForCategory($categoryName);
-         foreach ($listItemsCategory as $item) {
-            $name = PluginReservationCategory_Item::getItemNameFromId($item['id']);
-
-            $menu .= '<tr class="draggable" id="item_' . $item['id'] . '"><td>' . $name;
-            $menu .= '<input type="hidden" name="item_' . $item['id'] . '" value="' . $categoryName . '">';
-            $menu .= '</td></tr>';
+         $menu .= $this->openCategoryHtml($category_name, $category_name);
+         foreach ($category_items as $id) {
+            $it++;
+            $menu .= $this->makeItemHtml($id, $category_name, $it);
          }
-         $menu .= '</table>';
+         $menu .= $this->closeCategoryHtml();
       }
       $menu .= '</div>';
       $menu .= '</td>';
+      $menu .= '<td>';
 
-      $menu .= '<td><table class="dropper" id="itemsCategory_notcategorised">';
-      $menu .= '<th class="categoryTitle">' . __('Reservable item') . '</th>';
-      $menu .= '<input type="hidden" name="category_notcategorised" value="notcategorised">';
-      $listItemsCategory = PluginReservationCategory_Item::getReservationItemsForCategory("notcategorised");
-      foreach ($listItemsCategory as $item) {
-         $name = PluginReservationCategory_Item::getItemNameFromId($item['id']);
-
-         $menu .= '<tr class="draggable" id="item_' . $item['id'] . '"><td>' . $name;
-         $menu .= '<input type="hidden" name="item_' . $item['id'] . '" value="notcategorised">';
-         $menu .= '</td></tr>';
+      $menu .= $this->openCategoryHtml('notcategorized', __('Reservable item'), false);
+      if (array_key_exists('notcategorized', $config_categories)) {
+         $it = 0;
+         foreach ($config_categories['notcategorized'] as $id) {
+            $it++;
+            $menu .= $this->makeItemHtml($id, 'notcategorized',$it);
+         }
       }
-      $listReservationItemsNotCategorised = $this->getReservationItemsNotCategorised();
-      foreach ($listReservationItemsNotCategorised as $item) {
-         $name = PluginReservationCategory_Item::getItemNameFromId($item['id']);
+      $menu .= $this->closeCategoryHtml();
 
-         $menu .= '<tr class="draggable" id="item_' . $item['id'] . '"><td>' . $name;
-         $menu .= '<input type="hidden" name="item_' . $item['id'] . '" value="notcategorised">';
-         $menu .= '</td></tr>';
-      }
-      $menu .= '</table>';
       $menu .= '<div style="clear: left;"></div>';
       $menu .= '</td>';
       $menu .= "</tr>";
@@ -288,5 +247,34 @@ class PluginReservationConfig extends CommonDBTM
       return $menu;
    }
 
-   
+   private function makeItemHtml($item_id, $category_name, $index)
+   {
+      $name = PluginReservationCategory_Item::getItemNameFromId($item_id);
+      $comment = PluginReservationCategory_Item::getItemCommentFromId($item_id);
+      $html = '<tr class="draggable" id="item_' . $item_id . '">';
+      $html .= '<input type="hidden" name="item_' . $item_id . '" value="' . $category_name . '">';      
+      $html .= '<td>' . $name. '</td>';
+      $html .= '<td>' . nl2br($comment) . '</td>';
+      $html .= '<td class="index">' . $index . '</td>';
+      $html .= '</tr>';
+      return $html;
+   }
+
+   private function openCategoryHtml($category_name, $category_title, $deletable = true)
+   {
+      $html = '<table class="dropper" id="itemsCategory_' . $category_name . '">';
+      $html .= '<thead>';
+      $html .= '<th colspan="3" class="categoryTitle">' . $category_title . '</th>';
+      $deletable && $html .= '<td onclick="deleteCategory(\'' . $category_name . '\')" class="categoryClose" >X</td>';
+      $html .= '</thead>';      
+      $html .= '<input type="hidden" name="category_' . $category_name . '" value="' . $category_name . '">';
+      $html .= '<tbody>';
+      return $html;
+   }
+
+   private function closeCategoryHtml() {
+      $html = '</tbody>';
+      $html .= "</table>";
+      return $html;
+   }
 }

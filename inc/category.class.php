@@ -4,7 +4,7 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
-include GLPI_ROOT . "/plugins/reservation/inc/includes.php";
+include_once GLPI_ROOT . "/plugins/reservation/inc/includes.php";
 
 class PluginReservationCategory extends CommonDBTM
 {
@@ -64,9 +64,6 @@ class PluginReservationCategory extends CommonDBTM
             'name' => $name,
          ]
       );
-      $_SESSION['glpi_use_mode'] && Toolbox::logInFile('reservations_plugin', "DEBUG : " . json_encode($categories_table) . "\n", $force = false);
-
-      // Toolbox::logInFile('reservations_plugin', "addCategory : ".json_encode($name)."\n", $force = false);
    }
 
    /**
@@ -83,27 +80,96 @@ class PluginReservationCategory extends CommonDBTM
             'name' => $name,
          ]
       );
-      // Toolbox::logInFile('reservations_plugin', "deleteCategory : ".json_encode($name)."\n", $force = false);
    }
 
    /**
-    * update categories in database
+    * Get current categories and items config
+    * @return array array of items by categories like ["cat1" => [1,2,3,4], "cat2" => [5,6] ]
     */
-   public static function updateCategories($newList)
-   {
-      $currentList = PluginReservationCategory::getCategoriesNames();
+   public static function getCategoriesConfig()
+   { 
+      $result = [];
+      $list_reservationitems = PluginReservationCategory::getReservationItems();
+      foreach ($list_reservationitems as $item) {
+         $category_name =$item['category_name']; 
+         if ($category_name === null) {
+            $category_name = 'notcategorized';
+         }
 
-      foreach (array_diff($newList, $currentList) as $toAdd) {
-         // Toolbox::logInFile('reservations_plugin', "category to Add : ".json_encode($toAdd)."\n", $force = false);
-         PluginReservationCategory::addCategory($toAdd);
+         if (array_key_exists($category_name, $result)) {
+            array_push($result[$category_name], $item["items_id"]);
+         } else {
+            $result[$category_name] = [];
+            array_push($result[$category_name], $item["items_id"]);
+         }
       }
-      foreach (array_diff($currentList, $newList) as $toDelete) {
-         // Toolbox::logInFile('reservations_plugin', "category to Delete : ".json_encode($toDelete)."\n", $force = false);
-         PluginReservationCategory::deleteCategory($toDelete);
-      }
+      return $result;
    }
 
-   public function applyCategoriesConfig($POST)
+   /**
+    * get reservation items merged with their category configs (id, name, priority)
+    * @return array list of reservation items
+    */
+   public static function getReservationItems()
+   {
+      global $DB, $CFG_GLPI;
+      $result = [];
+
+      foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
+         if (!($item = getItemForItemtype($itemtype))) {
+            continue;
+         }
+         $itemtable = getTableForItemType($itemtype);
+         $categories_table = getTableForItemType(__CLASS__);
+         $category_items_table = getTableForItemType("PluginReservationCategory_Item");
+
+
+         $query = "SELECT `glpi_reservationitems`.`id`,
+                           `glpi_reservationitems`.`comment`,
+                           `$itemtable`.`name` AS name,
+                           `$itemtable`.`entities_id` AS entities_id,
+                           `$categories_table`.`name` AS category_name,
+                           `$categories_table`.`id` AS category_id,
+                           `$category_items_table`.`priority` AS items_priority,
+                           `glpi_reservationitems`.`items_id` AS items_id
+                             
+                  FROM `glpi_reservationitems`
+                  INNER JOIN `$itemtable`
+                     ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
+                           AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
+                  LEFT OUTER JOIN `$category_items_table`
+                     ON `glpi_reservationitems`.`id` = `$category_items_table`.`reservationitems_id`
+                  LEFT OUTER JOIN `$categories_table`
+                     ON `$category_items_table`.`categories_id` = `$categories_table`.`id`
+                  WHERE `glpi_reservationitems`.`is_active` = '1'
+                     AND `glpi_reservationitems`.`is_deleted` = '0'
+                     AND `$itemtable`.`is_deleted` = '0'
+                     " .getEntitiesRestrictRequest(
+                        " AND",
+                        $itemtable,
+                        '',
+                        $_SESSION['glpiactiveentities'],
+                        $item->maybeRecursive()
+                     ) . "
+                  ORDER BY `$itemtable`.`entities_id`,
+                     `$category_items_table`.`priority`,
+                     `$itemtable`.`name` ASC";
+
+         if ($res = $DB->query($query)) {
+            while ($row = $DB->fetch_assoc($res)) {
+               $result[] = array_merge($row, ['itemtype' => $itemtype]);
+            }
+         }
+      }
+      return $result;
+   }
+
+
+
+   /**
+    * Apply config defined in $_POST 
+    */
+   public static function applyCategoriesConfig($POST)
    {
       $categories = [];
       $items = [];
@@ -121,15 +187,35 @@ class PluginReservationCategory extends CommonDBTM
          }
       }
 
-      $_SESSION['glpi_use_mode'] && Toolbox::logInFile('reservations_plugin', "TEST ITEM RESULT : " . json_encode($items) . "\n", $force = false);
+      // logIfDebug("new category config", $categories);
+      logIfDebug("new category items", $items);
       PluginReservationCategory::updateCategories($categories);
-      PluginReservationCategory::updateCategoriesItems($items);
+      PluginReservationCategory::updateCategoryItems($items);
    }
 
    /**
     * update categories in database
+    * @param $list array of categories like ["cat1", "cat2" ]
     */
-   public static function updateCategoriesItems($list_items_by_categories)
+   public static function updateCategories($next_config = [])
+   {
+      $previous_config = PluginReservationCategory::getCategoriesNames();
+
+      foreach (array_diff($next_config, $previous_config) as $to_add) {
+         // Toolbox::logInFile('reservations_plugin', "category to Add : ".json_encode($toAdd)."\n", $force = false);
+         PluginReservationCategory::addCategory($to_add);
+      }
+      foreach (array_diff($previous_config, $next_config) as $to_delete) {
+         // Toolbox::logInFile('reservations_plugin', "category to Delete : ".json_encode($toDelete)."\n", $force = false);
+         PluginReservationCategory::deleteCategory($to_delete);
+      }
+   }
+
+   /**
+    * update category items in database
+    * @param $list_items_by_categories  array of items by categories like ["cat1" => [1,2,3,4], "cat2" => [5,6] ]
+    */
+   public static function updateCategoryItems($list_items_by_categories = [])
    {
       global $DB;
 
@@ -137,28 +223,28 @@ class PluginReservationCategory extends CommonDBTM
          $category = new PluginReservationCategory();
          $category->getFromDBByCrit(['name' => $category_name]);
 
-         foreach ($category_items as $item_id) {
+         for($i = 0; $i < count($category_items); ++$i) {
             $items = new PluginReservationCategory_Item();
             $items_table = $items->getTable();
 
-            if (!$items->getFromDBByCrit(['reservationitems_id' => $item_id])) {
-               $DB->insertOrDie(
-                  $items_table,
-                  [
-                     'categories_id' => $category->getId(),
-                     'reservationitems_id' => $item_id,
-                     'priority' => 0,
-                  ]
-               );
-            } else {
+            if ($items->getFromDBByCrit(['reservationitems_id' => $category_items[$i]] )) {
                $DB->updateOrDie(
                   $items_table,
                   [
                      'categories_id' => $category->getId(),
-                     'priority' => 0,
+                     'priority' => $i+1,
                   ],
                   [
-                     'reservationitems_id' => $item_id,
+                     'reservationitems_id' => $category_items[$i],
+                  ]
+               );
+            } else {
+               $DB->insertOrDie(
+                  $items_table,
+                  [
+                     'categories_id' => $category->getId(),
+                     'reservationitems_id' => $category_items[$i],
+                     'priority' => $i+1,
                   ]
                );
             }
