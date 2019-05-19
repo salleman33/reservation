@@ -10,179 +10,128 @@ function afficher_cacher(id) {
 }
 
 
-var dndHandler = {
-
-   draggedElement: null, // Propriété pointant vers l'élément en cours de déplacement
-
-   applyDragEvents: function (element) {
-
-      element.draggable = true;
-
-      var dndHandler = this; // Cette variable est nécessaire pour que l'événement « dragstart » ci-dessous accède facilement au namespace « dndHandler »
-
-      element.addEventListener('dragstart', function (e) {
-         dndHandler.draggedElement = e.target; // On sauvegarde l'élément en cours de déplacement
-         e.dataTransfer.setData('text/plain', ''); // Nécessaire pour Firefox
-      });
-
-   },
-
-   applyDropEvents: function (dropper) {
-
-      console.log(dropper.getElementsByTagName('tbody')[0]);
-      dropper.getElementsByTagName('tbody')[0].sortable();
-
-      dropper.addEventListener('dragover', function (e) {
-         e.preventDefault(); // On autorise le drop d'éléments
-         this.className = 'dropper drop_hover'; // Et on applique le style adéquat à notre zone de drop quand un élément la survole
-      });
-
-      dropper.addEventListener('dragleave', function () {
-         this.className = 'dropper'; // On revient au style de base lorsque l'élément quitte la zone de drop
-      });
-
-      var dndHandler = this; // Cette variable est nécessaire pour que l'événement « drop » ci-dessous accède facilement au namespace « dndHandler »
-      dropper.addEventListener('drop', function (e) {
-
-         var target = e.target,
-            draggedElement = dndHandler.draggedElement, // Récupération de l'élément concerné
-            clonedElement = draggedElement.cloneNode(true); // On créé immédiatement le clone de cet élément
-
-         while (target.className.indexOf('dropper') == -1) { // Cette boucle permet de remonter jusqu'à la zone de drop parente
-            target = target.parentNode;
-         }  
-
-         target.className = 'dropper'; // Application du style par défaut
-         tbody = target.getElementsByTagName('tbody')[0];
-         clonedElement = tbody.appendChild(clonedElement); // Ajout de l'élément cloné à la zone de drop actuelle
-         dndHandler.applyDragEvents(clonedElement); // Nouvelle application des événements qui ont été perdus lors du cloneNode()
-
-         draggedElement.parentNode.removeChild(draggedElement); // Suppression de l'élément d'origine
-
-         // positionnement du nom de la categorie dans la valeur de l'input hidden
-         categoryName = /^[a-zA-Z]+\_([a-zA-Z0-9]+)$/.exec(target.id)[1];
-         var input = clonedElement.getElementsByTagName('input')[0];
-         input.value=categoryName;
-
-         // maj des index
-         for (var i = 0; i < tbody.childNodes.length; i++) {
-            tbody.childNodes[i].getElementsByClassName('index')[0].innerHTML = i + 1;    
-         }
-      });
-
-   }
-
-};
-
 function createCategoryEnter() {
-   if(event.key === 'Enter') {
+   if (event.key === 'Enter') {
       createCategory();
-   } 
+   }
 }
 
 function deleteCategory(category) {
    var categorieOther = document.getElementById("itemsCategory_notcategorized");
-   
-   var element = document.getElementById("itemsCategory_"+category);
-   var tbody = element.getElementsByTagName('tbody')[0];
-   while (tbody.firstChild) {
-      if (/^item_[0-9]+$/.test(tbody.firstChild.id)) {
-         
-         clonedElement = tbody.firstChild.cloneNode(true);
-         var input = clonedElement.getElementsByTagName('input')[0];
-         input.value="notcategorized";
-         dndHandler.applyDragEvents(clonedElement);
+   var tbody_dst = categorieOther.getElementsByTagName('tbody')[0];
 
-         clonedElement = categorieOther.getElementsByTagName('tbody')[0].appendChild(clonedElement);         
-      }         
-      tbody.removeChild(tbody.firstChild);
+   var element = document.getElementById("itemsCategory_" + category);
+   var tbody_source = element.getElementsByTagName('tbody')[0];
+   while (tbody_source.firstChild) {
+      if (/^item_[0-9]+$/.test(tbody_source.firstChild.id)) {
+
+         clonedElement = tbody_source.firstChild.cloneNode(true);
+         var input = clonedElement.getElementsByTagName('input')[0];
+         input.value = "notcategorized";
+
+         clonedElement = tbody_dst.appendChild(clonedElement);
+      }
+      tbody_source.removeChild(tbody_source.firstChild);
    }
-   element.removeChild(tbody);
+   element.removeChild(tbody_source);
    element.parentNode.removeChild(element);
+
+   // maj des index destination
+   for (var i = 0; i < tbody_dst.childNodes.length; i++) {
+      tbody_dst.childNodes[i].getElementsByClassName('index')[0].innerHTML = i + 1;
+   }
 }
 
 function createCategory() {
    // TODO : verifier si la categorie n'existe pas deja ! 
-     
+
+
    titleField = document.getElementById('newCategoryTitle');
    titleValue = titleField.value;
-   if(!/^([a-zA-Z0-9]+)$/.test(titleValue) || titleValue === 'notcategorized') {
+   if (!/^([a-zA-Z0-9]+)$/.test(titleValue) || titleValue === 'notcategorized') {
       titleField.style.backgroundColor = "red";
       return;
-   }   
+   }
    titleField.style.backgroundColor = "initial";
    titleField.value = "";
-   
-   var table = document.createElement("table");
 
+   
+   
    var th = document.createElement("th");
    th.appendChild(document.createTextNode(titleValue));
    th.setAttribute('class', 'categoryTitle');
-   table.appendChild(th);
+   th.setAttribute('colspan', 3);
 
    var del = document.createElement("td");
    del.appendChild(document.createTextNode("X"));
    del.setAttribute('class', 'categoryClose');
-   del.setAttribute('onclick', 'deleteCategory(\''+titleValue+'\')');
-   table.appendChild(del);
+   del.setAttribute('onclick', 'deleteCategory(\'' + titleValue + '\')');
+
+   var thead = document.createElement("thead");
+   thead.appendChild(th);
+   thead.appendChild(del);   
 
    var input = document.createElement("input");
    input.setAttribute('type', 'hidden');
-   input.setAttribute('name', 'category_'+titleValue);
+   input.setAttribute('name', 'category_' + titleValue);
    input.setAttribute('value', titleValue);
-   table.appendChild(input);
-   table.setAttribute('class', 'dropper');
-   table.setAttribute("id", "itemsCategory_"+titleValue);
 
-  
-   dndHandler.applyDropEvents(table);
-   document.getElementById("categoriesContainer").appendChild(table);   
+   var table = document.createElement("table");
+   table.appendChild(thead);
+   table.appendChild(input);
+   table.appendChild(document.createElement("tbody"));
+   table.setAttribute('class', 'dropper');
+   table.setAttribute("id", "itemsCategory_" + titleValue);
+
+    	   
+   document.getElementById("categoriesContainer").appendChild(table);
+   $(table).sortable(
+      {
+         connectWith: '.dropper',
+         items: 'tbody tr',
+         stop: updateHiddenConfig,
+         receive: function (e, ui) { $(this).find("tbody").append(ui.item); }
+      }).disableSelection();
 }
 
-// var fixHelperModified = function(e, tr) {
-//    var $originals = tr.children();
-//    var $helper = tr.clone();
-//    $helper.children().each(function(index) {
-//        $(this).width($originals.eq(index).width());
-//    });
-//    return $helper;
-// },
 
+var updateHiddenConfig = function (e, ui) {
+   var target = ui.item.offsetParent()[0],
+      tr = ui.item[0];
 
-// $(".dropper tbody").sortable({
-//    helper: fixHelperModified,
-//    stop: updateIndex
-// }).disableSelection();
+   categoryName = /^[a-zA-Z]+\_([a-zA-Z0-9]+)$/.exec(target.id)[1];
+   var input = tr.getElementsByTagName('input')[0];
+   input.value = categoryName;
 
-// $(".dropper tbody").sortable();
-
-// $(function  () {
-//    $("tbody.dropper").sortable();
-//  });
-
-
-
-(function () {   
-
-   $('.noEnterSubmit').keypress(function(e){
-      // if ( e.which == 13 ) return false;
-      // //or...
-      if ( e.which == 13 ) e.preventDefault();
-   });
-
-   var elements = document.querySelectorAll('.draggable'),
-      elementsLen = elements.length;
-
-   for (var i = 0; i < elementsLen; i++) {
-      dndHandler.applyDragEvents(elements[i]); // Application des paramètres nécessaires aux éléments déplaçables
+   // maj des index sources
+   tbody_source = e.target.getElementsByTagName('tbody')[0];
+   for (var i = 0; i < tbody_source.childNodes.length; i++) {
+      tbody_source.childNodes[i].getElementsByClassName('index')[0].innerHTML = i + 1;
    }
-
-   var droppers = document.querySelectorAll('.dropper'),
-      droppersLen = droppers.length;
-
-   for (var i = 0; i < droppersLen; i++) {
-      dndHandler.applyDropEvents(droppers[i]); // Application des événements nécessaires aux zones de drop
+   // maj des index destination
+   tbody_dst = target.getElementsByTagName('tbody')[0];
+   for (var i = 0; i < tbody_dst.childNodes.length; i++) {
+      tbody_dst.childNodes[i].getElementsByClassName('index')[0].innerHTML = i + 1;
    }
+};
 
-})();
+
+
+   (function () {
+
+      $('.noEnterSubmit').keypress(function (e) {
+         // if ( e.which == 13 ) return false;
+         // //or...
+         if (e.which == 13) e.preventDefault();
+      });
+
+      $('.dropper').sortable(
+         {
+            connectWith: '.dropper',
+            items: 'tbody tr',
+            stop: updateHiddenConfig,
+            receive: function (e, ui) { $(this).find("tbody").append(ui.item); }
+         }).disableSelection();
+
+   })();
 

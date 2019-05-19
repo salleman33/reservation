@@ -49,13 +49,8 @@ color: black;
     position:relative;
     min-height: 200px;
     min-width: 100px;
-    /* float: left; */
-    /* padding-top: 15px;
-    padding-bottom: 15px; */
     margin-right: 20px;
-    /* border-radius: 10px; */
-    transition: all 200ms linear;
-
+    /* transition: all 200ms linear; */
     margin: 10px auto;
     margin-right: auto;
     border: 0;
@@ -69,19 +64,13 @@ color: black;
 
 .drop_hover {
     box-shadow: 3px 4px 5px 4px rgba(0, 0, 0, 0.8);
-    /* box-shadow: 0 0 30px rgba(0, 0, 0, 0.8) inset; */
 }
 
 .draggable {
-    /* display: inline-block; */
-    /* margin: 5px 10px 5px 10px;
-    height: 2em;
-    border: 1px solid #3D110F; */
-    /* text-align: center; */
     vertical-align: middle;
     line-height: 2em; 
     cursor: move;
-    transition: all 200ms linear;
+    /* transition: all 200ms linear; */
     user-select: none;          
 }
 
