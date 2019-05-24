@@ -197,7 +197,6 @@ class PluginReservationConfig extends CommonDBTM
 
    private function showConfigCategoriesForm()
    {
-      $config_categories = PluginReservationCategory::getCategoriesConfig();
       $menu = "<table class='tab_cadre_fixe'  cellpadding='2'>";
       $menu .= "<input type=\"hidden\" name=\"configCategoriesForm\">";
       $menu .= "<th colspan=\"2\">" . __('Categories customisation', "reservation") . "</th>";
@@ -209,19 +208,26 @@ class PluginReservationConfig extends CommonDBTM
 
       $menu .= '<td>';
       $menu .= '<input class="noEnterSubmit" onkeydown="createCategoryEnter()" type="text" id="newCategoryTitle" size="15"  title="Please enter a type">';
-      $menu .= '<button type="button" onclick="createCategory()">' . _sx('button', 'create', "reservation") . '</button>';
+      $menu .= '<button type="button" onclick="createCategory()">' . _sx('button', 'Add') . '</button>';
       $menu .= '<div style="clear: left;" id="categoriesContainer">';
 
       
-      foreach ($config_categories as $category_name => $category_items) {  
+      $categories_names = PluginReservationCategory::getCategoriesNames();
+      $all_reservation_items = PluginReservationCategory::getReservationItems();
+      foreach ($categories_names as $category_name ) {
+         $filtered_array = array_filter($all_reservation_items,
+            function ($element) use ($category_name) {
+               return ($element['category_name'] == $category_name);
+            } );
+
          $it = 0;     
          if ($category_name === "notcategorized") {
             continue;
          }
          $menu .= $this->openCategoryHtml($category_name, $category_name);
-         foreach ($category_items as $id) {
+         foreach ($filtered_array as $reservation_item) {
             $it++;
-            $menu .= $this->makeItemHtml($id, $category_name, $it);
+            $menu .= $this->makeItemHtml($reservation_item, $category_name, $it);
          }
          $menu .= $this->closeCategoryHtml();
       }
@@ -230,11 +236,15 @@ class PluginReservationConfig extends CommonDBTM
       $menu .= '<td>';
 
       $menu .= $this->openCategoryHtml('notcategorized', __('Reservable item'), false);
-      if (array_key_exists('notcategorized', $config_categories)) {
+      if (in_array('notcategorized', $categories_names)) {
+         $filtered_array = array_filter($all_reservation_items,
+            function ($element) {
+               return ($element['category_name'] === 'notcategorized' || is_null($element['category_name']));
+            } );
          $it = 0;
-         foreach ($config_categories['notcategorized'] as $id) {
+         foreach ($filtered_array as $reservation_item) {
             $it++;
-            $menu .= $this->makeItemHtml($id, 'notcategorized',$it);
+            $menu .= $this->makeItemHtml($reservation_item, 'notcategorized',$it);
          }
       }
       $menu .= $this->closeCategoryHtml();
@@ -247,19 +257,31 @@ class PluginReservationConfig extends CommonDBTM
       return $menu;
    }
 
-   private function makeItemHtml($item_id, $category_name, $index)
+   /**
+    * make html code for an item 
+    * @param hash $reservation_item item 
+    * @param string $category_name name of the category item
+    * @param integer $index index of the item 
+    * @return string code html
+    */
+   private function makeItemHtml($reservation_item, $category_name, $index)
    {
-      $name = PluginReservationCategory_Item::getItemNameFromId($item_id);
-      $comment = PluginReservationCategory_Item::getItemCommentFromId($item_id);
-      $html = '<tr class="draggable" id="item_' . $item_id . '">';
-      $html .= '<input type="hidden" name="item_' . $item_id . '" value="' . $category_name . '">';      
-      $html .= '<td>' . $name. '</td>';
-      $html .= '<td>' . nl2br($comment) . '</td>';
+      $html = '<tr class="draggable" id="item_' . $reservation_item['id'] . '">';
+      $html .= '<input type="hidden" name="item_' . $reservation_item['id'] . '" value="' . $category_name . '">';      
+      $html .= '<td>' . $reservation_item['name']. '</td>';
+      $html .= '<td>' . nl2br($reservation_item['comment']) . '</td>';
       $html .= '<td class="index">' . $index . '</td>';
       $html .= '</tr>';
       return $html;
    }
 
+   /**
+    * make html code to open category 
+    * @param string $category_name name of this category 
+    * @param string $category_name title displayed 
+    * @param boolean $deletable category is deletable or not
+    * @return string code html
+    */
    private function openCategoryHtml($category_name, $category_title, $deletable = true)
    {
       $html = '<table class="dropper" id="itemsCategory_' . $category_name . '">';
@@ -272,6 +294,10 @@ class PluginReservationConfig extends CommonDBTM
       return $html;
    }
 
+   /**
+    * make html code to close category
+    * @return string code html
+    */
    private function closeCategoryHtml() {
       $html = '</tbody>';
       $html .= "</table>";

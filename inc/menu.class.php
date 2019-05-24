@@ -4,15 +4,6 @@ if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access directly to this file");
 }
 
-// function getLinkforItem($item) {
-//    $itemLink = $item->getFormUrl();
-//    $argConcatenator = "?";
-//    if (strpos($itemLink, '?') !== false) {
-//       $argConcatenator = "&amp;";
-//    }
-//    echo "<a target='_blank' href='" . $itemLink . $argConcatenator . "id=" . $item->fields["id"] . "'>" . $item->fields["name"] . "</a>";
-// }
-
 function getToolTipforItem($item) {
    $config = new PluginReservationConfig();
 
@@ -440,22 +431,97 @@ class PluginReservationMenu extends CommonGLPI
     *
     */
    public static function displayTabContentForAvailableHardware() {
-      global $DB, $CFG_GLPI;
       $showentity = Session::isMultiEntitiesMode();
-      $config = new PluginReservationConfig();
       $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
 
       $begin = $form_dates["begin"];
       $end = $form_dates["end"];
 
-      $available_reservationsitem = PluginReservationReservation::getAvailablesItems($begin, $end);
-
       echo "<div class='center'>\n";
       echo "<form name='form' method='GET' action='".Reservation::getFormURL()."'>\n";
       echo "<table class='tab_cadre' style=\"border-spacing:20px;\">\n";
       echo "<tr>";
+      
 
-      $reservations = $CFG_GLPI["reservation_types"];
+      $plugin_config = new PluginReservationConfig();
+      $custom_categories = $plugin_config->getConfigurationValue("custom_categories", 0);
+      if ($custom_categories) {
+         $available_reservationsitem = PluginReservationCategory::getReservationItems($begin, $end, true);
+         PluginReservationMenu::customCategoriesView($available_reservationsitem);
+      } else {
+         $available_reservationsitem = PluginReservationReservation::getAvailablesItems($begin, $end);
+         PluginReservationMenu::defaultGlpiView($available_reservationsitem);
+      }
+
+      echo "</tr>";
+      echo "<tr class='tab_bg_1 center'><td colspan='" . ($showentity ? "5" : "4") . "'>";
+      echo "<input type='submit' value='" . __('Create new reservation', "reservation") . "' class='submit'></td></tr>\n";
+
+      echo "</table>\n";
+
+      echo "<input type='hidden' name='id' value=''>";
+      echo "<input type='hidden' name='begin' value='" . $begin . "'>";
+      echo "<input type='hidden' name='end' value='" . $end . "'>";
+      Html::closeForm();
+      echo "</div>";
+   }
+
+   private static function customCategoriesView($available_reservationsitem = []) {
+      global $CFG_GLPI;
+      $showentity = Session::isMultiEntitiesMode();
+
+      $categories_names = PluginReservationCategory::getCategoriesNames();
+      
+      foreach ($categories_names as $category_name ) {
+         $filtered_array = array_filter($available_reservationsitem,
+            function ($element) use ($category_name) {
+               if ($category_name === 'notcategorized') {
+                  return ($element['category_name'] === 'notcategorized' || is_null($element['category_name']));
+               } else {               
+                  return ($element['category_name'] == $category_name);
+               }
+            } );
+
+         echo "<td valign=\"top\">";
+         
+         
+         echo "\n\t<table class='tab_cadre'>";
+         echo "<tr><th colspan='" . ($showentity ? "6" : "5") . "'>" . $category_name . "</th></tr>\n";
+         foreach ($filtered_array as $reservation_item) {
+            $item = getItemForItemtype($reservation_item['itemtype']);
+            $item->getFromDB($reservation_item['items_id']);
+            echo "<td>";
+            echo HTML::getCheckbox([
+               'name' => "item[" . $reservation_item["id"] . "]",
+               "value" => $reservation_item["id"],
+               "zero_on_empty" => false
+            ]);
+            echo "</td>";
+
+            echo "<td>";
+            echo Html::link($item->fields['name'], $item->getFormURLWithID($item->fields['id']));
+            echo "</td>";
+            echo "<td>" . nl2br($reservation_item['comment']) . "</td>";
+
+            if ($showentity) {
+               echo "<td>".Dropdown::getDropdownName("glpi_entities", $reservation_item["entities_id"])."</td>";
+            }
+
+            echo "<td>";
+            getToolTipforItem($item);
+            echo "</td>";
+
+            echo "<td><a title=\"Show Calendar\" href='../../../front/reservation.php?reservationitems_id=" . $reservation_item['id'] . "'><i class=\"far fa-calendar-alt\"></i></a></td>";
+            echo "</tr>\n";
+         }
+         echo "</table>\n";
+         echo "</td>";
+      }
+   }
+
+   private static function defaultGlpiView($available_reservationsitem = []) {
+      global $CFG_GLPI;
+      $showentity = Session::isMultiEntitiesMode();
 
       foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
 
@@ -466,7 +532,7 @@ class PluginReservationMenu extends CommonGLPI
 
          if (!$filtered_array) {
             continue;
-	 }
+	      }
          echo "<td valign=\"top\">";
 
          $item = getItemForItemtype($itemtype);
@@ -501,18 +567,6 @@ class PluginReservationMenu extends CommonGLPI
          echo "</table>\n";
          echo "</td>";
       }
-
-      echo "</tr>";
-      echo "<tr class='tab_bg_1 center'><td colspan='" . ($showentity ? "5" : "4") . "'>";
-      echo "<input type='submit' value='" . __('Create new reservation', "reservation") . "' class='submit'></td></tr>\n";
-
-      echo "</table>\n";
-
-      echo "<input type='hidden' name='id' value=''>";
-      echo "<input type='hidden' name='begin' value='" . $begin . "'>";
-      echo "<input type='hidden' name='end' value='" . $end . "'>";
-      Html::closeForm();
-      echo "</div>";
    }
 
    /**

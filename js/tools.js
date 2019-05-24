@@ -54,8 +54,6 @@ function createCategory() {
    }
    titleField.style.backgroundColor = "initial";
    titleField.value = "";
-
-   
    
    var th = document.createElement("th");
    th.appendChild(document.createTextNode(titleValue));
