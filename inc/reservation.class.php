@@ -44,6 +44,8 @@ class PluginReservationReservation extends CommonDBTM
 
 
    /**
+    * get all reservations info merged with plugin_reservation info
+    * @param string[] $filters [optional] filters to apply to DB request
     * @return array GLPI reservations mixed with plugin reservations
     */
    public static function getAllReservations($filters = []) {
@@ -64,8 +66,6 @@ class PluginReservationReservation extends CommonDBTM
                   , $plugin_table
                $where";
 
-      // Toolbox::logInFile('reservations_plugin', "QUERY  : ".$query."\n", $force = false);
-
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
             while ($row = $DB->fetch_assoc($result)) {
@@ -78,7 +78,10 @@ class PluginReservationReservation extends CommonDBTM
 
 
    /**
-    *
+    * get all available  reservation items for this date
+    * @param string $begin the begin date with format "Y-m-d H:i:s"
+    * @param string $end the end date with "Y-m-d H:i:s"
+    * @return array array of reservations items 
     */
    public static function getAvailablesItems($begin, $end) {
       global $DB, $CFG_GLPI;
@@ -130,7 +133,9 @@ class PluginReservationReservation extends CommonDBTM
 
 
 
-
+   /**
+    * Send an email for this reservation
+    */
    public static function sendMail($reservation_id) {
       global $DB, $CFG_GLPI;
       $reservation = new Reservation();
@@ -147,6 +152,10 @@ class PluginReservationReservation extends CommonDBTM
       Toolbox::logInFile('reservations_plugin', "sendMail : ".$reservation_id."\n", $force = false);
    }
 
+   /**
+    * checkout a reservation
+    * @param integer $reservation_id the id of reservation
+    */
    public static function checkoutReservation($reservation_id) {
       global $DB, $CFG_GLPI;
 
@@ -165,7 +174,32 @@ class PluginReservationReservation extends CommonDBTM
       Toolbox::logInFile('reservations_plugin', "checkoutReservation : ".$reservation_id."\n", $force = false);
    }
 
+   /**
+    * checkin a reservation
+    * @since 2.2.0
+    * @param integer $reservation_id the id of reservation
+    */
+   public static function checkinReservation($reservation_id) {
+      global $DB;
 
+      $tablename = getTableForItemType(__CLASS__);
+      $query = "UPDATE `".$tablename."` 
+               SET `checkindate` = '" . date("Y-m-d H:i:s", time()) . "' 
+               WHERE `reservations_id` = '" . $reservation_id . "';";
+      $DB->query($query) or die("error on checkinReservation 1 : " . $DB->error());
+
+      Event::log($reservation_id, "reservation", 4, "inventory",
+                  sprintf(__('%1$s marks the reservation %2$s as gone'),
+                           $_SESSION["glpiname"], $reservation_id));
+      Toolbox::logInFile('reservations_plugin', "checkinReservation : ".$reservation_id."\n", $force = false);
+   }
+
+
+   /**
+    * Add an item to an existing reservation
+    * @param integer $item_id id of the item to add
+    * @param integer $reservation_id id of the concerned reservation 
+    */
    public static function addItemToResa($item_id, $reservation_id) {
       $resa = new Reservation();
       $resa->getFromDb($reservation_id);
@@ -188,6 +222,11 @@ class PluginReservationReservation extends CommonDBTM
       Toolbox::logInFile('reservations_plugin', "addItemToResa : ".$item_id. " => ".$reservation_id."\n", $force = false);
    }
 
+   /**
+    * Replace an item to an existing reservation
+    * @param integer $item_id id of the item to replace
+    * @param integer $reservation_id id of the concerned reservation 
+    */
    public static function switchItemToResa($item_id, $reservation_id) {
       global $DB;
 

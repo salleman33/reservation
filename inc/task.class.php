@@ -11,6 +11,7 @@ class PluginReservationTask extends CommonDBTM
       $target->events['plugin_reservation_conflict_new_user'] = __("Reservation Conflict When Extended, new user (plugin)", "reservation");
       $target->events['plugin_reservation_conflict_previous_user'] = __("Reservation Conflict When Extended, previous user (plugin)", "reservation");
       $target->events['plugin_reservation_expiration'] = __("User Reservation Expired (plugin)", "reservation");
+      $target->events['plugin_reservation_not_checkin'] = __("User Reservation Not Checkin (plugin)", "reservation");
    }
 
    public static function addData(NotificationTargetReservation $target) {
@@ -39,7 +40,7 @@ class PluginReservationTask extends CommonDBTM
          case "checkReservations":
             return ['description' => __('Watch Reservations', 'reservation') . " (" . __('plugin') . ")"];
          case "sendMailLateReservations":
-            return ['description' => __('Send an e-mail to users with late reservations', 'reservation') . " (" . __('plugin') . ")"];
+            return ['description' => __('Send an e-mail to users with expired reservations', 'reservation') . " (" . __('plugin') . ")"];
       }
    }
 
@@ -54,13 +55,44 @@ class PluginReservationTask extends CommonDBTM
     *     0 : nothing to do
     */
    public static function cronCheckReservations($task) {
-      $res = self::checkReservations($task);
-      $task->setVolume($res);
-      return $res;
+      $count = 0;
+      $count += self::checkExpiration($task);
+      $count += self::checkGone($task);  
+      $task->setVolume($count);
+      return $count;
+   }
+
+   public static function checkGone($task) {
+      $return = 0;
+
+      $config = new PluginReservationConfig();
+      if ($config->getConfigurationValue("checkin", 0)) {
+         return $return;
+      }
+      
+      $time = time();
+      $time -= ($time % MINUTE_TIMESTAMP);
+      $timout = $config->getConfigurationValue("checkin_timeout") * HOUR_TIMESTAMP;
+      $since = date("Y-m-d H:i:s", $time - $timout);
+      $task->log("Since : " . $since);
+
+      $reservations_list = PluginReservationReservation::getAllReservations(["`begin` <= '".$since."'", 'effectivedate is not null', 'checkindate is null']);
+      foreach ($reservations_list as $res) {
+         $reservation = new Reservation();
+         $reservation->getFromDB($res['reservations_id']);
+         $reservationitems = $reservation->getConnexityItem('reservationitem', 'reservationitems_id');
+         $item = $reservationitems->getConnexityItem($reservationitems->fields['itemtype'], 'items_id');
+
+         $task->log("Deleting reservation (check in) : " .$reservation->fields['id'] . " on item ". $item->fields['name']);
+         $reservation->delete(['id' => $reservation->fields['id']]);
+         NotificationEvent::raiseEvent('plugin_reservation_not_checkin', $reservation);
+         $return++;
+      }
+      return $return;
    }
 
 
-   public static function checkReservations($task) {
+   public static function checkExpiration($task) {
       global $DB, $CFG_GLPI;
       $return = 0;
 
@@ -107,8 +139,14 @@ class PluginReservationTask extends CommonDBTM
             // same user ?
             if ($conflict['users_id'] == $res['users_id']) {
                $task->log("$formatName created a new reservation for the same item : " . $item->fields['name']);
-               $new_comment = "(".$reservation->fields['comment'].")";
-               $new_comment .= " ==(" .date("d-m-Y", $time). ")==> ".$conflict_reservation->fields['comment'];
+               $extension_counter = 0;
+               $new_comment = $reservation->fields['comment'];
+               $current_counter = [];
+               if (preg_match('/.*\(\(extention : ([0-9]+)\)\)$/', $new_comment, $current_counter)) {
+                  $extension_counter = $current_counter[1];
+                  $new_comment = str_replace("((extention : $extension_counter))", '', $new_comment);
+               }
+               $new_comment .= " ((extension : ".$extension_counter++."))";
 
                $query = "UPDATE `glpi_reservations` 
                         SET `end` = '".$conflict_reservation->fields["end"]."',
@@ -146,8 +184,7 @@ class PluginReservationTask extends CommonDBTM
                   break;
             }
          }
-
-         $task->setVolume($return++);
+         $return++;
       }
       return $return;
    }

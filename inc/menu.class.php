@@ -253,14 +253,25 @@ class PluginReservationMenu extends CommonGLPI
       $showentity = Session::isMultiEntitiesMode();
       $config = new PluginReservationConfig();
       $mode_auto = $config->getConfigurationValue("mode_auto");
+      $checkin_enable = $config->getConfigurationValue("checkin", 0);
 
       echo "<div class='center'>";
       echo "<table class='tab_cadre'>";
       echo "<thead>";
+      $colums = 11;
+      $colums_action = 3;
+      if ($mode_auto) {
+         $colums--;
+         $colums_action--;
+      }
+      if ($checkin_enable) {
+         $colums++;
+      }
+      
       if ($includeFuture) {
-         echo "<tr><th colspan='" . ($mode_auto ? "10" : "11") . "'>" . __('Current and future reservations') . "</th></tr>\n";
+         echo "<tr><th colspan='" . $colums . "'>" . __('Current and future reservations') . "</th></tr>\n";
       } else {
-         echo "<tr><th colspan='" . ($mode_auto ? "10" : "11") . "'>" . __('Reservations in the selected timeline') . "</th></tr>\n";
+         echo "<tr><th colspan='" . $colums . "'>" . __('Reservations in the selected timeline') . "</th></tr>\n";
       }
       echo "<tr class='tab_bg_2'>";
       echo "<th>" . __('User') . "</a></th>";
@@ -269,8 +280,11 @@ class PluginReservationMenu extends CommonGLPI
       echo "<th>" . __('End') . "</a></th>";
       echo "<th>" . __('Comment') . "</a></th>";
       echo "<th>" . __('Moves', 'reservation') . "</a></th>";
+      if ($checkin_enable) {
+         echo "<th>" . __('Checkin', 'reservation') . "</th>";
+      }
       echo "<th>" . __('Checkout', 'reservation') . "</th>";
-      echo "<th colspan='" . ($mode_auto ? 2 : 3) . "'>" . __('Action') . "</th>";
+      echo "<th colspan='" . $colums_action . "'>" . __('Action') . "</th>";
 
       echo "</tr></thead>";
       echo "<tbody>";
@@ -353,6 +367,15 @@ class PluginReservationMenu extends CommonGLPI
                   echo "<img title=\"\" alt=\"\" src=\"../pics/down-icon.png\"></img>";
                }
                echo "</center></td>";
+            }
+
+            // checkin buttons or date checkin
+            if ($checkin_enable) {
+               if ($reservation_user_info['checkindate'] != null) {
+                  echo "<td>" . date(self::getDateFormat()." \à H:i:s", strtotime($reservation_user_info['checkindate'])) . "</td>";
+               } else {
+                  echo "<td><center><a href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?checkin=" . $reservation_user_info['reservations_id'] . "\"><img title=\"" . _sx('tooltip', 'Set As Gone', "reservation") . "\" alt=\"\" src=\"../pics/redbutton.png\"></img></a></center></td>";
+               }
             }
 
             // checkout buttons or date checkout

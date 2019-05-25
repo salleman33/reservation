@@ -26,6 +26,9 @@ if (isset($_GET['mailuser'])) {
 if (isset($_GET['checkout'])) {
    PluginReservationReservation::checkoutReservation($_GET['checkout']);
 }
+if (isset($_GET['checkin'])) {
+   PluginReservationReservation::checkinReservation($_GET['checkin']);
+}
 
 if (isset($_POST['add_item_to_reservation'])) {
    $current_reservation = $_POST['add_item_to_reservation'];

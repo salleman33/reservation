@@ -11,7 +11,6 @@ function plugin_reservation_install() {
    $version   = plugin_version_reservation();
    $migration = new Migration($version['version']);
 
-   // list of categories
    if (!$DB->tableExists("glpi_plugin_reservation_categories")) { 
       $query = "CREATE TABLE `glpi_plugin_reservation_categories` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -23,11 +22,6 @@ function plugin_reservation_install() {
       $DB->queryOrDie($query, $DB->error());
    }
 
-   // Categories-reservationItems
-   // --  FOREIGN KEY (reservationitems_id)
-   // --  REFERENCES glpi_reservationitems(id),
-   // --  FOREIGN KEY (categories_id)
-   // --  REFERENCES glpi_plugin_reservation_categories(id),
    if (!$DB->tableExists("glpi_plugin_reservation_categories_items")) { 
       $query = "CREATE TABLE `glpi_plugin_reservation_categories_items` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -50,12 +44,32 @@ function plugin_reservation_install() {
                 `baselinedate` datetime NOT NULL,
                 `effectivedate`  datetime,
                 `mailingdate` datetime,
+                `checkindate` datetime,
                 PRIMARY KEY (`id`),
                 KEY `reservations_id` (`reservations_id`)
                 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 
       $DB->queryOrDie($query, $DB->error());
    }
+
+   if (TableExists('glpi_plugin_reservation_reservations')) { // UPDATE 2.2.0
+      $migration->addField(
+         'glpi_plugin_reservation_reservations',
+         'checkindate',
+         'datetime',
+         ['null' => true]
+      );
+   }
+
+   // 2.2.0
+   // mettre une date de checkin pour toutes les reservations precedentes à la date actuelle ! 
+   // $query = "UPDATE glpi_plugin_reservation_reservations
+   //          SET checkindate = NOW()
+   //          WHERE `begin` <= NOW()
+   //          AND effectivedate is null
+   //          AND checkindate is null
+   //          ";
+   // $DB->queryOrDie($query, $DB->error());
 
    // add existing reservations if necessary
    $query = "SELECT *
