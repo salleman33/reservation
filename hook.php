@@ -11,6 +11,38 @@ function plugin_reservation_install() {
    $version   = plugin_version_reservation();
    $migration = new Migration($version['version']);
 
+   // list of categories
+   if (!$DB->tableExists("glpi_plugin_reservation_categories")) { 
+      $query = "CREATE TABLE `glpi_plugin_reservation_categories` (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `name` VARCHAR(255) NOT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE (`name`)
+                ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+
+      $DB->queryOrDie($query, $DB->error());
+   }
+
+   // Categories-reservationItems
+   // --  FOREIGN KEY (reservationitems_id)
+   // --  REFERENCES glpi_reservationitems(id),
+   // --  FOREIGN KEY (categories_id)
+   // --  REFERENCES glpi_plugin_reservation_categories(id),
+   if (!$DB->tableExists("glpi_plugin_reservation_categories_items")) { 
+      $query = "CREATE TABLE `glpi_plugin_reservation_categories_items` (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `categories_id` int(11) NOT NULL,
+                `reservationitems_id` int(11) NOT NULL,
+                `priority` int(11) NOT NULL,
+                PRIMARY KEY (`id`),
+                  KEY `reservationitems_id` (`reservationitems_id`),
+                  KEY `categories_id` (`categories_id`),
+                  UNIQUE (`categories_id`, `reservationitems_id`)
+                ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+
+      $DB->queryOrDie($query, $DB->error());
+   }
+
    if (!$DB->tableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_reservations` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -100,7 +132,7 @@ function plugin_reservation_install() {
  */
 function plugin_reservation_uninstall() {
    global $DB;
-   $tables = ["glpi_plugin_reservation_reservations", "glpi_plugin_reservation_configs"];
+   $tables = ["glpi_plugin_reservation_reservations", "glpi_plugin_reservation_configs", "glpi_plugin_reservation_categories", "glpi_plugin_reservation_categories_items" ];
    foreach ($tables as $table) {
       $DB->query("DROP TABLE IF EXISTS `$table`");
    }

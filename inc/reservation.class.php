@@ -151,7 +151,6 @@ class PluginReservationReservation extends CommonDBTM
       global $DB, $CFG_GLPI;
 
       $tablename = getTableForItemType(__CLASS__);
-      // Toolbox::logInFile('reservations_plugin', "checkoutReservation RETURN : ".$tablename."\n", $force = false);
       $query = "UPDATE `".$tablename."` 
                SET `effectivedate` = '" . date("Y-m-d H:i:s", time()) . "' 
                WHERE `reservations_id` = '" . $reservation_id . "';";

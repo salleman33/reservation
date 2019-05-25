@@ -11,10 +11,6 @@ cursor:pointer;
 text-decoration:underline;
 color: black;
 }
-
-
-
-
 .imgClass {
     background-image: url(../pics/greenbutton.png);
     background-position:  0px 0px;
@@ -26,3 +22,56 @@ color: black;
     cursor: pointer;
     outline: 0;
 }
+
+.categoryTitle {
+    /* position:absolute;
+    margin:0;
+    padding:5px;
+    top:0;
+    left:0; */
+    cursor: default; 
+}
+.categoryClose {
+    /* position:absolute;
+    margin:0;
+    padding:5px; */
+    color:red;
+    /* top:0;
+    right:0; */
+    cursor: pointer;
+    width: 15px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+.dropper {
+    position:relative;
+    min-height: 200px;
+    min-width: 100px;
+    margin-right: 20px;
+    /* transition: all 200ms linear; */
+    margin: 10px auto;
+    margin-right: auto;
+    border: 0;
+    text-align: left;
+    font-size: 11px;
+    width: 95%;
+    background-color: #ffffff;
+    box-shadow: 0px 1px 2px 1px #D2D2D2;
+    border-spacing: 0;
+}
+
+.drop_hover {
+    box-shadow: 3px 4px 5px 4px rgba(0, 0, 0, 0.8);
+}
+
+.draggable {
+    vertical-align: middle;
+    line-height: 2em; 
+    cursor: move;
+    /* transition: all 200ms linear; */
+    user-select: none;          
+}
+
+
