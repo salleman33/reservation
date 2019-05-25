@@ -66,13 +66,17 @@ class PluginReservationTask extends CommonDBTM
 
       $time = time();
       $time -= ($time % MINUTE_TIMESTAMP);
-      $begin = date("Y-m-d H:i:s", $time);
-      $delay = $CFG_GLPI['time_step'] * MINUTE_TIMESTAMP;
+      $config = new PluginReservationConfig();
+      $extension_time = $config->getConfigurationValue("extension_time", 'default');
+      if ($extension_time === 'default') {
+         $delay = $CFG_GLPI['time_step'] * MINUTE_TIMESTAMP;
+      } else {
+         $delay = $extension_time * HOUR_TIMESTAMP;
+      }
       $end = date("Y-m-d H:i:s", $time + $delay);
       $task->log("Until : " . $end);
 
       $reservations_list = PluginReservationReservation::getAllReservations(["`end` <= '".$end."'", 'effectivedate is null']);
-      //Toolbox::logInFile('reservations_plugin', "reservations_list : ".json_encode($reservations_list)."\n", $force = false);
 
       foreach ($reservations_list as $res) {
 	 // bug with GLPI 9.4 ?
@@ -162,7 +166,6 @@ class PluginReservationTask extends CommonDBTM
       $time -= ($time % MINUTE_TIMESTAMP);
       $now = date("Y-m-d H:i:s", $time);
 
-      $config = new PluginReservationConfig();
       $errlocale = setlocale(LC_TIME, 'fr_FR.utf8', 'fra');
       if (!$errlocale) {
          $task->log("setlocale failed");

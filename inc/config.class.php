@@ -47,7 +47,7 @@ class PluginReservationConfig extends CommonDBTM
    {
 
       $mode_auto = $this->getConfigurationValue("mode_auto");
-      $mode_duration_added = $this->getConfigurationValue("mode_duration_added", 'default');
+      $extension_time = $this->getConfigurationValue("extension_time", 'default');
       $conflict_action = $this->getConfigurationValue("conflict_action");
 
       echo "<form id=\"formPluginReservationConfigs\" method='post' action='" . $this->getFormURL() . "'>";
@@ -60,13 +60,13 @@ class PluginReservationConfig extends CommonDBTM
 
       echo '<tr class="tab_bg_2">';
       echo "<td>";
-      echo __('Duration added to reservations expiring and not checkout', "reservation");
+      echo __('Duration added (in hour) to reservations expiring and not checkout', "reservation");
       echo "<br>";
-      echo __('By defaut, use value of "step for the hours (minutes)" defined in General Setup > Assistance)', "reservation") . " : ";
-      echo "<select name=\"mode_duration_added\">";
-      echo "<option value=\"default\" " . ($mode_duration_added == 'default' ? 'selected="selected"' : '') . ">" . __('Default', "reservation") . "</option>";
-      for ($h = 1; $h <= 8; $h++) {
-         echo "<option value=\"" . $h . "\" " . ($mode_duration_added == $h ? 'selected="selected"' : '') . ">" . $h . " " . __('hour', "reservation") . "</option>";
+      echo __('By defaut, use value of <b>step for the hours</b> defined in <I>General Setup > Assistance</I>', "reservation") . " : ";
+      echo "<select name=\"extension_time\">";
+      echo "<option value=\"default\" " . ($extension_time == 'default' ? 'selected="selected"' : '') . ">" . __('Default', "reservation") . "</option>";
+      for ($h = 1; $h <= 24; $h++) {
+         echo "<option value=\"" . $h . "\" " . ($extension_time == $h ? 'selected="selected"' : '') . ">" . $h . " </option>";
       }
       echo "</select>";
       echo "</td>";
