@@ -204,7 +204,7 @@ class PluginReservationCategory extends CommonDBTM
 
    /**
     * update categories in database
-    * @param $list array of categories like ["cat1", "cat2" ]
+    * @param string[] $next_config [optiona] array of categories like ["cat1", "cat2" ]
     */
    private function updateCategories($next_config = [])
    {

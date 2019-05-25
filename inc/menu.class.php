@@ -482,8 +482,7 @@ class PluginReservationMenu extends CommonGLPI
                }
             } );
 
-         echo "<td valign=\"top\">";
-         
+         echo "<td style=\"display:inline-block;\" valign=\"top\">";         
          
          echo "\n\t<table class='tab_cadre'>";
          if ($category_name === 'pluginnotcategorized') {
