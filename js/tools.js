@@ -9,6 +9,15 @@ function afficher_cacher(id) {
    return true;
 }
 
+function afficher_cacher_simple(id) {
+   if (document.getElementById(id).style.display == 'none') {
+      document.getElementById(id).style.display = 'inline';
+   } else {
+      document.getElementById(id).style.display = 'none';
+   }
+   return true;
+}
+
 
 function createCategoryEnter() {
    if (event.key === 'Enter') {

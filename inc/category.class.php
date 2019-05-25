@@ -90,7 +90,7 @@ class PluginReservationCategory extends CommonDBTM
    public static function getCategoriesConfig()
    { 
       $result = [];
-      $list_reservationitems = PluginReservationCategory::getReservationItems();
+      $list_reservationitems = self::getReservationItems();
       foreach ($list_reservationitems as $item) {
          $category_name =$item['category_name']; 
          if ($category_name === null) {

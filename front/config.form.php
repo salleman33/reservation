@@ -15,11 +15,15 @@ if ($plugin->isActivated("reservation")) {
       $PluginReservationConfig->setMailAutomaticAction($_POST["mode_auto"]);
       $PluginReservationConfig->setConfigurationValue("mode_auto", $_POST["mode_auto"]);
    }
-   if (isset($_POST["mode_duration_added"])) {
-      $PluginReservationConfig->setConfigurationValue("mode_duration_added", $_POST["mode_duration_added"]);
+   if (isset($_POST["extension_time"])) {
+      $PluginReservationConfig->setConfigurationValue("extension_time", $_POST["extension_time"]);
    }
    if (isset($_POST["conflict_action"])) {
       $PluginReservationConfig->setConfigurationValue("conflict_action", $_POST["conflict_action"]);
+   }
+   if (isset($_POST["checkin"])) {
+      $PluginReservationConfig->setConfigurationValue("checkin", $_POST["checkin"]);
+      $PluginReservationConfig->setConfigurationValue("checkin_timeout", $_POST["checkin_timeout"]);
    }
    if (isset($_POST["custom_categories"])) {
       $PluginReservationConfig->setConfigurationValue("custom_categories", $_POST["custom_categories"]);

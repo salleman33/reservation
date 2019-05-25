@@ -447,10 +447,10 @@ class PluginReservationMenu extends CommonGLPI
       $custom_categories = $plugin_config->getConfigurationValue("custom_categories", 0);
       if ($custom_categories) {
          $available_reservationsitem = PluginReservationCategory::getReservationItems($begin, $end, true);
-         PluginReservationMenu::customCategoriesView($available_reservationsitem);
+         self::customCategoriesView($available_reservationsitem);
       } else {
          $available_reservationsitem = PluginReservationReservation::getAvailablesItems($begin, $end);
-         PluginReservationMenu::defaultGlpiView($available_reservationsitem);
+         self::defaultGlpiView($available_reservationsitem);
       }
 
       echo "</tr>";

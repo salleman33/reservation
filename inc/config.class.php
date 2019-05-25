@@ -46,9 +46,7 @@ class PluginReservationConfig extends CommonDBTM
    public function showForm()
    {
 
-      $mode_auto = $this->getConfigurationValue("mode_auto");
-      $extension_time = $this->getConfigurationValue("extension_time", 'default');
-      $conflict_action = $this->getConfigurationValue("conflict_action");
+      
 
       echo "<form id=\"formPluginReservationConfigs\" method='post' action='" . $this->getFormURL() . "'>";
 
@@ -58,6 +56,8 @@ class PluginReservationConfig extends CommonDBTM
 
       echo "<th>" . __('Configuration') . "</th>";
 
+      // extension time
+      $extension_time = $this->getConfigurationValue("extension_time", 'default');
       echo '<tr class="tab_bg_2">';
       echo "<td>";
       echo __('Duration added (in hour) to reservations expiring and not checkout', "reservation");
@@ -72,6 +72,8 @@ class PluginReservationConfig extends CommonDBTM
       echo "</td>";
       echo "</tr>";
 
+      // mode_auto for mailing
+      $mode_auto = $this->getConfigurationValue("mode_auto");
       echo '<tr class="tab_bg_2">';
       echo "<td>";
       echo __('Method used to send e-mails to users with late reservations', "reservation") . " : ";
@@ -82,6 +84,8 @@ class PluginReservationConfig extends CommonDBTM
       echo "</td>";
       echo "</tr>";
 
+      // conflicted reservation
+      $conflict_action = $this->getConfigurationValue("conflict_action");
       echo '<tr class="tab_bg_2">';
       echo "<td>";
       echo __('Method used when there is a conflicted reservation', "reservation") . " : ";
@@ -91,10 +95,36 @@ class PluginReservationConfig extends CommonDBTM
       echo "</select>";
       echo "</td>";
       echo "</tr>";
-      echo "</table>";
 
+      // checkin
+      $checkin = $this->getConfigurationValue("checkin", 0);
+      $checkin_timeout = $this->getConfigurationValue("checkin_timeout", 1);
+      echo '<tr class="tab_bg_2">';
+      echo "<td style=\"padding-left:20px;\">";      
+      echo "<input type=\"hidden\" name=\"checkin\" value=\"0\">";      
+      echo "<input onclick=\"javascript:afficher_cacher_simple('checkin_timeout');\" type=\"checkbox\" name=\"checkin\" value=\"1\" " . ($checkin ? 'checked' : '') . "> ";
+      echo __('Enable check in', "reservation"). "</td>";
+      echo '</tr>';
+      if ($checkin) {
+         echo '<tr class="tab_bg_2" id="checkin_timeout">';
+      } else {
+         echo '<tr class="tab_bg_2" id="checkin_timeout" style="display:none;" >';
+      }
+      echo "<td>";
+      echo __('Waiting time (in hour) to cancel the unclaimed reservation', "reservation") . " : ";
+      echo "<select name=\"checkin_timeout\">";
+      for ($h = 1; $h <= 24; $h++) {
+         echo "<option value=\"" . $h . "\" " . ($checkin_timeout == $h ? 'selected="selected"' : '') . ">" . $h . " </option>";
+      }
+      echo '</td>';
+      echo "</select>";
+      echo "</tr>";      
+      echo "</table>";      
+
+      // define tabs
       echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
       echo "<th>" . __('Tab Configuration', "reservation") . "</th>";
+      // current reservation tab
       $tabcurrent = $this->getConfigurationValue("tabcurrent", 1);
       echo '<tr class="tab_bg_2">';
       echo "<input type=\"hidden\" name=\"tabcurrent\" value=\"0\">";
@@ -102,7 +132,7 @@ class PluginReservationConfig extends CommonDBTM
       echo "<input type=\"checkbox\" name=\"tabcurrent\" value=\"1\" " . ($tabcurrent ? 'checked' : '') . "> ";
       echo __('Current Reservation tab', "reservation") . "</td>";
       echo "</tr>";
-
+      // incoming reservation tab
       $tabcoming = $this->getConfigurationValue("tabcoming");
       echo '<tr class="tab_bg_2">';
       echo "<input type=\"hidden\" name=\"tabcoming\" value=\"0\">";
@@ -112,22 +142,24 @@ class PluginReservationConfig extends CommonDBTM
       echo "</tr>";
       echo "</table>";
 
+      // custom categories
       echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
       echo "<th>" . __('Categories Configuration', "reservation") . "</th>";
       $custom_categories = $this->getConfigurationValue("custom_categories", 0);
       echo '<tr class="tab_bg_2">';
       echo "<input type=\"hidden\" name=\"custom_categories\" value=\"0\">";
       echo "<td style=\"padding-left:20px;\">";
-      echo "<input type=\"checkbox\" name=\"custom_categories\" value=\"1\" " . ($custom_categories ? 'checked' : '') . "> ";
+      echo "<input onclick=\"javascript:afficher_cacher_simple('custom_categories_view');\" type=\"checkbox\" name=\"custom_categories\" value=\"1\" " . ($custom_categories ? 'checked' : '') . "> ";
       echo __('Use custom categories', "reservation") . "</td>";
       echo "</tr>";
       if ($custom_categories) {
-         echo '<tr class="tab_bg_2">';
+         echo '<tr class="tab_bg_2" id="custom_categories">';
          echo $this->showConfigCategoriesForm();
          echo "</tr>";
-      }
+      } 
       echo "</table>";
 
+      // tooltip
       echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
       echo "<th>" . __('ToolTip Configuration', "reservation") . "</th>";
       $tooltip = $this->getConfigurationValue("tooltip");
