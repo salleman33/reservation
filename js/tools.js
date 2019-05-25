@@ -17,7 +17,7 @@ function createCategoryEnter() {
 }
 
 function deleteCategory(category) {
-   var categorieOther = document.getElementById("itemsCategory_notcategorized");
+   var categorieOther = document.getElementById("itemsCategory_pluginnotcategorized");
    var tbody_dst = categorieOther.getElementsByTagName('tbody')[0];
 
    var element = document.getElementById("itemsCategory_" + category);
@@ -27,7 +27,7 @@ function deleteCategory(category) {
 
          clonedElement = tbody_source.firstChild.cloneNode(true);
          var input = clonedElement.getElementsByTagName('input')[0];
-         input.value = "notcategorized";
+         input.value = "pluginnotcategorized";
 
          clonedElement = tbody_dst.appendChild(clonedElement);
       }
@@ -48,7 +48,7 @@ function createCategory() {
 
    titleField = document.getElementById('newCategoryTitle');
    titleValue = titleField.value;
-   if (!/^([a-zA-Z0-9]+)$/.test(titleValue) || titleValue === 'notcategorized') {
+   if (!/^([a-zA-Z0-9]+)$/.test(titleValue) || titleValue === 'pluginnotcategorized') {
       titleField.style.backgroundColor = "red";
       return;
    }

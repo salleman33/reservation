@@ -94,7 +94,7 @@ class PluginReservationCategory extends CommonDBTM
       foreach ($list_reservationitems as $item) {
          $category_name =$item['category_name']; 
          if ($category_name === null) {
-            $category_name = 'notcategorized';
+            $category_name = 'pluginnotcategorized';
          }
 
          if (array_key_exists($category_name, $result)) {
@@ -185,7 +185,7 @@ class PluginReservationCategory extends CommonDBTM
       $categories = [];
       $items = [];
       foreach ($POST as $key => $val) {
-         if (preg_match('/^item_([0-9])+$/', $key, $match)) {
+         if (preg_match('/^item_([0-9]+)$/', $key, $match)) {
             if (array_key_exists($val, $items)) {
                array_push($items[$val], $match[1]);
             } else {
@@ -229,7 +229,6 @@ class PluginReservationCategory extends CommonDBTM
       global $DB;
 
       foreach ($list_items_by_categories as $category_name => $category_items) {
-         // $category = new PluginReservationCategory();
          $this->getFromDBByCrit(['name' => $category_name]);
 
          for($i = 0; $i < count($category_items); ++$i) {
