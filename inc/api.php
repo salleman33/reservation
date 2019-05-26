@@ -4,6 +4,7 @@
 #include (__DIR__ . '/../../../inc/includes.php');
 #include (__DIR__ . '/../../../inc/api.class.php');
 #include '../../../inc/api.class.php';
+include_once 'includes.php';
 
 class PluginReservationApi extends API
 {
@@ -60,83 +61,222 @@ class PluginReservationApi extends API
          $this->session_write = (bool)$this->parameters['session_write'];
       }
 
+
       // inline documentation (api/)
       if ($is_inline_doc) {
          return $this->inlineDocumentation("plugins/reservation/apirest.md");
-      } else if ($resource === "initSession") {
-         // ## DECLARE ALL ENDPOINTS ##
-         // login into glpi
-         $this->session_write = true;
-         return $this->returnResponse($this->initSession($this->parameters));
-      } else if ($resource === "killSession") {
-         $this->retrieveSession($this->parameters);
-         // logout from glpi
-         $this->session_write = true;
-         return $this->returnResponse($this->killSession());
-      } else if ($resource === "checkoutItem") {
-         return $this->reservationsRoute();
-      } else if ($resource === "categories") {
-         return $this->categoriesRoute();
-      } else if ($resource === "items") {
-         return $this->itemsRoute();
+      } else {
+         switch ($resource) {
+            case "initSession":
+               $this->session_write = true;
+               return $this->returnResponse($this->initSession($this->parameters));
+            case "killSession":
+               $this->retrieveSession($this->parameters);
+               $this->session_write = true;
+               return $this->returnResponse($this->killSession());
+            case "reservationItem":
+               return $this->reservationItemRoutes();
+               // case "user":
+               //    return $this->userRoutes();
+            default:
+               return $this->returnError(
+                  __("resource not found"),
+                  400,
+                  "ERROR_RESOURCE_NOT_FOUND"
+               );
+         }
       }
 
       $this->messageLostError();
    }
 
-   private function itemsRoute() {
-      $duration          = $this->getDuration();
-      $code              = 200;
-      $additionalheaders = [];
+   private function reservationItemRoutes()
+   {
+      $method = trim(strval($this->url_elements[1]));
 
-      if (!isset($this->parameters['input'])) {
-         $this->messageBadArrayError();
-      }
-      // if duration is passed by query string, add it into input parameter
-      $input = (array)($this->parameters['input']);
-      if (($duration > 0) && !isset($input['duration'])) {
-         $this->parameters['input']->duration = $duration;
-      }
 
-      $time = time();
-      $now = date("Y-m-d H:i:s", $time);
-
-      switch ($this->verb) {
+      switch ($method) {
+         case "checkin":
+            return $this->checkinReservation();
+         case "checkout":
+            return $this->checkoutReservation();
+         case "nextReservation":
+            return $this->nextReservation();
+         case "currentReservation":
+            return $this->currentReservation();
          default:
-            $code = 400;
-            $response = "Use GET or PUT request !";
-            break;
-         case "PUT":
-            break;
-         case "GET":
-            break;
+            return $this->returnError(
+               __("resource not found"),
+               400,
+               "ERROR_RESOURCE_NOT_FOUND"
+            );
       }
-      return $this->returnResponse($response, $code, $additionalheaders);
    }
 
-   private function categoriesRoute()
+
+
+
+   /**
+    * 
+    */
+   private function currentReservation()
    {
-      $code              = 200;
+      $id                = $this->getId();
       $additionalheaders = [];
+      $code              = 200;
 
       switch ($this->verb) {
          default:
+         case "PUT":
             $code = 400;
             $response = "Use GET request !";
             break;
          case "GET":
-            $categories = PluginReservationCategory::getCategories();
-            if (count($categories) == 0) {
-               $response = ["success" => false, 'message' => __("There is no category", "reservation")];
-               break;
+            $time = time();
+            $now = date("Y-m-d H:i:s", $time);
+            $res = PluginReservationReservation::getAllReservations(
+               [
+                  "`begin` <= '" . $now . "'",
+                  "`end` >= '" . $now . "'",
+                  "reservationitems_id = " . $id
+               ]
+            );
+
+            if (count($res) == 0) {
+               return $this->messageNotfoundError();
             }
-            $response = ["payload" => $categories, "success" => true, "message" => "OK"];
+            $reservation = new Reservation();
+            $reservation->getFromDB($res[0]['reservations_id']);
+
+
+            $links = ["links" => [
+               ["rel" => "ReservationItem", "href" => self::$api_url . "/ReservationItem/" . $reservation->fields['reservationitems_id']],
+               ["rel" => "User", "href" => self::$api_url . "/User/" . $reservation->fields['users_id']]
+            ]];
+
+            $response = array_merge($reservation->fields, $links);
             break;
       }
       return $this->returnResponse($response, $code, $additionalheaders);
    }
 
-   private function reservationsRoute()
+
+   /**
+    * 
+    */
+   private function nextReservation()
+   {
+      $id                = $this->getId();
+      $additionalheaders = [];
+      $code              = 200;
+
+
+      switch ($this->verb) {
+         default:
+         case "PUT":
+            $code = 400;
+            $response = "Use GET request !";
+            break;
+         case "GET":
+
+            $time = time();
+            $now = date("Y-m-d H:i:s", $time);
+            $next_reservation = PluginReservationReservation::getAllReservations(
+               [
+                  "`begin` >= '" . $now . "'",
+                  "`end` > '" . $now . "'",
+                  "reservationitems_id = " . $id
+               ],
+               [
+                  "order by begin",
+                  "limit 1"
+               ]
+            );
+
+            if (count($next_reservation) == 0) {
+               return $this->messageNotfoundError();
+            }
+            $reservation = new Reservation();
+            $reservation->getFromDB($next_reservation[0]['reservations_id']);
+
+            $links = ["links" => [
+               ["rel" => "ReservationItem", "href" => self::$api_url . "/ReservationItem/" . $reservation->fields['reservationitems_id']],
+               ["rel" => "User", "href" => self::$api_url . "/User/" . $reservation->fields['users_id']]
+            ]];
+            $response = array_merge($reservation->fields, $links);
+            break;
+      }
+      return $this->returnResponse($response, $code, $additionalheaders);
+   }
+
+   /**
+    * 
+    */
+   private function checkinReservation()
+   {
+      $id                = $this->getId();
+      $additionalheaders = [];
+      $code              = 200;
+
+
+
+      $config = new PluginReservationConfig();
+      $checkin_enable = $config->getConfigurationValue("checkin", 0);
+      if (!$checkin_enable) {       
+         return $this->returnError(
+            __("check in function is not enabled"),
+            400,
+            "ERROR_METHOD_NOT_ALLOWED"
+         );
+      }
+
+      switch ($this->verb) {
+         default:
+         case "GET":
+            $code = 400;
+            $response = "Use PUT request !";
+            break;
+         case "PUT":
+            if (!isset($this->parameters['input'])) {
+               $this->messageBadArrayError();
+            }
+            // if id is passed by query string, add it into input parameter
+            $input = (array)($this->parameters['input']);
+            if (($id > 0) && !isset($input['id'])) {
+               $this->parameters['input']->id = $id;
+            }
+
+
+            $time = time();
+            $now = date("Y-m-d H:i:s", $time);
+            $current_reservation = PluginReservationReservation::getAllReservations(
+               [
+                  "`begin` <= '" . $now . "'",
+                  "`end` >= '" . $now . "'",
+                  "reservationitems_id = " . $this->parameters['input']->id,
+                  "checkindate is null"
+               ]
+            );
+
+            if (count($current_reservation) == 1) {
+               $reservation_id = $current_reservation[0]['reservations_id'];
+               try {
+                  PluginReservationReservation::checkinReservation($reservation_id);
+                  $response = [$reservation_id => true, "message" => ""];
+               } catch (Exception $e) {
+                  $response = [$reservation_id => false, "message" => $e->getMessage()];
+               }
+               break;
+            }
+            return $this->messageNotfoundError();
+      }
+      return $this->returnResponse($response, $code, $additionalheaders);
+   }
+
+   /**
+    * 
+    */
+   private function checkoutReservation()
    {
       $id                = $this->getId();
       $additionalheaders = [];
@@ -160,50 +300,52 @@ class PluginReservationApi extends API
 
             $time = time();
             $now = date("Y-m-d H:i:s", $time);
-            $current_reservation = PluginReservationReservation::getAllReservations(["`begin` <= '" . $now . "'", "`end` >= '" . $now . "'", "reservationitems_id = " . $this->parameters['input']->id]);
-            $reservationitems = new ReservationItem();
-            $reservationitems->getFromDB($this->parameters['input']->id);
-            $item = $reservationitems->getConnexityItem($reservationitems->fields['itemtype'], 'items_id');
-            #Toolbox::logInFile('reservations_plugin', "API : ".$this->parameters['input']->id. " <=> ".$reservationitems->fields['id']."\n", $force = false);
-            if (count($current_reservation) == 0) {
-               $response = [$this->parameters['input']->id => $item->fields['name'], "success" => false, 'message'    => __("Item is not currently reserved", "reservation")];
+            $current_reservation = PluginReservationReservation::getAllReservations(
+               [
+                  "`begin` <= '" . $now . "'",
+                  "`end` >= '" . $now . "'",
+                  "reservationitems_id = " . $this->parameters['input']->id,
+                  "effectivedate is null"
+               ]
+            );
+
+            if (count($current_reservation) == 1) {
+               $reservation_id = $current_reservation[0]['reservations_id'];
+               try {
+                  PluginReservationReservation::checkoutReservation($reservation_id);
+                  $response = [$reservation_id => true, "message" => ""];
+               } catch (Exception $e) {
+                  $response = [$reservation_id => false, "message" => $e->getMessage()];
+               }
                break;
             }
-
-            $reservation_id = $current_reservation[0]['reservations_id'];
-            PluginReservationReservation::checkoutReservation($reservation_id);
-            $response = [$input['id'] => $item->fields['name'], "success" => true, "message" => "OK"];
-
-            break;
+            return $this->messageNotfoundError();
       }
       return $this->returnResponse($response, $code, $additionalheaders);
    }
 
+   /**
+    * 
+    */
    private function getId()
    {
-      $id = isset($this->url_elements[1]) && is_numeric($this->url_elements[1])
-         ? intval($this->url_elements[1])
-         : false;
+      $last = end($this->url_elements);
+      $id = is_numeric($last) ? intval($last) : false;
 
-      $additional_id = isset($this->url_elements[3]) && is_numeric($this->url_elements[3])
-         ? intval($this->url_elements[3])
-         : false;
+      // $id = isset($this->url_elements[1]) && is_numeric($this->url_elements[1])
+      //    ? intval($this->url_elements[1])
+      //    : false;
 
-      if ($additional_id || isset($this->parameters['parent_itemtype'])) {
-         $this->parameters['parent_id'] = $id;
-         $id = $additional_id;
-      }
+      // $additional_id = isset($this->url_elements[3]) && is_numeric($this->url_elements[3])
+      //    ? intval($this->url_elements[3])
+      //    : false;
+
+      // if ($additional_id || isset($this->parameters['parent_itemtype'])) {
+      //    $this->parameters['parent_id'] = $id;
+      //    $id = $additional_id;
+      // }
 
       return $id;
-   }
-
-   private function getDuration()
-   {
-      $duration = isset($this->url_elements[1]) && is_numeric($this->url_elements[1])
-         ? intval($this->url_elements[1])
-         : false;
-
-      return $duration;
    }
 
    public function parseIncomingParams($is_inline_doc = false)

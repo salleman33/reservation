@@ -48,7 +48,7 @@ class PluginReservationReservation extends CommonDBTM
     * @param string[] $filters [optional] filters to apply to DB request
     * @return array GLPI reservations mixed with plugin reservations
     */
-   public static function getAllReservations($filters = []) {
+   public static function getAllReservations($filters = [], $options = []) {
       global $DB;
 
       $res = [];
@@ -56,15 +56,20 @@ class PluginReservationReservation extends CommonDBTM
       $plugin_table = getTableForItemType(__CLASS__);
 
       $where = "WHERE ".$plugin_table.".reservations_id = ".$reservation_table.".id";
-
       foreach ($filters as $filter) {
          $where .= " AND ".$filter;
+      }
+
+      $extra = '';
+      foreach ($options as $option) {
+         $extra .= " ".$option;
       }
 
       $query = "SELECT *
                FROM $reservation_table
                   , $plugin_table
-               $where";
+               $where
+               $extra";
 
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
@@ -182,16 +187,27 @@ class PluginReservationReservation extends CommonDBTM
    public static function checkinReservation($reservation_id) {
       global $DB;
 
-      $tablename = getTableForItemType(__CLASS__);
-      $query = "UPDATE `".$tablename."` 
-               SET `checkindate` = '" . date("Y-m-d H:i:s", time()) . "' 
-               WHERE `reservations_id` = '" . $reservation_id . "';";
-      $DB->query($query) or die("error on checkinReservation 1 : " . $DB->error());
+      $resa = new Reservation();
+      $resa->getFromDb($reservation_id);
 
-      Event::log($reservation_id, "reservation", 4, "inventory",
+      $time = time();
+      $time -= ($time % MINUTE_TIMESTAMP);
+      $now = date("Y-m-d H:i:s", $time);
+
+      $input = $resa->fields;
+      $input['begin'] = $now;
+      if ($resa->update($input)) {
+         $tablename = getTableForItemType(__CLASS__);
+         $query = "UPDATE `".$tablename."` 
+                  SET `checkindate` = '" . date("Y-m-d H:i:s", time()) . "' 
+                  WHERE `reservations_id` = '" . $reservation_id . "';";
+         $DB->query($query) or die("error on checkinReservation  : " . $DB->error());
+
+         Event::log($reservation_id, "reservation", 4, "inventory",
                   sprintf(__('%1$s marks the reservation %2$s as gone'),
                            $_SESSION["glpiname"], $reservation_id));
-      Toolbox::logInFile('reservations_plugin', "checkinReservation : ".$reservation_id."\n", $force = false);
+         Toolbox::logInFile('reservations_plugin', "checkinReservation : ".$reservation_id."\n", $force = false);
+      }
    }
 
 
@@ -228,14 +244,19 @@ class PluginReservationReservation extends CommonDBTM
     * @param integer $reservation_id id of the concerned reservation 
     */
    public static function switchItemToResa($item_id, $reservation_id) {
-      global $DB;
+      $resa = new Reservation();
+      $resa->getFromDb($reservation_id);
 
-      $query = "UPDATE `glpi_reservations` SET `reservationitems_id`='" . $item_id . "' WHERE `id`='" . $reservation_id . "';";
-      $DB->query($query) or die("error on 'update' in replaceResa / hash: " . $DB->error());
-      Event::log($reservation_id, "reservation", 4, "inventory",
+      $input = $resa->fields;
+      $input['reservationitems_id'] = $item_id;
+
+      if($resa->update($input)) {
+         Event::log($reservation_id, "reservation", 4, "inventory",
                   sprintf(__('%1$s switchs the reservation %2$s with item %3$s'),
                           $_SESSION["glpiname"], $reservation_id, $item_id));
-      Toolbox::logInFile('reservations_plugin', "switchItemToResa : ".$item_id. " <=> ".$reservation_id."\n", $force = false);
+         Toolbox::logInFile('reservations_plugin', "switchItemToResa : ".$item_id. " <=> ".$reservation_id."\n", $force = false);
+      }
+      
    }
 
 }
