@@ -104,6 +104,10 @@ class PluginReservationApi extends API
             return $this->nextReservation();
          case "currentReservation":
             return $this->currentReservation();
+         case "currentOrNextReservation":
+            return $this->currentOrNextReservation();
+         case "search":
+            return $this->search();
          default:
             return $this->returnError(
                __("resource not found"),
@@ -114,6 +118,67 @@ class PluginReservationApi extends API
    }
 
 
+
+   /**
+    * 
+    */
+   private function search()
+   {
+      $additionalheaders = [];
+      $code              = 200;
+
+      switch ($this->verb) {
+         default:
+         case "PUT":
+            $code = 400;
+            $response = "Use GET request !";
+            break;
+         case "GET":
+            $response = array();
+            $begin = $this->parameters['begin'];
+            $end = $this->parameters['end'];
+            $user = $this->parameters['user'];
+            $available = $this->parameters['available'];
+
+            if ($available) {
+               $result = PluginReservationReservation::getAvailablesItems($begin, $end);
+
+            } else {
+               $filters = array("`begin` >= '" . $begin . "'");
+               array_push($filters, "`end` <= '" . $end . "'");
+
+               if (isset($user)) {
+                  array_push($filters, "`users_id` >= '" . $user . "'");
+               } else {
+                  return $this->returnError(
+                     __("missing params"),
+                     400,
+                     "ERROR_METHOD_NOT_ALLOWED"
+                  );
+               }
+
+               $result = PluginReservationReservation::getAllReservations($filters);
+            }
+
+            if (count($result) == 0) {
+               return $this->messageNotfoundError();
+            }
+
+            foreach ($result as $resa) {
+               $reservationItem = new ReservationItem();
+               $reservationItem->getFromDB($resa['id']);               
+
+               $links = ["links" => [
+                  ["rel" => "Entity", "href" => self::$api_url . "/Entity/" . $reservationItem->fields['entities_id']],
+                  ["rel" => $reservationItem->fields['itemtype'], "href" => self::$api_url . "/" . $reservationItem->fields['itemtype'] . "/" . $reservationItem->fields['items_id']]
+               ]];
+
+               array_push($response, array_merge($reservationItem->fields, $links));
+            }
+            break;
+      }
+      return $this->returnResponse($response, $code, $additionalheaders);
+   }
 
 
    /**
@@ -184,7 +249,7 @@ class PluginReservationApi extends API
             $next_reservation = PluginReservationReservation::getAllReservations(
                [
                   "`begin` >= '" . $now . "'",
-                  "`end` > '" . $now . "'",
+                  "`end` >= '" . $now . "'",
                   "reservationitems_id = " . $id
                ],
                [
@@ -212,6 +277,53 @@ class PluginReservationApi extends API
    /**
     * 
     */
+   private function currentOrNextReservation()
+   {
+      $id                = $this->getId();
+      $additionalheaders = [];
+      $code              = 200;
+
+      switch ($this->verb) {
+         default:
+         case "PUT":
+            $code = 400;
+            $response = "Use GET request !";
+            break;
+         case "GET":
+            $time = time();
+            $now = date("Y-m-d H:i:s", $time);
+            $res = PluginReservationReservation::getAllReservations(
+               [
+                  "`end` >= '" . $now . "'",
+                  "reservationitems_id = " . $id
+               ],
+               [
+                  "order by begin",
+                  "limit 1"
+               ]
+            );
+
+            if (count($res) == 0) {
+               return $this->messageNotfoundError();
+            }
+            $reservation = new Reservation();
+            $reservation->getFromDB($res[0]['reservations_id']);
+
+
+            $links = ["links" => [
+               ["rel" => "ReservationItem", "href" => self::$api_url . "/ReservationItem/" . $reservation->fields['reservationitems_id']],
+               ["rel" => "User", "href" => self::$api_url . "/User/" . $reservation->fields['users_id']]
+            ]];
+
+            $response = array_merge($reservation->fields, $links);
+            break;
+      }
+      return $this->returnResponse($response, $code, $additionalheaders);
+   }
+
+   /**
+    * 
+    */
    private function checkinReservation()
    {
       $id                = $this->getId();
@@ -222,7 +334,7 @@ class PluginReservationApi extends API
 
       $config = new PluginReservationConfig();
       $checkin_enable = $config->getConfigurationValue("checkin", 0);
-      if (!$checkin_enable) {       
+      if (!$checkin_enable) {
          return $this->returnError(
             __("check in function is not enabled"),
             400,
