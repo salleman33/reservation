@@ -66,7 +66,7 @@ class PluginReservationTask extends CommonDBTM
       $return = 0;
 
       $config = new PluginReservationConfig();
-      if ($config->getConfigurationValue("checkin", 0)) {
+      if ($config->getConfigurationValue("checkin", 0) == 0) {
          return $return;
       }
       
@@ -76,7 +76,7 @@ class PluginReservationTask extends CommonDBTM
       $since = date("Y-m-d H:i:s", $time - $timout);
       $task->log("Since : " . $since);
 
-      $reservations_list = PluginReservationReservation::getAllReservations(["`begin` <= '".$since."'", 'effectivedate is not null', 'checkindate is null']);
+      $reservations_list = PluginReservationReservation::getAllReservations(["`begin` <= '".$since."'", 'effectivedate is null', 'checkindate is null']);
       foreach ($reservations_list as $res) {
          $reservation = new Reservation();
          $reservation->getFromDB($res['reservations_id']);
