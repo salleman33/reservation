@@ -36,6 +36,15 @@ function plugin_reservation_install() {
 
       $DB->queryOrDie($query, $DB->error());
    }
+   
+   if ($DB->tableExists('glpi_plugin_reservation_reservations')) { // UPDATE 2.2.0
+      $migration->addField(
+         'glpi_plugin_reservation_reservations',
+         'checkindate',
+         'datetime',
+         ['null' => true]
+      );
+   }
 
    if (!$DB->tableExists("glpi_plugin_reservation_reservations")) { //INSTALL >= 2.0.0
       $query = "CREATE TABLE `glpi_plugin_reservation_reservations` (
@@ -52,14 +61,6 @@ function plugin_reservation_install() {
       $DB->queryOrDie($query, $DB->error());
    }
 
-   if (TableExists('glpi_plugin_reservation_reservations')) { // UPDATE 2.2.0
-      $migration->addField(
-         'glpi_plugin_reservation_reservations',
-         'checkindate',
-         'datetime',
-         ['null' => true]
-      );
-   }
 
    // 2.2.0
    // mettre une date de checkin pour toutes les reservations precedentes à la date actuelle ! 
