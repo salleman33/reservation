@@ -106,6 +106,8 @@ class PluginReservationApi extends API
             return $this->currentReservation();
          case "currentOrNextReservation":
             return $this->currentOrNextReservation();
+         case "todayReservationOfUserId":
+            return $this->todayReservationOfUserId();
          case "search":
             return $this->search();
          default:
@@ -166,7 +168,7 @@ class PluginReservationApi extends API
 
             foreach ($result as $resa) {
                $reservationItem = new ReservationItem();
-               $reservationItem->getFromDB($resa['id']);               
+               $reservationItem->getFromDB($resa['reservationitems_id']);               
 
                $links = ["links" => [
                   ["rel" => "Entity", "href" => self::$api_url . "/Entity/" . $reservationItem->fields['entities_id']],
@@ -296,6 +298,58 @@ class PluginReservationApi extends API
                [
                   "`end` >= '" . $now . "'",
                   "reservationitems_id = " . $id
+               ],
+               [
+                  "order by begin",
+                  "limit 1"
+               ]
+            );
+
+            if (count($res) == 0) {
+               return $this->messageNotfoundError();
+            }
+            $reservation = new Reservation();
+            $reservation->getFromDB($res[0]['reservations_id']);
+
+
+            $links = ["links" => [
+               ["rel" => "ReservationItem", "href" => self::$api_url . "/ReservationItem/" . $reservation->fields['reservationitems_id']],
+               ["rel" => "User", "href" => self::$api_url . "/User/" . $reservation->fields['users_id']]
+            ]];
+
+            $response = array_merge($reservation->fields, $links);
+            break;
+      }
+      return $this->returnResponse($response, $code, $additionalheaders);
+   }
+
+   /**
+    * 
+    */
+   private function todayReservationOfUserId()
+   {
+      $user_id                = $this->getId();
+      $additionalheaders = [];
+      $code              = 200;
+
+      switch ($this->verb) {
+         default:
+         case "PUT":
+            $code = 400;
+            $response = "Use GET request !";
+            break;
+         case "GET":
+            $time = time();
+	    $day = date("d", time());
+	    $month = date("m", time());
+	    $year = date("Y", time());
+            $now = date("Y-m-d H:i:s", $time);
+	    $end_day = date("Y-m-d H:i:s", mktime(23, 59, 00, $month, $day, $year));
+            $res = PluginReservationReservation::getAllReservations(
+               [
+                  "`end` >= '" . $now . "'",
+                  "`begin` < '" . $end_day . "'",
+                  "users_id = " . $user_id
                ],
                [
                   "order by begin",
