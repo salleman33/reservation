@@ -253,7 +253,7 @@ class PluginReservationConfig extends CommonDBTM
             } );
 
          $it = 0;     
-         if ($category_name === "pluginnotcategorized") {
+         if ($category_name === "zzpluginnotcategorized") {
             continue;
          }
          $menu .= $this->openCategoryHtml($category_name, $category_name);
@@ -267,16 +267,16 @@ class PluginReservationConfig extends CommonDBTM
       $menu .= '</td>';
       $menu .= '<td>';
 
-      $menu .= $this->openCategoryHtml('pluginnotcategorized', '', false);
-      // if (in_array('pluginnotcategorized', $categories_names)) {
+      $menu .= $this->openCategoryHtml('zzpluginnotcategorized', '', false);
+      // if (in_array('zzpluginnotcategorized', $categories_names)) {
          $filtered_array = array_filter($all_reservation_items,
             function ($element) {
-               return ($element['category_name'] === 'pluginnotcategorized' || is_null($element['category_name']));
+               return ($element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']));
             } );
          $it = 0;
          foreach ($filtered_array as $reservation_item) {
             $it++;
-            $menu .= $this->makeItemHtml($reservation_item, 'pluginnotcategorized',$it);
+            $menu .= $this->makeItemHtml($reservation_item, 'zzpluginnotcategorized',$it);
          }
       // }
       $menu .= $this->closeCategoryHtml();

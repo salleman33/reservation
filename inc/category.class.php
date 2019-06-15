@@ -94,7 +94,7 @@ class PluginReservationCategory extends CommonDBTM
       foreach ($list_reservationitems as $item) {
          $category_name =$item['category_name']; 
          if ($category_name === null) {
-            $category_name = 'pluginnotcategorized';
+            $category_name = 'zzpluginnotcategorized';
          }
 
          if (array_key_exists($category_name, $result)) {

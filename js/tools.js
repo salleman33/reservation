@@ -26,7 +26,7 @@ function createCategoryEnter() {
 }
 
 function deleteCategory(category) {
-   var categorieOther = document.getElementById("itemsCategory_pluginnotcategorized");
+   var categorieOther = document.getElementById("itemsCategory_zzpluginnotcategorized");
    var tbody_dst = categorieOther.getElementsByTagName('tbody')[0];
 
    var element = document.getElementById("itemsCategory_" + category);
@@ -36,7 +36,7 @@ function deleteCategory(category) {
 
          clonedElement = tbody_source.firstChild.cloneNode(true);
          var input = clonedElement.getElementsByTagName('input')[0];
-         input.value = "pluginnotcategorized";
+         input.value = "zzpluginnotcategorized";
 
          clonedElement = tbody_dst.appendChild(clonedElement);
       }
@@ -57,7 +57,7 @@ function createCategory() {
 
    titleField = document.getElementById('newCategoryTitle');
    titleValue = titleField.value;
-   if (!/^([a-zA-Z0-9]+)$/.test(titleValue) || titleValue === 'pluginnotcategorized') {
+   if (!/^([a-zA-Z0-9]+)$/.test(titleValue) || titleValue === 'zzpluginnotcategorized') {
       titleField.style.backgroundColor = "red";
       return;
    }
@@ -101,6 +101,12 @@ function createCategory() {
       }).disableSelection();
 }
 
+var fixHelper = function (e, ui) {
+   ui.children().each(function() {
+      $(this).width($(this).width());
+   });
+   return ui;
+};
 
 var updateHiddenConfig = function (e, ui) {
    var target = ui.item.offsetParent()[0],
@@ -136,6 +142,7 @@ var updateHiddenConfig = function (e, ui) {
          {
             connectWith: '.dropper',
             items: 'tbody tr',
+	    helper: fixHelper,
             stop: updateHiddenConfig,
             receive: function (e, ui) { $(this).find("tbody").append(ui.item); }
          }).disableSelection();
