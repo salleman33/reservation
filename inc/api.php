@@ -220,12 +220,18 @@ class PluginReservationApi extends API
                $reservationItem = new ReservationItem();
                $reservationItem->getFromDB($resa['id']);
 
+               $cat = ["category" => [
+                  "id" => $resa['category_id'],
+                  "name" => $resa['category_name'],
+                  "priority" => $resa['items_priority']
+               ]];
+
                $links = ["links" => [
                   ["rel" => "Entity", "href" => self::$api_url . "/Entity/" . $reservationItem->fields['entities_id']],
                   ["rel" => $reservationItem->fields['itemtype'], "href" => self::$api_url . "/" . $reservationItem->fields['itemtype'] . "/" . $reservationItem->fields['items_id']]
                ]];
 
-               array_push($response, array_merge($reservationItem->fields, $links));
+               array_push($response, array_merge($reservationItem->fields, $cat, $links));
             }      
             break;
       }
