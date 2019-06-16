@@ -207,7 +207,9 @@ class PluginReservationReservation extends CommonDBTM
                   sprintf(__('%1$s marks the reservation %2$s as gone'),
                            $_SESSION["glpiname"], $reservation_id));
          Toolbox::logInFile('reservations_plugin', "checkinReservation : ".$reservation_id."\n", $force = false);
+         return true;
       }
+      return false;
    }
 
 
