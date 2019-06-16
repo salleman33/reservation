@@ -266,15 +266,6 @@ class PluginReservationApi extends API
             $response = "Use GET request !";
             break;
          case "GET":
-            if (!isset($this->parameters['input'])) {
-               $this->messageBadArrayError();
-            }
-            // if id is passed by query string, add it into input parameter
-            $input = (array)($this->parameters['input']);
-            if (($id > 0) && !isset($input['id'])) {
-               $this->parameters['input']->id = $id;
-            }
-
             $cat_id = PluginReservationCategory_Item::getCategoryId($id);
 
             if (count($cat_id) == 1) {
