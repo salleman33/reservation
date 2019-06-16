@@ -112,6 +112,8 @@ class PluginReservationApi extends API
             return $this->searchReservations();
          case "searchReservationItems":
             return $this->searchReservationItems();
+         case "category":
+            return $this->getCategory();
          default:
             return $this->returnError(
                __("resource not found"),
@@ -145,7 +147,7 @@ class PluginReservationApi extends API
 
 
             $filters = array(
-               "`begin` >= '" . $begin . "'", 
+               "`begin` >= '" . $begin . "'",
                "`end` <= '" . $end . "'"
             );
 
@@ -210,7 +212,7 @@ class PluginReservationApi extends API
             $response = array();
             $begin = $this->parameters['begin'];
             $end = $this->parameters['end'];
-         
+
             $result = PluginReservationCategory::getReservationItems($begin, $end, true);
             if (count($result) == 0) {
                return $this->messageNotfoundError();
@@ -232,12 +234,56 @@ class PluginReservationApi extends API
                ]];
 
                array_push($response, array_merge($reservationItem->fields, $cat, $links));
-            }      
+            }
             break;
       }
       return $this->returnResponse($response, $code, $additionalheaders);
    }
 
+   /**
+    * 
+    */
+   private function getCategory()
+   {
+      $id                = $this->getId();
+      $additionalheaders = [];
+      $code              = 200;
+
+      $plugin_config = new PluginReservationConfig();
+      $custom_categories = $plugin_config->getConfigurationValue("custom_categories", 0);
+      if (!$custom_categories) {
+         return $this->returnError(
+            __("custom categories is not enabled"),
+            400,
+            "ERROR_METHOD_NOT_ALLOWED"
+         );
+      }
+
+      switch ($this->verb) {
+         default:
+         case "GET":
+            $code = 400;
+            $response = "Use PUT request !";
+            break;
+         case "PUT":
+            if (!isset($this->parameters['input'])) {
+               $this->messageBadArrayError();
+            }
+            // if id is passed by query string, add it into input parameter
+            $input = (array)($this->parameters['input']);
+            if (($id > 0) && !isset($input['id'])) {
+               $this->parameters['input']->id = $id;
+            }
+
+            $cat_id = PluginReservationCategory_Item::getCategoryId($id);
+            if (count($cat_id) == 1) {
+               $response = [$cat_id];
+               break;
+            }
+            return $this->messageNotfoundError();
+      }
+      return $this->returnResponse($response, $code, $additionalheaders);
+   }
 
    /**
     * 
@@ -488,7 +534,6 @@ class PluginReservationApi extends API
                   } else {
                      $response = [$reservation_id => false, "message" => "error in glpi !"];
                   }
-                  
                } catch (Exception $e) {
                   $response = [$reservation_id => false, "message" => $e->getMessage()];
                }
