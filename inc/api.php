@@ -276,6 +276,7 @@ class PluginReservationApi extends API
             }
 
             $cat_id = PluginReservationCategory_Item::getCategoryId($id);
+
             if (count($cat_id) == 1) {
                $response = [$cat_id];
                break;
