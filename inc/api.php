@@ -261,11 +261,11 @@ class PluginReservationApi extends API
 
       switch ($this->verb) {
          default:
-         case "GET":
-            $code = 400;
-            $response = "Use PUT request !";
-            break;
          case "PUT":
+            $code = 400;
+            $response = "Use GET request !";
+            break;
+         case "GET":
             if (!isset($this->parameters['input'])) {
                $this->messageBadArrayError();
             }
