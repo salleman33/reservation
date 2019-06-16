@@ -142,8 +142,24 @@ class PluginReservationApi extends API
             $user = $this->parameters['user'];
             $available = $this->parameters['available'];
 
-            if ($available) {
+            if ($available == 'true') {
                $result = PluginReservationReservation::getAvailablesItems($begin, $end);
+            if (count($result) == 0) {
+               return $this->messageNotfoundError();
+            }
+
+            foreach ($result as $resa) {
+               $reservationItem = new ReservationItem();
+               $reservationItem->getFromDB($resa['id']);               
+
+               $links = ["links" => [
+                  ["rel" => "Entity", "href" => self::$api_url . "/Entity/" . $reservationItem->fields['entities_id']],
+                  ["rel" => $reservationItem->fields['itemtype'], "href" => self::$api_url . "/" . $reservationItem->fields['itemtype'] . "/" . $reservationItem->fields['items_id']]
+               ]];
+
+               array_push($response, array_merge($reservationItem->fields, $links));
+            }
+      		return $this->returnResponse($response, $code, $additionalheaders);
 
             } else {
                $filters = array("`begin` >= '" . $begin . "'");
