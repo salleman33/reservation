@@ -525,11 +525,11 @@ class PluginReservationApi extends API
                      $response = [$reservation_id => true, "message" => ""];
                   } else {
                      $response = [$reservation_id => false, "message" => "error in glpi !"];
-                     $code = 404
+                     $code = 404;
                   }
                } catch (Exception $e) {
                   $response = [$reservation_id => false, "message" => $e->getMessage()];
-                  $code = 404
+                  $code = 404;
                }
                break;
             }
