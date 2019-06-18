@@ -148,11 +148,11 @@ class PluginReservationApi extends API
 
             $filters = array(
                "`begin` >= '" . $begin . "'",
-               "`end` <= '" . $end . "'"
+	       "`end` <= '" . $end . "'"
             );
 
             if (isset($user)) {
-               array_push($filters, "`users_id` >= '" . $user . "'");
+               array_push($filters, "`users_id` = '" . $user . "'");
             } else {
                return $this->returnError(
                   __("missing params"),
