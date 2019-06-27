@@ -443,7 +443,8 @@ class PluginReservationApi extends API
                [
                   "`end` >= '" . $now . "'",
                   "`begin` < '" . $end_day . "'",
-                  "users_id = " . $user_id
+                  "users_id = " . $user_id,
+                  "checkindate is NULL" 
                ],
                [
                   "order by begin",
