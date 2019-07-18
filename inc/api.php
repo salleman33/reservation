@@ -512,10 +512,13 @@ class PluginReservationApi extends API
             $now = date("Y-m-d H:i:s", $time);
             $current_reservation = PluginReservationReservation::getAllReservations(
                [
-                  "`begin` <= '" . $now . "'",
                   "`end` >= '" . $now . "'",
                   "reservationitems_id = " . $this->parameters['input']->id,
                   "checkindate is null"
+               ],
+               [
+                  "order by begin",
+                  "limit 1"
                ]
             );
 
