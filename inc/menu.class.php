@@ -498,8 +498,8 @@ class PluginReservationMenu extends CommonGLPI
       foreach ($categories_names as $category_name ) {
          $filtered_array = array_filter($available_reservationsitem,
             function ($element) use ($category_name) {
-               if ($category_name === 'pluginnotcategorized') {
-                  return ($element['category_name'] === 'pluginnotcategorized' || is_null($element['category_name']));
+               if ($category_name === 'zzpluginnotcategorized') {
+                  return ($element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']));
                } else {               
                   return ($element['category_name'] == $category_name);
                }
@@ -508,7 +508,7 @@ class PluginReservationMenu extends CommonGLPI
          echo "<td style=\"display:inline-block;\" valign=\"top\">";         
          
          echo "\n\t<table class='tab_cadre'>";
-         if ($category_name === 'pluginnotcategorized') {
+         if ($category_name === 'zzpluginnotcategorized') {
             $category_name = '';
          }
          echo "<tr><th colspan='" . ($showentity ? "6" : "5") . "'>" . $category_name . "</th></tr>\n";

@@ -64,6 +64,30 @@ class PluginReservationCategory_Item extends CommonDBChild
    }
 
    /**
+    * Get the category id of a reservationitem
+    * @param $id integer the reservationitem id
+    * @return integer the category id
+    */
+   public static function getCategoryId($item_id)
+   {
+      global $DB;
+      $cat_id = '';
+
+      $query = "SELECT `glpi_plugin_reservation_categories_items`.`categories_id`
+               FROM `glpi_plugin_reservation_categories_items`
+               WHERE `reservationitems_id` = $item_id
+               ";
+      if ($result = $DB->query($query)) {
+         
+         if ($DB->numrows($result) == 1) {
+            $cat_id = $DB->result($result, 0, "categories_id");
+         }
+      }
+ 
+      return $cat_id;
+   }
+
+   /**
     * Get the itemtype of the reservationitem
     * @param $id integer the reservationitem id
     */
