@@ -502,17 +502,15 @@ class PluginReservationMenu extends CommonGLPI
       
       // display the custom categories first
       foreach ($categories_names as $category_name ) {
-         
-         $category_items = array_filter($available_reservationsitem,
-            function ($element) use ($category_name) {
-               if ($category_name == 'zzpluginnotcategorized') {
-                  return false;
-               } else {
+         if ($category_name != 'zzpluginnotcategorized') {
+            $category_items = array_filter($available_reservationsitem,
+               function ($element) use ($category_name) {
                   return ($element['category_name'] == $category_name);
                }
             } );
 
             self::displayCategory($category_name, $category_items);
+         }
       }
 
       // display the remaining items
@@ -549,6 +547,10 @@ class PluginReservationMenu extends CommonGLPI
 
    private static function displayCategory($category_name ='', $category_items = [])
    {
+      if (empty($category_items)) {
+         return;
+      }
+
       $showentity = Session::isMultiEntitiesMode();
       echo "<td style=\"display:inline-block;\" valign=\"top\">";         
          
