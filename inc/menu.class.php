@@ -472,11 +472,11 @@ class PluginReservationMenu extends CommonGLPI
       if ($custom_categories)
       {
          $available_reservationsitem = PluginReservationCategory::getReservationItems($begin, $end, true);
-         displayItemsInCustomCategories($available_reservationsitem);
+         self::displayItemsInCustomCategories($available_reservationsitem);
       } else
       {
          $available_reservationsitem = PluginReservationReservation::getAvailablesItems($begin, $end);
-         displayItemsInTypesCategories($available_reservationsitem);
+         self::displayItemsInTypesCategories($available_reservationsitem);
       }
 
       echo "</tr>";
@@ -512,7 +512,7 @@ class PluginReservationMenu extends CommonGLPI
                }
             } );
 
-         displayCategory($category_name, $category_items);
+            self::displayCategory($category_name, $category_items);
       }
 
       // display the remaining items
@@ -523,10 +523,10 @@ class PluginReservationMenu extends CommonGLPI
 
       if ($use_items_types)
       {
-         displayItemsInTypesCategories($remaining_items);
+         self::displayItemsInTypesCategories($remaining_items);
       } else
       {
-         displayCategory('',$remaining_items);
+         self::displayCategory('',$remaining_items);
       }
    }
 
@@ -544,7 +544,7 @@ class PluginReservationMenu extends CommonGLPI
             continue;
          }
          $item = getItemForItemtype($itemtype);
-         displayCategory($item->getTypeName(), $type_items);
+         self::displayCategory($item->getTypeName(), $type_items);
       }
    }
 
