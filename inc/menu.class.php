@@ -505,7 +505,7 @@ class PluginReservationMenu extends CommonGLPI
          
          $category_items = array_filter($available_reservationsitem,
             function ($element) use ($category_name) {
-               if ($category_name === 'zzpluginnotcategorized') {
+               if ($category_name == 'zzpluginnotcategorized') {
                   return false;
                } else {
                   return ($element['category_name'] == $category_name);
@@ -518,7 +518,7 @@ class PluginReservationMenu extends CommonGLPI
       // display the remaining items
       $remaining_items = array_filter($available_reservationsitem,
          function ($element){
-            return $element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']);
+            return $element['category_name'] == 'zzpluginnotcategorized' || is_null($element['category_name']);
          } );
 
       if ($use_items_types)
@@ -540,9 +540,7 @@ class PluginReservationMenu extends CommonGLPI
                return ($element['itemtype'] == $itemtype);
             } );
 
-         if (!$type_items) {
-            continue;
-         }
+
          $item = getItemForItemtype($itemtype);
          self::displayCategory($item->getTypeName(), $type_items);
       }
