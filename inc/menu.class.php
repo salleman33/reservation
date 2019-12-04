@@ -507,7 +507,7 @@ class PluginReservationMenu extends CommonGLPI
                function ($element) use ($category_name) {
                   return ($element['category_name'] == $category_name);
                }
-            } );
+            );
 
             self::displayCategory($category_name, $category_items);
          }
