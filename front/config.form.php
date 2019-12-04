@@ -28,6 +28,9 @@ if ($plugin->isActivated("reservation")) {
    if (isset($_POST["custom_categories"])) {
       $PluginReservationConfig->setConfigurationValue("custom_categories", $_POST["custom_categories"]);
    }
+   if (isset($_POST["use_items_types"])) {
+      $PluginReservationConfig->setConfigurationValue("use_items_types", $_POST["use_items_types"]);
+   }
    if (isset($_POST['configCategoriesForm'])) {
       $PluginReservationCategory = new PluginReservationCategory();
       $PluginReservationCategory->applyCategoriesConfig($_POST);

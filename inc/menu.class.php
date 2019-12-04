@@ -468,12 +468,15 @@ class PluginReservationMenu extends CommonGLPI
 
       $plugin_config = new PluginReservationConfig();
       $custom_categories = $plugin_config->getConfigurationValue("custom_categories", 0);
-      if ($custom_categories) {
+
+      if ($custom_categories)
+      {
          $available_reservationsitem = PluginReservationCategory::getReservationItems($begin, $end, true);
-         self::customCategoriesView($available_reservationsitem);
-      } else {
+         displayItemsInCustomCategories($available_reservationsitem);
+      } else
+      {
          $available_reservationsitem = PluginReservationReservation::getAvailablesItems($begin, $end);
-         self::defaultGlpiView($available_reservationsitem);
+         displayItemsInTypesCategories($available_reservationsitem);
       }
 
       echo "</tr>";
@@ -487,6 +490,102 @@ class PluginReservationMenu extends CommonGLPI
       echo "<input type='hidden' name='end' value='" . $end . "'>";
       Html::closeForm();
       echo "</div>";
+   }
+
+   private static function displayItemsInCustomCategories($available_reservationsitem = [])
+   {
+      global $CFG_GLPI;
+      $plugin_config = new PluginReservationConfig();
+      $use_items_types = $plugin_config->getConfigurationValue("use_items_types", 0);
+
+      $categories_names = PluginReservationCategory::getCategoriesNames();
+      
+      // display the custom categories first
+      foreach ($categories_names as $category_name ) {
+         
+         $category_items = array_filter($available_reservationsitem,
+            function ($element) use ($category_name) {
+               if ($category_name === 'zzpluginnotcategorized') {
+                  return false;
+               } else {
+                  return ($element['category_name'] == $category_name);
+               }
+            } );
+
+         displayCategory($category_name, $category_items);
+      }
+
+      // display the remaining items
+      $remaining_items = array_filter($available_reservationsitem,
+         function ($element){
+            return $element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']);
+         } );
+
+      if ($use_items_types)
+      {
+         displayItemsInTypesCategories($remaining_items);
+      } else
+      {
+         displayCategory('',$remaining_items);
+      }
+   }
+
+   private static function displayItemsInTypesCategories($available_reservationsitem = [])
+   {
+      global $CFG_GLPI;
+
+      foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
+         $type_items = array_filter($available_reservationsitem,
+            function ($element) use ($itemtype) {
+               return ($element['itemtype'] == $itemtype);
+            } );
+
+         if (!$type_items) {
+            continue;
+         }
+         $item = getItemForItemtype($itemtype);
+         displayCategory($item->getTypeName(), $type_items);
+      }
+   }
+
+
+   private static function displayCategory($category_name ='', $category_items = [])
+   {
+      $showentity = Session::isMultiEntitiesMode();
+      echo "<td style=\"display:inline-block;\" valign=\"top\">";         
+         
+      echo "\n\t<table class='tab_cadre'>";
+      echo "<tr><th colspan='" . ($showentity ? "6" : "5") . "'>" . $category_name . "</th></tr>\n";
+
+      foreach ($category_items as $reservation_item) {
+         $item = getItemForItemtype($reservation_item['itemtype']);
+         $item->getFromDB($reservation_item['items_id']);
+         echo "<td>";
+         echo HTML::getCheckbox([
+            'name' => "item[" . $reservation_item["id"] . "]",
+            "value" => $reservation_item["id"],
+            "zero_on_empty" => false
+         ]);
+         echo "</td>";
+
+         echo "<td>";
+         echo Html::link($item->fields['name'], $item->getFormURLWithID($item->fields['id']));
+         echo "</td>";
+         echo "<td>" . nl2br($reservation_item['comment']) . "</td>";
+
+         if ($showentity) {
+            echo "<td>".Dropdown::getDropdownName("glpi_entities", $reservation_item["entities_id"])."</td>";
+         }
+
+         echo "<td>";
+         getToolTipforItem($item);
+         echo "</td>";
+
+         echo "<td><a title=\"Show Calendar\" href='../../../front/reservation.php?reservationitems_id=" . $reservation_item['id'] . "'><i class=\"far fa-calendar-alt\"></i></a></td>";
+         echo "</tr>\n";
+      }
+      echo "</table>\n";
+      echo "</td>";
    }
 
    private static function customCategoriesView($available_reservationsitem = []) {
