@@ -153,7 +153,14 @@ class PluginReservationConfig extends CommonDBTM
       echo __('Use custom categories', "reservation") . "</td>";
       echo "</tr>";
       if ($custom_categories) {
-         echo '<tr class="tab_bg_2" id="custom_categories">';
+         $use_items_types = $this->getConfigurationValue("use_items_types", 0);
+         echo '<tr class="tab_bg_2">';
+         echo "<input type=\"hidden\" name=\"use_items_types\" value=\"0\">";
+         echo "<td style=\"padding-left:20px;\">";
+         echo "<input onclick=\"javascript:afficher_cacher_simple('use_items_types_view');\" type=\"checkbox\" name=\"use_items_types\" value=\"1\" " . ($use_items_types ? 'checked' : '') . "> ";
+         echo __('Use items types when not in a custom category', "reservation") . "</td>";
+         echo "</tr>";
+         echo '<tr class="tab_bg_2" id="use_items_types">';
          echo $this->showConfigCategoriesForm();
          echo "</tr>";
       } 
