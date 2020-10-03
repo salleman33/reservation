@@ -99,26 +99,45 @@ class PluginReservationConfig extends CommonDBTM
       // checkin
       $checkin = $this->getConfigurationValue("checkin", 0);
       $checkin_timeout = $this->getConfigurationValue("checkin_timeout", 1);
+      $checkin_action = $this->getConfigurationValue("checkin_action", '0');
       echo '<tr class="tab_bg_2">';
       echo "<td style=\"padding-left:20px;\">";      
       echo "<input type=\"hidden\" name=\"checkin\" value=\"0\">";      
-      echo "<input onclick=\"javascript:afficher_cacher_simple('checkin_timeout');\" type=\"checkbox\" name=\"checkin\" value=\"1\" " . ($checkin ? 'checked' : '') . "> ";
+      echo "<input onclick=\"javascript:afficher_cacher_simple('checkin_config');\" type=\"checkbox\" name=\"checkin\" value=\"1\" " . ($checkin ? 'checked' : '') . "> ";
       echo __('Enable check in', "reservation"). "</td>";
       echo '</tr>';
+
+      // checkin action
+      echo '<tr class="tab_bg_2">';
+      echo "<td>";
       if ($checkin) {
-         echo '<tr class="tab_bg_2" id="checkin_timeout">';
+         echo '<table id="checkin_config">';
       } else {
-         echo '<tr class="tab_bg_2" id="checkin_timeout" style="display:none;" >';
+         echo '<table id="checkin_config" style="display:none;" >';
       }
+      echo '<tr>';
+      echo "<td>";
+      echo __('Action when reservation are not checkin', "reservation") . " : ";
+      echo "<select name=\"checkin_action\">";
+      echo "<option value=\"0\" " . ($checkin_action == '0' ? 'selected="selected"' : '') . ">" . __('Do Nothing', "reservation") . "</option>";
+      echo "<option value=\"1\" " . ($checkin_action == '1' ? 'selected="selected"' : '') . ">" . __('Warn', "reservation") . "</option>";
+      echo "<option value=\"2\" " . ($checkin_action == '2' ? 'selected="selected"' : '') . ">" . __('Warn and delete unclaimed reservation', "reservation") . "</option>";
+      echo "</select>";
+      echo "</td>";
+      echo "</tr>";
+
+      // checkin timeout
+      echo '<tr>';
       echo "<td>";
       echo __('Waiting time (in hour) to cancel the unclaimed reservation', "reservation") . " : ";
       echo "<select name=\"checkin_timeout\">";
       for ($h = 1; $h <= 24; $h++) {
          echo "<option value=\"" . $h . "\" " . ($checkin_timeout == $h ? 'selected="selected"' : '') . ">" . $h . " </option>";
       }
-      echo '</td>';
       echo "</select>";
+      echo '</td>'; 
       echo "</tr>";      
+      echo '</table>';
       echo "</table>";      
 
       // define tabs
