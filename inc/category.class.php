@@ -131,10 +131,9 @@ class PluginReservationCategory extends CommonDBTM
          $category_items_table = getTableForItemType("PluginReservationCategory_Item");
 
          $left = "LEFT JOIN `glpi_reservations`
-                        ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`"
-                            . ($begin == '' ? "" : "AND '". $begin."' < `glpi_reservations`.`end`")
-                            . ($end == '' ? "" : "AND '". $end."' > `glpi_reservations`.`begin`")
-                            .")";
+                        ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
+                            AND '". $begin."' < `glpi_reservations`.`end`
+                            AND '". $end."' > `glpi_reservations`.`begin`)";
          
          $where = $available ? " AND `glpi_reservations`.`id` IS NULL " : '' ;
 
