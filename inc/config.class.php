@@ -324,7 +324,7 @@ class PluginReservationConfig extends CommonDBTM
     */
    private function makeItemHtml($reservation_item, $category_name, $index)
    {
-      $html = '<tr class="draggable" id="item_' . $reservation_item['id'] . '">';
+      $html = '<tr class="draggable" ' . ($reservation_item['is_active'] == '1' ? '' : 'style="background-color:#f36647 "') . ' id="item_' . $reservation_item['id'] . '">';
       $html .= '<input type="hidden" name="item_' . $reservation_item['id'] . '" value="' . $category_name . '">';      
       $html .= '<td>' . $reservation_item['name']. '</td>';
       $html .= '<td>' . nl2br($reservation_item['comment']) . '</td>';

@@ -126,9 +126,10 @@ class PluginReservationCategory extends CommonDBTM
          $category_items_table = getTableForItemType("PluginReservationCategory_Item");
 
          $left = "LEFT JOIN `glpi_reservations`
-                        ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
-                            AND '". $begin."' < `glpi_reservations`.`end`
-                            AND '". $end."' > `glpi_reservations`.`begin`)";
+                        ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`"
+                            . ($begin == '' ? "" : "AND '". $begin."' < `glpi_reservations`.`end`")
+                            . ($end == '' ? "" : "AND '". $end."' > `glpi_reservations`.`begin`")
+                            .")";
          
          $where = $available ? " AND `glpi_reservations`.`id` IS NULL " : '' ;
 
@@ -140,7 +141,8 @@ class PluginReservationCategory extends CommonDBTM
                            `$categories_table`.`name` AS category_name,
                            `$categories_table`.`id` AS category_id,
                            `$category_items_table`.`priority` AS items_priority,
-                           `glpi_reservationitems`.`items_id` AS items_id
+                           `glpi_reservationitems`.`items_id` AS items_id,
+                           `glpi_reservationitems`.`is_active`
                              
                   FROM `glpi_reservationitems`
                   INNER JOIN `$itemtable`
@@ -151,8 +153,7 @@ class PluginReservationCategory extends CommonDBTM
                   LEFT OUTER JOIN `$categories_table`
                      ON `$category_items_table`.`categories_id` = `$categories_table`.`id`
                   $left
-                  WHERE `glpi_reservationitems`.`is_active` = '1'
-                     AND `glpi_reservationitems`.`is_deleted` = '0'
+                  WHERE `glpi_reservationitems`.`is_deleted` = '0'
                      AND `$itemtable`.`is_deleted` = '0'
                      $where ".
                      getEntitiesRestrictRequest(
