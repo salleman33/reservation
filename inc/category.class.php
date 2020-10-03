@@ -112,9 +112,14 @@ class PluginReservationCategory extends CommonDBTM
     * get reservation items merged with their category configs (id, name, priority)
     * @return array list of reservation items like [{"id":"1","comment":"Windows 10","name":"computer 1","entities_id":"0","category_name":"Windows","category_id":"11","items_priority":"1","items_id":"1","itemtype":"Computer"}{...}{...}],
     */
-   public static function getReservationItems($begin = '', $end = '', $available = false)
+   public static function getReservationItems($begin = '', $end = '', $available = false, $optional =  [])
    {
       global $DB, $CFG_GLPI;
+      $filter_is_active = true;
+      if (isset($optional["filter_is_active"])) {
+         $filter_is_active = $optional["filter_is_active"];
+      }
+
       $result = [];
 
       foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
@@ -154,6 +159,7 @@ class PluginReservationCategory extends CommonDBTM
                      ON `$category_items_table`.`categories_id` = `$categories_table`.`id`
                   $left
                   WHERE `glpi_reservationitems`.`is_deleted` = '0'
+                     " . ($filter_is_active ? "AND `glpi_reservationitems`.`is_active` = '1'" : "") . "
                      AND `$itemtable`.`is_deleted` = '0'
                      $where ".
                      getEntitiesRestrictRequest(

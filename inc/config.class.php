@@ -271,7 +271,7 @@ class PluginReservationConfig extends CommonDBTM
 
       
       $categories_names = PluginReservationCategory::getCategoriesNames();
-      $all_reservation_items = PluginReservationCategory::getReservationItems();
+      $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, [ "filter_is_active" => false ]);
       foreach ($categories_names as $category_name ) {
          $filtered_array = array_filter($all_reservation_items,
             function ($element) use ($category_name) {
