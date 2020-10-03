@@ -69,6 +69,9 @@ class PluginReservationTask extends CommonDBTM
       if ($config->getConfigurationValue("checkin", 0) == 0) {
          return $return;
       }
+      if ($config->getConfigurationValue("checkin_action", 0) == 0) {
+         return $return;
+      }
       
       $time = time();
       $time -= ($time % MINUTE_TIMESTAMP);
@@ -83,8 +86,11 @@ class PluginReservationTask extends CommonDBTM
          $reservationitems = $reservation->getConnexityItem('reservationitem', 'reservationitems_id');
          $item = $reservationitems->getConnexityItem($reservationitems->fields['itemtype'], 'items_id');
 
-         $task->log("Deleting reservation (check in) : " .$reservation->fields['id'] . " on item ". $item->fields['name']);
-         $reservation->delete(['id' => $reservation->fields['id']]);
+
+         if ($config->getConfigurationValue("checkin_action", 0) == 2) {
+            $task->log("Deleting reservation (check in) : " .$reservation->fields['id'] . " on item ". $item->fields['name']);
+            $reservation->delete(['id' => $reservation->fields['id']]);
+         }
          NotificationEvent::raiseEvent('plugin_reservation_not_checkin', $reservation);
          $return++;
       }
