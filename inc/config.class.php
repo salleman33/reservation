@@ -99,7 +99,7 @@ class PluginReservationConfig extends CommonDBTM
       // checkin
       $checkin = $this->getConfigurationValue("checkin", 0);
       $checkin_timeout = $this->getConfigurationValue("checkin_timeout", 1);
-      $checkin_action = $this->getConfigurationValue("checkin_action", '0');
+      $checkin_action = $this->getConfigurationValue("checkin_action", '2');
       echo '<tr class="tab_bg_2">';
       echo "<td style=\"padding-left:20px;\">";      
       echo "<input type=\"hidden\" name=\"checkin\" value=\"0\">";      

@@ -1,7 +1,7 @@
 <?php
 
 define('PLUGIN_RESERVATION_GLPI_MIN_VERSION', '9.3');
-define('PLUGIN_VERSION', '2.3.1');
+define('PLUGIN_VERSION', '2.3.2');
 
 /**
  * Init the hooks of the plugins - Needed
