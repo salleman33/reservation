@@ -148,9 +148,9 @@ class PluginReservationTask extends CommonDBTM
                $extension_counter = 0;
                $new_comment = $reservation->fields['comment'];
                $current_counter = [];
-               if (preg_match('/.*\(\(extention : ([0-9]+)\)\)$/', $new_comment, $current_counter)) {
+               if (preg_match('/.*\(\(extension : ([0-9]+)\)\)$/', $new_comment, $current_counter)) {
                   $extension_counter = $current_counter[1];
-                  $new_comment = str_replace("((extention : $extension_counter))", '', $new_comment);
+                  $new_comment = str_replace("((extension : $extension_counter))", '', $new_comment);
                }
                $new_comment .= " ((extension : ".$extension_counter++."))";
 
