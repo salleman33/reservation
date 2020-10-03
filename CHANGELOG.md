@@ -1,3 +1,10 @@
+
+# 2.3.0
+
+* new feature : check-in mode : warn 
+* bug fix 
+
+
 # 2.2.1
 
 * new feature : when using your own item categories, you can now use the items types for uncategorized items
