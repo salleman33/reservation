@@ -96,7 +96,7 @@ function getModelFromItem($item) {
             FROM `$modeltable` WHERE
             `$modeltable`.`id` = " . $item->fields[$modelfield];
             if ($resmodel = $DB->query($query)) {
-               while ($rowModel = $DB->fetch_assoc($resmodel)) {
+               while ($rowModel = $DB->fetchAssoc($resmodel)) {
                   $typemodel = $rowModel["model"];
                }
             }

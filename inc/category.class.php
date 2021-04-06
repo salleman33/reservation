@@ -43,7 +43,7 @@ class PluginReservationCategory extends CommonDBTM
 
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
-            while ($row = $DB->fetch_assoc($result)) {
+            while ($row = $DB->fetchAssoc($result)) {
                $res[] = $row['name'];
             }
          }
@@ -173,7 +173,7 @@ class PluginReservationCategory extends CommonDBTM
                      `$itemtable`.`name` ASC";
 
          if ($res = $DB->query($query)) {
-            while ($row = $DB->fetch_assoc($res)) {
+            while ($row = $DB->fetchAssoc($res)) {
                $result[] = array_merge($row, ['itemtype' => $itemtype]);
             }
          }

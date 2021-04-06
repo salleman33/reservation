@@ -16,7 +16,7 @@ class PluginReservationConfig extends CommonDBTM
       $value = $defaultValue;
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result) > 0) {
-            while ($row = $DB->fetch_assoc($result)) {
+            while ($row = $DB->fetchAssoc($result)) {
                $value = $row['value'];
             }
          }
