@@ -152,7 +152,7 @@ class PluginReservationTask extends CommonDBTM
                   $extension_counter = $current_counter[1];
                   $new_comment = str_replace("((extension : $extension_counter))", '', $new_comment);
                }
-               $new_comment .= " ((extension : ".$extension_counter++."))";
+               $new_comment .= " ((extension : ".++$extension_counter."))";
 
                $query = "UPDATE `glpi_reservations` 
                         SET `end` = '".$conflict_reservation->fields["end"]."',
