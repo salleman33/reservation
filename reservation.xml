@@ -53,6 +53,10 @@ Il apporte également quelques actions simplifiées sur les réservations comme 
     </authors>
     <versions>
         <version>
+            <num>2.3.6</num>
+            <compatibility>9.5</compatibility>
+        </version>
+        <version>
             <num>2.3.5</num>
             <compatibility>9.5</compatibility>
         </version>
