@@ -152,9 +152,9 @@ class PluginReservationTask extends CommonDBTM
                   $extension_counter = $current_counter[1];
                   $new_comment = str_replace("((extension : $extension_counter))", '', $new_comment);
                }
-               $new_comment .= " ((extension : ".$extension_counter++.")) ";
-	       $new_comment .= $conflict_reservation->fields['comment'];
 
+               $new_comment .= " ((extension : ".++$extension_counter."))";
+               $new_comment .= $conflict_reservation->fields['comment'];
 
                $query = "UPDATE `glpi_reservations` 
                         SET `end` = '".$conflict_reservation->fields["end"]."',
@@ -179,7 +179,8 @@ class PluginReservationTask extends CommonDBTM
                   $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
                   break;
                case "delay":
-                  if ($conflict_reservation->fields["end"] <= $end) {
+		  $end_plus_epsilon = date("Y-m-d H:i:s", $time + $delay + ($delay / 2));
+                  if ($conflict_reservation->fields["end"] <= $end_plus_epsilon) {
                      $task->log("Could not delay reservation " . $conflict_reservation->fields['id'] . " on item ". $item->fields['name']);
                      $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
                      break;
