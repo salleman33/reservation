@@ -350,9 +350,9 @@ class PluginReservationMenu extends CommonGLPI
                }
 
                // date begin
-               echo "<td rowspan=" . $rowspan_line . " $color>".date(self::getDateFormat()." \à H:i:s", strtotime($reservation->fields['begin']))."</td>";
+               echo "<td rowspan=" . $rowspan_line . " $color>".date(self::getDateFormat()." H:i", strtotime($reservation->fields['begin']))."</td>";
                // date end
-               echo "<td rowspan=" . $rowspan_line . " $color>".date(self::getDateFormat()." \à H:i:s", strtotime($reservation_user_info['baselinedate']))."</td>";
+               echo "<td rowspan=" . $rowspan_line . " $color>".date(self::getDateFormat()." H:i", strtotime($reservation_user_info['baselinedate']))."</td>";
 
                // comment
                echo "<td rowspan=" . $rowspan_line . " $color>".$reservation->fields['comment']."</td>";
@@ -372,7 +372,7 @@ class PluginReservationMenu extends CommonGLPI
             // checkin buttons or date checkin
             if ($checkin_enable) {
                if ($reservation_user_info['checkindate'] != null) {
-                  echo "<td>" . date(self::getDateFormat()." \à H:i:s", strtotime($reservation_user_info['checkindate'])) . "</td>";
+                  echo "<td>" . date(self::getDateFormat()." H:i", strtotime($reservation_user_info['checkindate'])) . "</td>";
                } else {
                   echo "<td><center><a href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?checkin=" . $reservation_user_info['reservations_id'] . "\"><img title=\"" . _sx('tooltip', 'Set As Gone', "reservation") . "\" alt=\"\" src=\"../pics/redbutton.png\"></img></a></center></td>";
                }
@@ -428,11 +428,11 @@ class PluginReservationMenu extends CommonGLPI
             if (!$mode_auto) {
                echo "<td>";
                echo "<ul>";
-               if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i:s", time()) && $reservation_user_info['effectivedate'] == null) {
+               if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i", time()) && $reservation_user_info['effectivedate'] == null) {
                   echo "<li><a class=\"bouton\" title=\"" . _sx('tooltip', 'Send an e-mail for the late reservation', "reservation") . "\" href=\"".Toolbox::getItemTypeSearchURL(__CLASS__)."?mailuser=" . $reservation_user_info['reservations_id'] . "\">" . _sx('button', 'Send an e-mail', "reservation") . "</a></li>";
                   if (isset($reservation_user_info['mailingdate'])) {
                      echo "<li>" . __('Last e-mail sent on', "reservation") . " </li>";
-                     echo "<li>" . date(self::getDateFormat()." H:i:s", strtotime($reservation_user_info['mailingdate'])) . "</li>";
+                     echo "<li>" . date(self::getDateFormat()." H:i", strtotime($reservation_user_info['mailingdate'])) . "</li>";
                   }
                }
                echo "</ul>";
@@ -634,19 +634,19 @@ class PluginReservationMenu extends CommonGLPI
          $form_dates["end"] = $_GET['date_end'];
       }
       if (isset($_POST['nextday']) || isset($_GET['nextday'])) {
-	 $day = date("d", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
-	 $month = date("m", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
-	 $year = date("Y", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
+         $day = date("d", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
+         $month = date("m", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
+         $year = date("Y", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
 
          $form_dates["begin"] = date("Y-m-d H:i:s", mktime($planning_begin_time[0], $planning_begin_time[1], 00, $month, $day, $year));
          $form_dates["end"] = date("Y-m-d H:i:s", mktime($planning_end_time[0], $planning_end_time[1], 00, $month, $day, $year));
       }
       if (isset($_POST['previousday']) || isset($_GET['previousday'])) {
-	 $day = date("d", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
-	 $month = date("m", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
-	 $year = date("Y", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
+         $day = date("d", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
+         $month = date("m", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
+         $year = date("Y", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
 	 
-	 $form_dates["begin"] = date("Y-m-d H:i:s", mktime($planning_begin_time[0], $planning_begin_time[1], 00, $month, $day, $year));
+	      $form_dates["begin"] = date("Y-m-d H:i:s", mktime($planning_begin_time[0], $planning_begin_time[1], 00, $month, $day, $year));
          $form_dates["end"] = date("Y-m-d H:i:s", mktime($planning_end_time[0], $planning_end_time[1], 00, $month, $day, $year));
       }
 
