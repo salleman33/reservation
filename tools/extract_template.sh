@@ -42,6 +42,10 @@ xgettext *.php */*.php -o locales/glpi.pot -L PHP --add-comments=TRANS --from-co
 #Update main language
 LANG=C msginit --no-translator -i locales/glpi.pot -l en_GB -o locales/en_GB.po
 
+
+# merge language with new pot :
+# msgmerge locales/fr_FR.po locales/glpi.pot -o locales/fr_FR_new.po
+
 ### for using tx :
 ##tx set --execute --auto-local -r GLPI.glpipot 'locales/<lang>.po' --source-lang en_GB --source-file locales/glpi.pot
 ## tx push -s
