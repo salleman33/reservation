@@ -68,13 +68,13 @@ msgstr ""
 
 #: inc/config.class.php:63
 msgid "Duration added (in hour) to reservations expiring and not checkout"
-msgstr ""
+msgstr "Durée (en heure) ajoutée aux réservations expirées et non rendues"
 
 #: inc/config.class.php:65
 msgid ""
 "By defaut, use value of <b>step for the hours</b> defined in <I>General "
 "Setup > Assistance</I>"
-msgstr ""
+msgstr "par defaut on utilise la valeur de <b>Pas pour les heures (en minutes)</b> définie dans le menu <I>Générale > Assistance</I>"
 
 #: inc/config.class.php:67
 msgid "Default"
@@ -112,24 +112,24 @@ msgstr ""
 
 #: inc/config.class.php:120
 msgid "Action when reservation are not checkin"
-msgstr ""
+msgstr "Action lorsque le depart d'une réservation n'a pas été acquitté"
 
 #: inc/config.class.php:122
 msgid "Do Nothing"
-msgstr ""
+msgstr "Ne rien faire"
 
 #: inc/config.class.php:123
 msgid "Warn"
-msgstr ""
+msgstr "Avertir"
 
 #: inc/config.class.php:124
 #, fuzzy
 msgid "Warn and delete unclaimed reservation"
-msgstr "Envoyer un email"
+msgstr "Avertir et supprimer la réservation"
 
 #: inc/config.class.php:132
 msgid "Waiting time (in hour) to cancel the unclaimed reservation"
-msgstr ""
+msgstr "Delai (en heure) avant la suppression d'une réservation dont le depart n'a pas été acquitté"
 
 #: inc/config.class.php:145
 msgid "Tab Configuration"
@@ -426,7 +426,7 @@ msgstr "Envoi un email aux utilisateurs avec des réservations expirées"
 #: inc/task.class.php:91
 #, php-format
 msgid "Deleting reservation (check in) : %1$s on item %2$s"
-msgstr ""
+msgstr "suppression de la réservation (depart non acquitté) : %1$s avec le matériel %2$s"
 
 #: inc/task.class.php:116
 #, php-format
