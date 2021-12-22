@@ -447,7 +447,7 @@ msgstr "%1$s ajoute la réservation %2$s pour le matériel %3$s"
 #, php-format
 msgid ""
 "conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
-msgstr ""
+msgstr "conflit pour la réservation %1$s avec le matériel %2$s utilisé par %3$s (de %4$s à %5$s)"
 
 #: inc/task.class.php:186
 #, fuzzy, php-format
