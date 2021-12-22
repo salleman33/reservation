@@ -8,6 +8,7 @@
             <cs>Poskytuje odlišnou správu rezervací. Také dociluje akcí při rezervacích</cs>
             <en>Provides a different management of reservations. Also facilitates actions on reservations</en>
             <fr>Apporte une gestion differente des reservations. Permet egalement d'effectuer facilement des actions sur les reservations.</fr>
+            <de></de>
         </short>
         <long>
             <cs>Tento zásuvný modul nabízí odlišnou správu rezervací materiálu:
@@ -31,7 +32,7 @@ It also brings some simplified actions on bookings like :
 
 - add a material to an existing reservation
 - replace one material with another.</en>
-            
+
             <fr>Ce plugin propose une gestion différente des réservations de matériel :
 
 - acquittement des retours de matériels
@@ -42,6 +43,9 @@ Il apporte également quelques actions simplifiées sur les réservations comme 
 
 - ajouter un matériel à une réservation existante
 - remplacer un matériel par un autre.</fr>
+
+            <de>
+            </de>
         </long>
     </description>
     <homepage>https://github.com/salleman33/reservation</homepage>
@@ -101,6 +105,7 @@ Il apporte également quelques actions simplifiées sur les réservations comme 
         <lang>cs_CZ</lang>
         <lang>en_GB</lang>
         <lang>fr_FR</lang>
+        <lang>de_DE</lang>
     </langs>
     <license>GLPv3</license>
     <screenshots>
@@ -118,13 +123,13 @@ Il apporte également quelques actions simplifiées sur les réservations comme 
             <tag>acknowledgment</tag>
             <tag>management</tag>
         </en>
-        <de>
-        </de>
         <fr>
             <tag>réservations</tag>
             <tag>acquittement</tag>
             <tag>gestion</tag>
         </fr>
+        <de>
+        </de>
     </tags>
 </root>
 
