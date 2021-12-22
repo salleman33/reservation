@@ -1,3 +1,6 @@
+# 2.3.7
+* add language German (thanks to mahanovi)
+* fix bug when a reservation is made in the past
 
 # 2.3.0
 
