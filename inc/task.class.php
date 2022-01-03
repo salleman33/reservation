@@ -89,7 +89,7 @@ class PluginReservationTask extends CommonDBTM
 
          if ($config->getConfigurationValue("checkin_action", 2) == 2) {
 	    $task->log(sprintf(__('Deleting reservation (check in) : %1$s on item %2$s'),
-	   		$reservation->fields['id'], $item->fields['name']);	    
+	   		$reservation->fields['id'], $item->fields['name']));	    
             $reservation->delete(['id' => $reservation->fields['id']]);
          }
          NotificationEvent::raiseEvent('plugin_reservation_not_checkin', $reservation);
