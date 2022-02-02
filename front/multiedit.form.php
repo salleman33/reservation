@@ -9,12 +9,15 @@ include_once GLPI_ROOT . "plugins/reservation/inc/includes.php";
 
 $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {
-
     $PluginReservationMultiEdit = new PluginReservationMultiEdit();
-
     Session::checkRight("reservation", ReservationItem::RESERVEANITEM);
 
     Html::header(PluginReservationMultiEdit::getTypeName(2), $_SERVER['PHP_SELF'], "plugins", "pluginreservationmenu", "reservation");
+
+    if (isset($_POST["update"])) {
+        $PluginReservationMultiEdit->updateMultipleItems($_POST);
+        Html::redirect($CFG_GLPI["root_doc"] . "/plugins/reservation/front/menu.php");
+    }
 
     if (isset($_GET["ids"]) && !empty($_GET["ids"])) {
         $PluginReservationMultiEdit->showForm($_GET);

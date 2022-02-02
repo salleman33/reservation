@@ -8,6 +8,59 @@ include_once GLPI_ROOT . "/plugins/reservation/inc/includes.php";
 
 class PluginReservationMultiEdit extends CommonDBTM
 {
+
+    public function updateMultipleItems($post)
+    {
+        if (!Session::haveRight("reservation", ReservationItem::RESERVEANITEM)) {
+            return false;
+        }
+
+        //var_dump($post);
+
+        $allValid = true;
+        $multiResa = [];
+
+        foreach ($post["resa_ids"] as $resa_id) {
+            $resa = new Reservation();
+            if (!$resa->getFromDB($resa_id)) {
+                echo "FAIL1";
+                return false;
+            }
+
+            if (!$resa->can($resa_id, UPDATE)) {
+                echo "FAIL2";
+                return false;
+            }
+
+            $data = [];
+            $data["begin"] = $post["resa"]["begin"];
+            $data["end"] = $post["resa"]["end"];
+
+            $multiResa[$resa_id] = $resa;
+
+            $allValid = $allValid && $resa->prepareInputForUpdate($data);
+        }
+
+        $updateSuccess = true;
+        if ($allValid) {
+            foreach ($multiResa as $resa_id => $resa_instance) {
+                $updateSuccess = $updateSuccess && $resa_instance->update([
+                    'id'    => (int) $resa_id,
+                    'begin' => $post["resa"]["begin"],
+                    'end'   => $post["resa"]["end"]
+                ]);
+            }
+
+            if ($updateSuccess) {
+            } else {
+                // TODO throw error, possible data integrity failure
+            }
+        } else {
+            // TODO throw error
+            echo "NO";
+        }
+    }
+
     public function showForm($ID)
     {
         global $CFG_GLPI;
@@ -27,7 +80,7 @@ class PluginReservationMultiEdit extends CommonDBTM
 
         echo "<div class='center'>";
         // TODO change the action path to deal with multiple items
-        echo "<form method='post' name=form action='" . Reservation::getFormURL() . "'>";
+        echo "<form method='post' name=form action='" . $this->getFormURL() . "'>";
 
         echo "<table class='tab_cadre' width='700px'>";
         echo "<tr><th colspan='2'>" . __('Edit multiple items') . "</th></tr>\n";
@@ -46,6 +99,8 @@ class PluginReservationMultiEdit extends CommonDBTM
             $itemid = $resa->getField('reservationitems_id');
 
             $options['item'][$itemid] = $itemid;
+
+            echo "<input type='hidden' name='resa_ids[$resa_id]' value='$resa_id'>";
         }
         // TODO every time $resa is used, there is a possible problem.
         // TODO ensure that every resa have been made by the same user and got the same begin and end date
