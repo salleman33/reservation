@@ -4,60 +4,92 @@ if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
 
+use Glpi\Event;
+
 include_once GLPI_ROOT . "/plugins/reservation/inc/includes.php";
 
 class PluginReservationMultiEdit extends CommonDBTM
 {
-
     public function updateMultipleItems($post)
     {
         if (!Session::haveRight("reservation", ReservationItem::RESERVEANITEM)) {
             return false;
         }
 
-        //var_dump($post);
+        if (!isset($post["resa_ids"])) {
+            return false;
+        }
+        if (!is_array($post["resa_ids"])) {
+            return false;
+        }
+        if (count($post["resa_ids"]) < 2) {
+            return false;
+        }
 
-        $allValid = true;
-        $multiResa = [];
+        if (!isset($post["begin"])) {
+            return false;
+        }
+        if (!isset($post["end"])) {
+            return false;
+        }
+
+        $areResaValidForUpdate = true;
+        $reservations = [];
 
         foreach ($post["resa_ids"] as $resa_id) {
             $resa = new Reservation();
             if (!$resa->getFromDB($resa_id)) {
-                echo "FAIL1";
                 return false;
             }
 
             if (!$resa->can($resa_id, UPDATE)) {
-                echo "FAIL2";
                 return false;
             }
 
-            $data = [];
-            $data["begin"] = $post["resa"]["begin"];
-            $data["end"] = $post["resa"]["end"];
+            $areResaValidForUpdate &= $resa->prepareInputForUpdate([
+                'begin' => $post["begin"],
+                'end'   => $post["end"]
+            ]);
 
-            $multiResa[$resa_id] = $resa;
-
-            $allValid = $allValid && $resa->prepareInputForUpdate($data);
+            $reservations[$resa_id] = $resa;
         }
 
-        $updateSuccess = true;
-        if ($allValid) {
-            foreach ($multiResa as $resa_id => $resa_instance) {
-                $updateSuccess = $updateSuccess && $resa_instance->update([
+        $updateSuccessful = true;
+        if ($areResaValidForUpdate) {
+            foreach ($reservations as $resa_id => $resa_instance) {
+                $updateSuccessful &= $resa_instance->update([
                     'id'    => (int) $resa_id,
-                    'begin' => $post["resa"]["begin"],
-                    'end'   => $post["resa"]["end"]
+                    'begin' => $post["begin"],
+                    'end'   => $post["end"]
                 ]);
             }
 
-            if ($updateSuccess) {
+            if ($updateSuccessful) {
+                // update successful
+
+                foreach ($reservations as $resa_id => $resa_instace) {
+                    Event::log(
+                        $resa_id,
+                        "reservation",
+                        4,
+                        "inventory",
+                        sprintf(
+                            __('%1$s updated the reservation %2$s with new dates'),
+                            $_SESSION["glpiname"],
+                            $resa_id
+                        )
+                    );
+                    Toolbox::logInFile('reservations_plugin', "multiedit_update : " . $resa_id . "\n", $force = false);
+                }
+
+                return true;
             } else {
                 // TODO throw error, possible data integrity failure
+                return false;
             }
         } else {
             // TODO throw error
-            echo "NO";
+            return false;
         }
     }
 
@@ -69,21 +101,19 @@ class PluginReservationMultiEdit extends CommonDBTM
             return false;
         }
 
-        if (!isset($ID["ids"]) || empty($ID["ids"]) || !is_array($ID["ids"])) {
+        if (!isset($ID["ids"]) || !is_array($ID["ids"]) || count($ID["ids"]) < 2) {
             return false;
         }
 
-        if (count($ID["ids"]) <= 1) {
-            // redirect to normal way
-            Html::redirect(Toolbox::getItemTypeFormURL('Reservation') . "?id=" . array_shift($ID["ids"]));
-        }
-
         echo "<div class='center'>";
-        // TODO change the action path to deal with multiple items
         echo "<form method='post' name=form action='" . $this->getFormURL() . "'>";
 
         echo "<table class='tab_cadre' width='700px'>";
-        echo "<tr><th colspan='2'>" . __('Edit multiple items') . "</th></tr>\n";
+        echo "<tr><th colspan='2'>" . __('Update multiple items') . "</th></tr>\n";
+
+        $confirmedSameUser = '';
+        $confirmedSameBegin = '';
+        $confirmedSameEnd = '';
 
         $options = [];
         foreach ($ID["ids"] as $resa_id) {
@@ -96,14 +126,39 @@ class PluginReservationMultiEdit extends CommonDBTM
                 return false;
             }
 
+            // check that every resa have the same users_id
+            if ($confirmedSameUser == '') {
+                $confirmedSameUser = $resa->getField('users_id');
+            } else {
+                if ($confirmedSameUser != $resa->getField('users_id')) {
+                    return false;
+                }
+            }
+
+            // check that every resa have the same begin date
+            if ($confirmedSameBegin == '') {
+                $confirmedSameBegin = $resa->getField('begin');
+            } else {
+                if ($confirmedSameBegin != $resa->getField('begin')) {
+                    return false;
+                }
+            }
+
+            // check that every resa have the same end date
+            if ($confirmedSameEnd == '') {
+                $confirmedSameEnd = $resa->getField('end');
+            } else {
+                if ($confirmedSameEnd != $resa->getField('end')) {
+                    return false;
+                }
+            }
+
             $itemid = $resa->getField('reservationitems_id');
 
             $options['item'][$itemid] = $itemid;
 
             echo "<input type='hidden' name='resa_ids[$resa_id]' value='$resa_id'>";
         }
-        // TODO every time $resa is used, there is a possible problem.
-        // TODO ensure that every resa have been made by the same user and got the same begin and end date
 
         // Add Hardware name
         $r = new ReservationItem();
@@ -127,46 +182,29 @@ class PluginReservationMultiEdit extends CommonDBTM
             }
 
             echo "<span class='b'>" . sprintf(__('%1$s - %2$s'), $type, $name) . "</span><br>";
-            echo "<input type='hidden' name='items[$itemID]' value='$itemID'>";
         }
 
         echo "</td></tr>\n";
 
-        // TODO ensure same user for each resa
-        $uid = $resa->fields['users_id'];
-
+        // user
         echo "<tr class='tab_bg_2'><td>" . __('By') . "</td>";
         echo "<td>";
-        if (
-            !Session::haveRight("reservation", UPDATE)
-            || is_null($item)
-            || !Session::haveAccessToEntity($item->fields["entities_id"])
-        ) {
+        echo "<input type='hidden' name='users_id' value='" . $confirmedSameUser . "'>";
+        echo Dropdown::getDropdownName(User::getTable(), $confirmedSameUser);
+        echo "</td>";
+        echo "</tr>\n";
 
-            echo "<input type='hidden' name='users_id' value='" . $uid . "'>";
-            echo Dropdown::getDropdownName(
-                User::getTable(),
-                $uid
-            );
-        } else {
-            User::dropdown([
-                'value'        => $uid,
-                'entity'       => $item->getEntityID(),
-                'entity_sons'  => $item->isRecursive(),
-                'right'        => 'all'
-            ]);
-        }
-        echo "</td></tr>\n";
+        // begin
         echo "<tr class='tab_bg_2'><td>" . __('Start date') . "</td><td>";
         $rand_begin = Html::showDateTimeField(
             "resa[begin]",
             [
-                'value'      => $resa->fields["begin"],
+                'value'      => $confirmedSameBegin,
                 'maybeempty' => false
             ]
         );
         echo "</td></tr>\n";
-        $default_delay = floor((strtotime($resa->fields["end"]) - strtotime($resa->fields["begin"]))
+        $default_delay = floor((strtotime($confirmedSameEnd) - strtotime($confirmedSameBegin))
             / $CFG_GLPI['time_step'] / MINUTE_TIMESTAMP)
             * $CFG_GLPI['time_step'] * MINUTE_TIMESTAMP;
 
@@ -174,6 +212,7 @@ class PluginReservationMultiEdit extends CommonDBTM
         $default_delay = 0;
         //
 
+        // duration / end
         echo "<tr class='tab_bg_2'><td>" . __('Duration') . "</td><td>";
         $rand = Dropdown::showTimeStamp(
             "resa[_duration]",
@@ -184,10 +223,11 @@ class PluginReservationMultiEdit extends CommonDBTM
                 'emptylabel' => __('Specify an end date')
             ]
         );
+
         echo "<br><div id='date_end$rand'></div>";
         $params = [
             'duration'     => '__VALUE__',
-            'end'          => $resa->fields["end"],
+            'end'          => $confirmedSameEnd,
             'name'         => "resa[end]"
         ];
 
@@ -202,44 +242,25 @@ class PluginReservationMultiEdit extends CommonDBTM
             $params['duration'] = 0;
             Ajax::updateItem("date_end$rand", $CFG_GLPI["root_doc"] . "/ajax/planningend.php", $params);
         }
-        // todo deal with multiple items
-        Alert::displayLastAlert('Reservation', array_shift($ID["ids"]));
+
         echo "</td></tr>\n";
 
-        echo "<tr class='tab_bg_2'><td>" . __('Comments') . "</td>";
-        echo "<td><textarea name='comment' rows='8' cols='60'>" . $resa->fields["comment"] . "</textarea>";
-        echo "</td></tr>\n";
-
-
-        if (($resa->fields["users_id"] == Session::getLoginUserID())
-            || Session::haveRightsOr(static::$rightname, [PURGE, UPDATE])
-        ) {
+        // save button
+        if (($resa->fields["users_id"] == Session::getLoginUserID()) || Session::haveRight("reservation", UPDATE)) {
             echo "<tr class='tab_bg_2'>";
-            if (($resa->fields["users_id"] == Session::getLoginUserID())
-                || Session::haveRight(static::$rightname, PURGE)
-            ) {
-                echo "<td class='top center'>";
-                echo "<input type='submit' name='purge' value=\"" . _sx('button', 'Delete permanently') . "\"
-                        class='submit'>";
-                if ($resa->fields["group"] > 0) {
-                    echo "<br><input type='checkbox' name='_delete_group'>&nbsp;" .
-                        __s('Delete all repetition');
-                }
-                echo "</td>";
-            }
-            if (($resa->fields["users_id"] == Session::getLoginUserID())
-                || Session::haveRight(static::$rightname, UPDATE)
-            ) {
-                echo "<td class='top center'>";
-                echo "<input type='submit' name='update' value=\"" . _sx('button', 'Save') . "\"
-                       class='submit'>";
-                echo "</td>";
-            }
+            echo "<td></td>";
+
+            echo "<td class='top center'>";
+            echo "<input type='submit' name='update' value=\"" . _sx('button', 'Save') . "\" class='submit'>";
+            echo "</td>";
+
             echo "</tr>\n";
         }
 
         echo "</table>";
         Html::closeForm();
         echo "</div>\n";
+
+        return true;
     }
 }
