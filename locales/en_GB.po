@@ -1,14 +1,14 @@
 # English translations for PACKAGE package.
-# Copyright (C) 2021 THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2022 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2021.
+# Automatically generated, 2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-10 15:53+0100\n"
-"PO-Revision-Date: 2021-12-10 15:53+0100\n"
+"POT-Creation-Date: 2022-02-03 17:18+0100\n"
+"PO-Revision-Date: 2022-02-03 17:18+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
@@ -134,220 +134,228 @@ msgid "Tab Configuration"
 msgstr "Tab Configuration"
 
 #: inc/config.class.php:152
+msgid "My Reservation tab"
+msgstr "My Reservation tab"
+
+#: inc/config.class.php:160
 msgid "Current Reservation tab"
 msgstr "Current Reservation tab"
 
-#: inc/config.class.php:160
+#: inc/config.class.php:168
 msgid "Incoming Reservation tab"
 msgstr "Incoming Reservation tab"
 
-#: inc/config.class.php:166
+#: inc/config.class.php:174
 msgid "Categories Configuration"
 msgstr "Categories Configuration"
 
-#: inc/config.class.php:172
+#: inc/config.class.php:180
 msgid "Use custom categories"
 msgstr "Use custom categories"
 
-#: inc/config.class.php:180
+#: inc/config.class.php:188
 msgid "Use items types when not in a custom category"
 msgstr "Use items types when not in a custom category"
 
-#: inc/config.class.php:190
+#: inc/config.class.php:198
 msgid "ToolTip Configuration"
 msgstr "ToolTip Configuration"
 
-#: inc/config.class.php:196
+#: inc/config.class.php:204
 msgid "ToolTip"
 msgstr "ToolTip"
 
-#: inc/config.class.php:204 inc/menu.class.php:281
+#: inc/config.class.php:212 inc/menu.class.php:320
 msgid "Comment"
 msgstr "Comment"
 
-#: inc/config.class.php:211 inc/menu.class.php:29
+#: inc/config.class.php:219 inc/menu.class.php:30
 msgid "Location"
 msgstr "Location"
 
-#: inc/config.class.php:218 inc/menu.class.php:39
+#: inc/config.class.php:226 inc/menu.class.php:40
 msgid "Serial number"
 msgstr "Serial number"
 
-#: inc/config.class.php:225 inc/menu.class.php:36
+#: inc/config.class.php:233 inc/menu.class.php:37
 msgid "Inventory number"
 msgstr "Inventory number"
 
-#: inc/config.class.php:232 inc/menu.class.php:33
+#: inc/config.class.php:240 inc/menu.class.php:34
 msgid "Group"
 msgstr "Group"
 
-#: inc/config.class.php:239 inc/menu.class.php:44
+#: inc/config.class.php:247 inc/menu.class.php:45
 msgid "Manufacturer"
 msgstr "Manufacturer"
 
-#: inc/config.class.php:239 inc/menu.class.php:44
+#: inc/config.class.php:247 inc/menu.class.php:45
 msgid "Model"
 msgstr "Model"
 
-#: inc/config.class.php:246 inc/menu.class.php:48
+#: inc/config.class.php:254 inc/menu.class.php:49
 msgid "Status"
 msgstr "Status"
 
-#: inc/config.class.php:250 inc/menu.class.php:416
+#: inc/config.class.php:258 inc/menu.class.php:457
 msgctxt "button"
 msgid "Save"
 msgstr "Save"
 
-#: inc/config.class.php:260
+#: inc/config.class.php:268
 msgid "Categories customisation"
 msgstr "Categories customisation"
 
-#: inc/config.class.php:262
+#: inc/config.class.php:270
 msgid "Make your own category !"
 msgstr "Make your own category !"
 
-#: inc/config.class.php:263
+#: inc/config.class.php:271
 msgid "Drag and drop items on a custom category :"
 msgstr "Drag and drop items on a custom category :"
 
-#: inc/config.class.php:269 inc/menu.class.php:403
+#: inc/config.class.php:277 inc/menu.class.php:444
 msgctxt "button"
 msgid "Add"
 msgstr "Add"
 
-#: inc/menu.class.php:154
+#: inc/menu.class.php:168
+msgid "My Reservations"
+msgstr "My Reservations"
+
+#: inc/menu.class.php:172
 msgid "Current Reservations"
 msgstr "Current Reservations"
 
-#: inc/menu.class.php:158
+#: inc/menu.class.php:176
 msgid "Current and Incoming Reservations"
 msgstr "Current and Incoming Reservations"
 
-#: inc/menu.class.php:161
+#: inc/menu.class.php:179
 msgid "Available Hardware"
 msgstr "Available Hardware"
 
-#: inc/menu.class.php:272
+#: inc/menu.class.php:311
 msgid "Current and future reservations"
 msgstr "Current and future reservations"
 
-#: inc/menu.class.php:274
+#: inc/menu.class.php:313
 msgid "Reservations in the selected timeline"
 msgstr "Reservations in the selected timeline"
 
-#: inc/menu.class.php:277
+#: inc/menu.class.php:316
 msgid "User"
 msgstr "User"
 
-#: inc/menu.class.php:278
+#: inc/menu.class.php:317
 msgid "Item"
 msgstr "Item"
 
-#: inc/menu.class.php:279
+#: inc/menu.class.php:318
 msgid "Begin"
 msgstr "Begin"
 
-#: inc/menu.class.php:280
+#: inc/menu.class.php:319
 msgid "End"
 msgstr "End"
 
-#: inc/menu.class.php:282
+#: inc/menu.class.php:321
 msgid "Moves"
 msgstr "Moves"
 
-#: inc/menu.class.php:284
+#: inc/menu.class.php:323
 msgid "Checkin"
 msgstr "Checkin"
 
-#: inc/menu.class.php:286
+#: inc/menu.class.php:325
 msgid "Checkout"
 msgstr "Checkout"
 
-#: inc/menu.class.php:287
+#: inc/menu.class.php:326
 msgid "Action"
 msgstr "Action"
 
-#: inc/menu.class.php:377
+#: inc/menu.class.php:418
 msgctxt "tooltip"
 msgid "Set As Gone"
 msgstr "Set As Gone"
 
-#: inc/menu.class.php:385
+#: inc/menu.class.php:426
 msgctxt "tooltip"
 msgid "Set As Returned"
 msgstr "Set As Returned"
 
-#: inc/menu.class.php:394
+#: inc/menu.class.php:435
 msgctxt "button"
 msgid "Add an item"
 msgstr "Add an item"
 
-#: inc/menu.class.php:408
+#: inc/menu.class.php:449
 msgctxt "button"
 msgid "Replace an item"
 msgstr "Replace an item"
 
-#: inc/menu.class.php:424
+#: inc/menu.class.php:465
 msgid "Edit"
 msgstr "Edit"
 
-#: inc/menu.class.php:424
+#: inc/menu.class.php:465
 msgctxt "button"
 msgid "Edit"
 msgstr "Edit"
 
-#: inc/menu.class.php:432
+#: inc/menu.class.php:473
 msgctxt "tooltip"
 msgid "Send an e-mail for the late reservation"
 msgstr "Send an e-mail for the late reservation"
 
-#: inc/menu.class.php:432
+#: inc/menu.class.php:473
 msgctxt "button"
 msgid "Send an e-mail"
 msgstr "Send an e-mail"
 
-#: inc/menu.class.php:434
+#: inc/menu.class.php:475
 msgid "Last e-mail sent on"
 msgstr "Last e-mail sent on"
 
-#: inc/menu.class.php:484
+#: inc/menu.class.php:524
 msgid "Create new reservation"
 msgstr "Create new reservation"
 
-#: inc/menu.class.php:676
+#: inc/menu.class.php:721
 msgid "Date"
 msgstr "Date"
 
-#: inc/menu.class.php:682
+#: inc/menu.class.php:727
 msgid "Previous"
 msgstr "Previous"
 
-#: inc/menu.class.php:685
+#: inc/menu.class.php:730
 msgid "Start date"
 msgstr "Start date"
 
-#: inc/menu.class.php:688
+#: inc/menu.class.php:733
 msgctxt "button"
 msgid "Search"
 msgstr "Search"
 
-#: inc/menu.class.php:691
+#: inc/menu.class.php:736
 msgid "Next"
 msgstr "Next"
 
-#: inc/menu.class.php:694
+#: inc/menu.class.php:739
 msgid "Reset"
 msgstr "Reset"
 
-#: inc/menu.class.php:698
+#: inc/menu.class.php:743
 msgid "End date"
 msgstr "End date"
 
-#: inc/menu.class.php:726
+#: inc/menu.class.php:772
 msgid "Show all"
 msgstr "Show all"
 
-#: inc/menu.class.php:730
+#: inc/menu.class.php:776
 msgid "Reservations This Month"
 msgstr "Reservations This Month"
 
@@ -429,47 +437,47 @@ msgstr "Until : %1$s"
 msgid "Extending reservation : %1$s"
 msgstr "Extending reservation : %1$s"
 
-#: inc/task.class.php:148
+#: inc/task.class.php:149
 #, php-format
 msgid "%1$s created a new reservation for the same item : %2$s"
 msgstr "%1$s created a new reservation for the same item : %2$s"
 
-#: inc/task.class.php:171
+#: inc/task.class.php:172
 #, php-format
 msgid ""
 "conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
 msgstr ""
 "conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
 
-#: inc/task.class.php:186
+#: inc/task.class.php:187
 #, php-format
 msgid "Deleting reservation %1$s on item %2$s"
 msgstr "Deleting reservation %1$s on item %2$s"
 
-#: inc/task.class.php:192
+#: inc/task.class.php:193
 #, php-format
 msgid "Could not delay reservation %1$s on item %2$s"
 msgstr "Could not delay reservation %1$s on item %2$s"
 
-#: inc/task.class.php:200
+#: inc/task.class.php:201
 #, php-format
 msgid "Delaying reservation %1$s on item %2$s"
 msgstr "Delaying reservation %1$s on item %2$s"
 
-#: inc/task.class.php:235
+#: inc/task.class.php:236
 #, php-format
 msgid "Sending e-mail for reservation %1$s"
 msgstr "Sending e-mail for reservation %1$s"
 
-#: inc/task.class.php:236
+#: inc/task.class.php:237
 #, php-format
 msgid "Expected return time was : %1$s"
 msgstr "Expected return time was : %1$s"
 
-#: inc/task.class.php:238
+#: inc/task.class.php:239
 msgid "Sending an e-mail"
 msgstr "Sending an e-mail"
 
-#: inc/task.class.php:240
+#: inc/task.class.php:241
 msgid "Could not send notification"
 msgstr "Could not send notification"
