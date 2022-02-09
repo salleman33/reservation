@@ -164,6 +164,10 @@ class PluginReservationMenu extends CommonGLPI
       $ong = [];
       $config = new PluginReservationConfig();
       $i = 1;
+      if ($config->getConfigurationValue("tabmine")) {
+         $ong[$i] = __('My Reservations', "reservation");
+         $i++;
+      }
       if ($config->getConfigurationValue("tabcurrent", 1)) {
          $ong[$i] = __('Current Reservations', "reservation");
          $i++;
@@ -179,23 +183,23 @@ class PluginReservationMenu extends CommonGLPI
    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
    {
       $config = new PluginReservationConfig();
+      $tabmine = $config->getConfigurationValue("tabmine");
+      $tabcurrent = $config->getConfigurationValue("tabcurrent");
       $tabcoming = $config->getConfigurationValue("tabcoming");
-      switch ($tabnum) {
-         case 1:
-            self::displayTabContentForCurrentReservations($item);
-            break;
-         case 2:
-            if ($tabcoming) {
-               self::displayTabContentForAllReservations($item);
-            } else {
-               self::displayTabContentForAvailableHardware($item);
-            }
-            break;
-         case 3:
-            self::displayTabContentForAvailableHardware($item);
-            break;
-      }
-      return true;
+
+      $tabs = [];
+      if ($tabmine)
+         array_push($tabs, 'PluginReservationMenu::displayTabContentForMyReservations');
+      if ($tabcurrent)
+         array_push($tabs, 'PluginReservationMenu::displayTabContentForCurrentReservations');
+      if ($tabcoming)
+         array_push($tabs, 'PluginReservationMenu::displayTabContentForAllReservations');
+      array_push($tabs, 'PluginReservationMenu::displayTabContentForAvailableHardware');
+
+      if (array_key_exists($tabnum - 1, $tabs))
+         $tabs[$tabnum - 1]($item);
+      else
+         return true;
    }
 
 
@@ -226,6 +230,21 @@ class PluginReservationMenu extends CommonGLPI
          $result[$one[$element]][] = $one;
       }
       return $result;
+   }
+
+   public static function displayTabContentForMyReservations()
+   {
+      $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+      $begin = $form_dates["begin"];
+      $end = $form_dates["end"];
+      $user_id = $_SESSION['glpiID'];
+
+      $filters = ["'" . $begin . "' < `end`", "'" . $end . "' > `begin`", "'" . $user_id . "' = `users_id`"];
+      $list = PluginReservationReservation::getAllReservations($filters);
+      $ReservationsOfUser = self::arrayGroupBy($list, 'users_id');
+      ksort($ReservationsOfUser);
+
+      self::displayTabReservations($begin, $end, $ReservationsOfUser, true);
    }
 
    /**

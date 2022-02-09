@@ -46,7 +46,7 @@ class PluginReservationConfig extends CommonDBTM
    public function showForm()
    {
 
-      
+
 
       echo "<form id=\"formPluginReservationConfigs\" method='post' action='" . $this->getFormURL() . "'>";
 
@@ -101,10 +101,10 @@ class PluginReservationConfig extends CommonDBTM
       $checkin_timeout = $this->getConfigurationValue("checkin_timeout", 1);
       $checkin_action = $this->getConfigurationValue("checkin_action", '2');
       echo '<tr class="tab_bg_2">';
-      echo "<td style=\"padding-left:20px;\">";      
-      echo "<input type=\"hidden\" name=\"checkin\" value=\"0\">";      
+      echo "<td style=\"padding-left:20px;\">";
+      echo "<input type=\"hidden\" name=\"checkin\" value=\"0\">";
       echo "<input onclick=\"javascript:afficher_cacher_simple('checkin_config');\" type=\"checkbox\" name=\"checkin\" value=\"1\" " . ($checkin ? 'checked' : '') . "> ";
-      echo __('Enable check in', "reservation"). "</td>";
+      echo __('Enable check in', "reservation") . "</td>";
       echo '</tr>';
 
       // checkin action
@@ -135,14 +135,22 @@ class PluginReservationConfig extends CommonDBTM
          echo "<option value=\"" . $h . "\" " . ($checkin_timeout == $h ? 'selected="selected"' : '') . ">" . $h . " </option>";
       }
       echo "</select>";
-      echo '</td>'; 
-      echo "</tr>";      
+      echo '</td>';
+      echo "</tr>";
       echo '</table>';
-      echo "</table>";      
+      echo "</table>";
 
       // define tabs
       echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
       echo "<th>" . __('Tab Configuration', "reservation") . "</th>";
+      // my reservation tab
+      $tabmine = $this->getConfigurationValue("tabmine", 1);
+      echo '<tr class="tab_bg_2">';
+      echo "<input type=\"hidden\" name=\"tabmine\" value=\"0\">";
+      echo "<td style=\"padding-left:20px;\">";
+      echo "<input type=\"checkbox\" name=\"tabmine\" value=\"1\" " . ($tabmine ? 'checked' : '') . "> ";
+      echo __('My Reservation tab', "reservation") . "</td>";
+      echo "</tr>";
       // current reservation tab
       $tabcurrent = $this->getConfigurationValue("tabcurrent", 1);
       echo '<tr class="tab_bg_2">';
@@ -182,7 +190,7 @@ class PluginReservationConfig extends CommonDBTM
          echo '<tr class="tab_bg_2" id="use_items_types">';
          echo $this->showConfigCategoriesForm();
          echo "</tr>";
-      } 
+      }
       echo "</table>";
 
       // tooltip
@@ -269,16 +277,18 @@ class PluginReservationConfig extends CommonDBTM
       $menu .= '<button type="button" onclick="createCategory()">' . _sx('button', 'Add') . '</button>';
       $menu .= '<div style="clear: left;" id="categoriesContainer">';
 
-      
+
       $categories_names = PluginReservationCategory::getCategoriesNames();
-      $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, [ "filter_is_active" => false ]);
-      foreach ($categories_names as $category_name ) {
-         $filtered_array = array_filter($all_reservation_items,
+      $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, ["filter_is_active" => false]);
+      foreach ($categories_names as $category_name) {
+         $filtered_array = array_filter(
+            $all_reservation_items,
             function ($element) use ($category_name) {
                return ($element['category_name'] == $category_name);
-            } );
+            }
+         );
 
-         $it = 0;     
+         $it = 0;
          if ($category_name === "zzpluginnotcategorized") {
             continue;
          }
@@ -295,15 +305,17 @@ class PluginReservationConfig extends CommonDBTM
 
       $menu .= $this->openCategoryHtml('zzpluginnotcategorized', '', false);
       // if (in_array('zzpluginnotcategorized', $categories_names)) {
-         $filtered_array = array_filter($all_reservation_items,
-            function ($element) {
-               return ($element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']));
-            } );
-         $it = 0;
-         foreach ($filtered_array as $reservation_item) {
-            $it++;
-            $menu .= $this->makeItemHtml($reservation_item, 'zzpluginnotcategorized',$it);
+      $filtered_array = array_filter(
+         $all_reservation_items,
+         function ($element) {
+            return ($element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']));
          }
+      );
+      $it = 0;
+      foreach ($filtered_array as $reservation_item) {
+         $it++;
+         $menu .= $this->makeItemHtml($reservation_item, 'zzpluginnotcategorized', $it);
+      }
       // }
       $menu .= $this->closeCategoryHtml();
 
@@ -325,8 +337,8 @@ class PluginReservationConfig extends CommonDBTM
    private function makeItemHtml($reservation_item, $category_name, $index)
    {
       $html = '<tr class="draggable" ' . ($reservation_item['is_active'] == '1' ? '' : 'style="background-color:#f36647 "') . ' id="item_' . $reservation_item['id'] . '">';
-      $html .= '<input type="hidden" name="item_' . $reservation_item['id'] . '" value="' . $category_name . '">';      
-      $html .= '<td>' . $reservation_item['name']. '</td>';
+      $html .= '<input type="hidden" name="item_' . $reservation_item['id'] . '" value="' . $category_name . '">';
+      $html .= '<td>' . $reservation_item['name'] . '</td>';
       $html .= '<td>' . nl2br($reservation_item['comment']) . '</td>';
       $html .= '<td class="index">' . $index . '</td>';
       $html .= '</tr>';
@@ -346,7 +358,7 @@ class PluginReservationConfig extends CommonDBTM
       $html .= '<thead>';
       $html .= '<th colspan="3" class="categoryTitle">' . $category_title . '</th>';
       $deletable && $html .= '<td onclick="deleteCategory(\'' . $category_name . '\')" class="categoryClose" >X</td>';
-      $html .= '</thead>';      
+      $html .= '</thead>';
       $html .= '<input type="hidden" name="category_' . $category_name . '" value="' . $category_name . '">';
       $html .= '<tbody>';
       return $html;
@@ -356,7 +368,8 @@ class PluginReservationConfig extends CommonDBTM
     * make html code to close category
     * @return string code html
     */
-   private function closeCategoryHtml() {
+   private function closeCategoryHtml()
+   {
       $html = '</tbody>';
       $html .= "</table>";
       return $html;

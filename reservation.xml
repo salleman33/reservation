@@ -69,10 +69,6 @@ Es bringt auch einige vereinfachte Aktionen auf Buchungen wie :
             <compatibility>9.5</compatibility>
         </version>
         <version>
-            <num>2.3.7</num>
-            <compatibility>9.5</compatibility>
-        </version>
-        <version>
             <num>2.3.6</num>
             <compatibility>9.5</compatibility>
         </version>
