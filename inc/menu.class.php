@@ -297,8 +297,8 @@ class PluginReservationMenu extends CommonGLPI
       echo "<div class='center'>";
       echo "<table class='tab_cadre'>";
       echo "<thead>";
-      $colums = 12;
-      $colums_action = 4;
+      $colums = 11;
+      $colums_action = 3;
       if ($mode_auto) {
          $colums--;
          $colums_action--;
