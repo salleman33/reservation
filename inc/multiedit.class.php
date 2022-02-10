@@ -54,41 +54,91 @@ class PluginReservationMultiEdit extends CommonDBTM
             $reservations[$resa_id] = $resa;
         }
 
-        $updateSuccessful = true;
         if ($areResaValidForUpdate) {
+            $updateSuccessful = true;
             foreach ($reservations as $resa_id => $resa_instance) {
-                $updateSuccessful &= $resa_instance->update([
-                    'id'    => (int) $resa_id,
-                    'begin' => $post["begin"],
-                    'end'   => $post["end"]
-                ]);
+                $updateSuccessful &= $resa_instance->update(
+                    [
+                        'id'        => (int) $resa_id,
+                        'begin'     => $post["begin"],
+                        'end'       => $post["end"],
+                        'comment'   => $post["comment"]
+                    ]
+                );
             }
 
             if ($updateSuccessful) {
-                // update successful
-
                 foreach ($reservations as $resa_id => $resa_instace) {
                     Event::log(
                         $resa_id,
                         "reservation",
                         4,
                         "inventory",
-                        sprintf(
-                            __('%1$s updated the reservation %2$s with new dates'),
-                            $_SESSION["glpiname"],
-                            $resa_id
-                        )
+                        sprintf(__('%1$s updated the reservation %2$s with new dates'), $_SESSION["glpiname"], $resa_id)
                     );
                     Toolbox::logInFile('reservations_plugin', "multiedit_update : " . $resa_id . "\n", $force = false);
                 }
 
                 return true;
             } else {
-                // TODO throw error, possible data integrity failure
+                // fail to update
                 return false;
             }
         } else {
-            // TODO throw error
+            // can't update
+            return false;
+        }
+    }
+
+    public function purgeMultipleItems($post)
+    {
+        if (!Session::haveRight("reservation", ReservationItem::RESERVEANITEM)) {
+            return false;
+        }
+
+        if (!isset($post["resa_ids"])) {
+            return false;
+        }
+        if (!is_array($post["resa_ids"])) {
+            return false;
+        }
+        if (count($post["resa_ids"]) < 2) {
+            return false;
+        }
+
+        $reservations = [];
+
+        foreach ($post["resa_ids"] as $resa_id) {
+            $resa = new Reservation();
+            if (!$resa->getFromDB($resa_id)) {
+                return false;
+            }
+
+            $reservations[$resa_id] = $resa;
+        }
+
+        $purgeSuccessful = true;
+        foreach ($reservations as $resa_id => $resa_instance) {
+            $purgeSuccessful &= $resa_instance->delete([
+                'id'    => (int) $resa_id,
+                'purge' => 'purge'
+            ], 1);
+        }
+
+        if ($purgeSuccessful) {
+            foreach ($reservations as $resa_id => $resa_instance) {
+                Event::log(
+                    $resa_id,
+                    "reservation",
+                    4,
+                    "inventory",
+                    sprintf(__('%1$s purges the reservation for item %2$s'), $_SESSION["glpiname"], $resa_id)
+                );
+            }
+
+            return true;
+        } else {
+            // fail to purge
             return false;
         }
     }
@@ -114,6 +164,7 @@ class PluginReservationMultiEdit extends CommonDBTM
         $confirmedSameUser = '';
         $confirmedSameBegin = '';
         $confirmedSameEnd = '';
+        $mixedComment = '';
 
         $options = [];
         foreach ($ID["ids"] as $resa_id) {
@@ -153,6 +204,11 @@ class PluginReservationMultiEdit extends CommonDBTM
                 }
             }
 
+            // pick one comment
+            if ($mixedComment == '' && !empty($resa->getField('comment'))) {
+                $mixedComment = $resa->getField('comment');
+            }
+
             $itemid = $resa->getField('reservationitems_id');
 
             $options['item'][$itemid] = $itemid;
@@ -163,7 +219,7 @@ class PluginReservationMultiEdit extends CommonDBTM
         // Add Hardware name
         $r = new ReservationItem();
 
-        echo "<tr class='tab_bg_1'><td>" . _n('Item', 'Items', 1) . "</td>";
+        echo "<tr class='tab_bg_1'><td>" . _n('Item', 'Items', count($options['item'])) . "</td>";
         echo "<td>";
         foreach ($options['item'] as $itemID) {
             $r->getFromDB($itemID);
@@ -242,20 +298,30 @@ class PluginReservationMultiEdit extends CommonDBTM
             $params['duration'] = 0;
             Ajax::updateItem("date_end$rand", $CFG_GLPI["root_doc"] . "/ajax/planningend.php", $params);
         }
-
         echo "</td></tr>\n";
 
-        // save button
-        if (($resa->fields["users_id"] == Session::getLoginUserID()) || Session::haveRight("reservation", UPDATE)) {
-            echo "<tr class='tab_bg_2'>";
-            echo "<td></td>";
+        // comment
+        echo "<tr class='tab_bg_2'><td>" . __('Comments') . "</td>";
+        echo "<td><textarea name='comment' rows='8' cols='60'>" . $mixedComment . "</textarea>";
+        echo "</td></tr>\n";
 
+        // Actions
+        echo "<tr class='tab_bg_2'>";
+
+        // delete button
+        if ($confirmedSameUser == Session::getLoginUserID() || Session::haveRight("reservation", PURGE)) {
+            echo "<td class='top center'>";
+            echo "<input type='submit' name='purge' value=\"" . _sx('button', 'Delete permanently') . "\" class='submit'>";
+            echo "</td>";
+        }
+
+        // save button
+        if ($confirmedSameUser == Session::getLoginUserID() || Session::haveRight("reservation", UPDATE)) {
             echo "<td class='top center'>";
             echo "<input type='submit' name='update' value=\"" . _sx('button', 'Save') . "\" class='submit'>";
             echo "</td>";
-
-            echo "</tr>\n";
         }
+        echo "</tr>\n";
 
         echo "</table>";
         Html::closeForm();

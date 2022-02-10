@@ -15,7 +15,7 @@ if ($plugin->isActivated("reservation")) {
 
     Html::header(PluginReservationMultiEdit::getTypeName(2), $_SERVER['PHP_SELF'], "plugins", "pluginreservationmenu", "reservation");
 
-    // Handle form submit
+    // Handle form submit : update
     if (isset($_POST["update"])) {
         Toolbox::manageBeginAndEndPlanDates($_POST['resa']);
         if (Session::haveRight("reservation", UPDATE) || (Session::getLoginUserID() == $_POST["users_id"])) {
@@ -23,6 +23,15 @@ if ($plugin->isActivated("reservation")) {
             $_POST['end']     = $_POST['resa']["end"];
 
             $PluginReservationMultiEdit->updateMultipleItems($_POST);
+
+            Html::redirect($CFG_GLPI["root_doc"] . "/plugins/reservation/front/menu.php");
+        }
+    }
+
+    // Handle form submit : purge
+    if (isset($_POST["purge"])) {
+        if (Session::haveRight("reservation", PURGE) || (Session::getLoginUserID() == $_POST["users_id"])) {
+            $PluginReservationMultiEdit->purgeMultipleItems($_POST);
 
             Html::redirect($CFG_GLPI["root_doc"] . "/plugins/reservation/front/menu.php");
         }

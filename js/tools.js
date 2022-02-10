@@ -149,3 +149,19 @@ var updateHiddenConfig = function (e, ui) {
 
    })();
 
+
+// Handle click event on the Allow Multiple Edit checkbox on the menu.class.php
+function onClickAllowMultipleEditCheckbox(checkbox) {
+   var showIfMultiEditEnabledElements = document.getElementsByClassName('showIfMultiEditEnabled');
+   var hideIfMultiEditEnabledElements = document.getElementsByClassName('hideIfMultiEditEnabled');
+   var allowMultipleEditCheckboxElements = document.getElementsByClassName('allowMultipleEditCheckbox');
+
+   for (var i = 0; i < showIfMultiEditEnabledElements.length; i++)
+      showIfMultiEditEnabledElements[i].style.display = (checkbox.checked ? "table-cell" : "none");
+   for (var i = 0; i < hideIfMultiEditEnabledElements.length; i++)
+      hideIfMultiEditEnabledElements[i].style.display = (checkbox.checked ? "none" : "table-cell");
+
+   // Sync checkboxes through tabs
+   for (var i = 0; i < allowMultipleEditCheckboxElements.length; i++)
+      allowMultipleEditCheckboxElements[i].checked = checkbox.checked;
+}
