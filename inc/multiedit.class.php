@@ -264,10 +264,6 @@ class PluginReservationMultiEdit extends CommonDBTM
             / $CFG_GLPI['time_step'] / MINUTE_TIMESTAMP)
             * $CFG_GLPI['time_step'] * MINUTE_TIMESTAMP;
 
-        // FIX
-        $default_delay = 0;
-        //
-
         // duration / end
         echo "<tr class='tab_bg_2'><td>" . __('Duration') . "</td><td>";
         $rand = Dropdown::showTimeStamp(
