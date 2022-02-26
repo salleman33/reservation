@@ -8,7 +8,8 @@ define('PLUGIN_VERSION', '2.3.8');
  *
  * @return void
  */
-function plugin_init_reservation() {
+function plugin_init_reservation()
+{
    global $PLUGIN_HOOKS;
 
    $PLUGIN_HOOKS['csrf_compliant']['reservation'] = true;
@@ -19,6 +20,7 @@ function plugin_init_reservation() {
    $PLUGIN_HOOKS['item_update']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
    $PLUGIN_HOOKS['item_purge']['reservation'] = ['Reservation' => 'plugin_item_purge_reservation'];
    $PLUGIN_HOOKS['menu_toadd']['reservation'] = ['plugins' => 'PluginReservationMenu'];
+   $PLUGIN_HOOKS['multi_edit']['reservation'] = 'front/multiedit.form.php';
 
    Plugin::registerClass('PluginReservationMenu');
    Plugin::registerClass('PluginReservationConfig');
@@ -27,14 +29,15 @@ function plugin_init_reservation() {
    Plugin::registerClass('PluginReservationCategory_Item');
    Plugin::registerClass('PluginReservationTask');
    Plugin::registerClass('PluginReservationApi');
+   Plugin::registerClass('PluginReservationMultiEdit');
 
    // Notifications
    $PLUGIN_HOOKS['item_get_events']['reservation'] =
-   [ 'NotificationTargetReservation' => [ 'PluginReservationTask', 'addEvents' ] ];
+      ['NotificationTargetReservation' => ['PluginReservationTask', 'addEvents']];
    $PLUGIN_HOOKS['item_get_datas']['reservation'] =
-   [ 'NotificationTargetReservation' => [ 'PluginReservationTask', 'addData' ] ];
+      ['NotificationTargetReservation' => ['PluginReservationTask', 'addData']];
    $PLUGIN_HOOKS['item_add_targets']['reservation'] =
-   [ 'NotificationTargetReservation' => [ 'PluginReservationTask', 'addTarget' ] ];
+      ['NotificationTargetReservation' => ['PluginReservationTask', 'addTarget']];
 
    if (Session::getLoginUserID()) {
       $PLUGIN_HOOKS['menu_entry']['reservation'] = 'front/reservation.php';
@@ -46,7 +49,8 @@ function plugin_init_reservation() {
  *
  * @return array
  */
-function plugin_version_reservation() {
+function plugin_version_reservation()
+{
    return [
       'name' => 'Reservation',
       'version' => PLUGIN_VERSION,
@@ -66,7 +70,8 @@ function plugin_version_reservation() {
  *
  * @return boolean
  */
-function plugin_reservation_check_prerequisites() {
+function plugin_reservation_check_prerequisites()
+{
    return true;
 }
 
@@ -78,7 +83,8 @@ function plugin_reservation_check_prerequisites() {
  *
  * @return boolean
  */
-function plugin_reservation_check_config($verbose = false) {
+function plugin_reservation_check_config($verbose = false)
+{
    if (true) { // Your configuration check
       return true;
    }

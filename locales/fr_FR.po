@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-03 17:18+0100\n"
-"PO-Revision-Date: 2022-02-03 17:48+0100\n"
+"POT-Creation-Date: 2022-02-10 15:36+0100\n"
+"PO-Revision-Date: 2022-02-10 15:47+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.0.1\n"
 
-#: front/config.form.php:57
+#: front/config.form.php:57 front/multiedit.form.php:50
 msgid "Setup"
 msgstr "Installation"
 
-#: front/config.form.php:60
+#: front/config.form.php:60 front/multiedit.form.php:53
 msgid "Please activate the plugin"
 msgstr "Veuillez activer le plugin"
 
@@ -202,7 +202,7 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: inc/config.class.php:258 inc/menu.class.php:457
+#: inc/config.class.php:258 inc/menu.class.php:460 inc/multiedit.class.php:321
 msgctxt "button"
 msgid "Save"
 msgstr "Sauvegarder"
@@ -219,7 +219,7 @@ msgstr ""
 msgid "Drag and drop items on a custom category :"
 msgstr ""
 
-#: inc/config.class.php:277 inc/menu.class.php:444
+#: inc/config.class.php:277 inc/menu.class.php:447
 msgctxt "button"
 msgid "Add"
 msgstr "Ajouter"
@@ -227,6 +227,14 @@ msgstr "Ajouter"
 #: inc/menu.class.php:168
 msgid "My Reservations"
 msgstr "Mes Réservations"
+
+#: inc/menu.class.php:172
+msgid "Current Reservations"
+msgstr "Réservations actuelles"
+
+#: inc/menu.class.php:176
+msgid "Current and Incoming Reservations"
+msgstr "Réservations actuelles et à venir"
 
 #: inc/menu.class.php:179
 msgid "Available Hardware"
@@ -244,9 +252,11 @@ msgstr "Réservations actuelles"
 msgid "User"
 msgstr ""
 
-#: inc/menu.class.php:317
+#: inc/menu.class.php:317 inc/multiedit.class.php:222
 msgid "Item"
-msgstr ""
+msgid_plural "Items"
+msgstr[0] ""
+msgstr[1] ""
 
 #: inc/menu.class.php:318
 msgid "Begin"
@@ -268,93 +278,141 @@ msgstr "Acquittement"
 msgid "Checkout"
 msgstr "Acquittement"
 
-#: inc/menu.class.php:326
+#: inc/menu.class.php:327
 msgid "Action"
 msgstr "Action"
 
-#: inc/menu.class.php:418
+#: inc/menu.class.php:327
+msgid "Allow multiple edit"
+msgstr "Autoriser la modification de groupe"
+
+#: inc/menu.class.php:421
 msgctxt "tooltip"
 msgid "Set As Gone"
 msgstr "Acquitter le retour"
 
-#: inc/menu.class.php:426
+#: inc/menu.class.php:429
 msgctxt "tooltip"
 msgid "Set As Returned"
 msgstr "Acquitter le retour"
 
-#: inc/menu.class.php:435
+#: inc/menu.class.php:438
 msgctxt "button"
 msgid "Add an item"
 msgstr "Ajouter un élément"
 
-#: inc/menu.class.php:449
+#: inc/menu.class.php:452
 msgctxt "button"
 msgid "Replace an item"
 msgstr "Remplacer un élément"
 
-#: inc/menu.class.php:465
-msgid "Edit"
-msgstr ""
+#: inc/menu.class.php:498
+msgid "Edit multiple"
+msgstr "Modifier le groupe"
 
-#: inc/menu.class.php:465
+#: inc/menu.class.php:504 inc/menu.class.php:511 inc/menu.class.php:519
+msgid "Edit"
+msgstr "Modifier"
+
+#: inc/menu.class.php:504 inc/menu.class.php:511 inc/menu.class.php:519
 msgctxt "button"
 msgid "Edit"
 msgstr "Modifier"
 
-#: inc/menu.class.php:473
+#: inc/menu.class.php:528
 msgctxt "tooltip"
 msgid "Send an e-mail for the late reservation"
 msgstr "Envoyer un email"
 
-#: inc/menu.class.php:473
+#: inc/menu.class.php:528
 msgctxt "button"
 msgid "Send an e-mail"
 msgstr "Envoyer un email"
 
-#: inc/menu.class.php:475
+#: inc/menu.class.php:530
 msgid "Last e-mail sent on"
 msgstr "Dernier email envoyé"
 
-#: inc/menu.class.php:524
+#: inc/menu.class.php:579
 msgid "Create new reservation"
 msgstr "Créer une nouvelle réservation"
 
-#: inc/menu.class.php:721
+#: inc/menu.class.php:776
 msgid "Date"
 msgstr ""
 
-#: inc/menu.class.php:727
+#: inc/menu.class.php:782
 msgid "Previous"
 msgstr ""
 
-#: inc/menu.class.php:730
+#: inc/menu.class.php:785 inc/multiedit.class.php:254
 msgid "Start date"
 msgstr ""
 
-#: inc/menu.class.php:733
+#: inc/menu.class.php:788
 msgctxt "button"
 msgid "Search"
-msgstr ""
+msgstr "Rechercher"
 
-#: inc/menu.class.php:736
+#: inc/menu.class.php:791
 msgid "Next"
 msgstr ""
 
-#: inc/menu.class.php:739
+#: inc/menu.class.php:794
 msgid "Reset"
 msgstr ""
 
-#: inc/menu.class.php:743
+#: inc/menu.class.php:798
 msgid "End date"
 msgstr ""
 
-#: inc/menu.class.php:772
+#: inc/menu.class.php:827
 msgid "Show all"
 msgstr ""
 
-#: inc/menu.class.php:776
+#: inc/menu.class.php:831
 msgid "Reservations This Month"
 msgstr "Réservations du mois"
+
+#: inc/multiedit.class.php:77
+#, php-format
+msgid "%1$s updated the reservation %2$s with new dates"
+msgstr "%1$s modifie la réservation %2$s pour de nouvelles dates"
+
+#: inc/multiedit.class.php:135
+#, php-format
+msgid "%1$s purges the reservation for item %2$s"
+msgstr "%1$s purge la réservation %2$s"
+
+#: inc/multiedit.class.php:162
+msgid "Update multiple items"
+msgstr "Modifier un groupe de réservations"
+
+#: inc/multiedit.class.php:240
+#, php-format
+msgid "%1$s - %2$s"
+msgstr "%1$s - %2$s"
+
+#: inc/multiedit.class.php:246
+msgid "By"
+msgstr "Par"
+
+#: inc/multiedit.class.php:272
+msgid "Duration"
+msgstr "Durée"
+
+#: inc/multiedit.class.php:279
+msgid "Specify an end date"
+msgstr "Spécifier une date de fin"
+
+#: inc/multiedit.class.php:304
+msgid "Comments"
+msgstr "Commentaires"
+
+#: inc/multiedit.class.php:314
+msgctxt "button"
+msgid "Delete permanently"
+msgstr "Supprimer définitivement"
 
 #: inc/reservation.class.php:24
 msgid "Reservation"
