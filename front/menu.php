@@ -18,7 +18,7 @@ if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')
    Html::displayNotFoundError();
 }
 
-Session::checkRight("reservation", [CREATE, UPDATE, DELETE]);
+Session::checkRightsOr("reservation", [CREATE, UPDATE, DELETE]);
 
 if (isset($_GET['mailuser'])) {
    PluginReservationReservation::sendMail($_GET['mailuser']);

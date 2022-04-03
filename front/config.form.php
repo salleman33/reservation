@@ -9,7 +9,7 @@ include_once GLPI_ROOT . "plugins/reservation/inc/includes.php";
 $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {
    $PluginReservationConfig = new PluginReservationConfig();
-   Session::checkRight("config", [CREATE, UPDATE, DELETE]);
+   Session::checkRightsOr("config", [CREATE, UPDATE, DELETE]);
 
    if (isset($_POST["mode_auto"])) {
       $PluginReservationConfig->setMailAutomaticAction($_POST["mode_auto"]);

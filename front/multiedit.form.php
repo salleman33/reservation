@@ -11,7 +11,7 @@ $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {
     $PluginReservationMultiEdit = new PluginReservationMultiEdit();
 
-    Session::checkRight("reservation", ReservationItem::RESERVEANITEM);
+    Session::checkRightsOr("reservation", ReservationItem::RESERVEANITEM);
 
     Html::header(PluginReservationMultiEdit::getTypeName(2), $_SERVER['PHP_SELF'], "plugins", "pluginreservationmenu", "reservation");
 
