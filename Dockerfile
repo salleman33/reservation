@@ -1,5 +1,4 @@
-#FROM php:8.1-apache
-FROM php:7.4-apache
+FROM php:8.0-apache
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -15,6 +14,5 @@ RUN wget https://github.com/glpi-project/glpi/releases/download/9.5.7/glpi-9.5.7
 	tar xvf glpi-9.5.7.tgz && rm glpi-9.5.7.tgz
 RUN chown -R www-data glpi/files glpi/config
 
-ADD . glpi/plugins/reservation
 
 
