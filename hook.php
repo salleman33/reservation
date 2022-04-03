@@ -180,8 +180,6 @@ function plugin_item_add_reservation($reservation) {
          PluginReservationReservation::checkinReservation($reservation->fields['id']);
       }
    }
-
-
 }
 
 /**
