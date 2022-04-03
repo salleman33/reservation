@@ -164,7 +164,7 @@ class PluginReservationMenu extends CommonGLPI
       $ong = [];
       $config = new PluginReservationConfig();
       $i = 1;
-      if ($config->getConfigurationValue("tabmine")) {
+      if ($config->getConfigurationValue("tabmine", 0)) {
          $ong[$i] = __('My Reservations', "reservation");
          $i++;
       }
@@ -183,9 +183,9 @@ class PluginReservationMenu extends CommonGLPI
    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
    {
       $config = new PluginReservationConfig();
-      $tabmine = $config->getConfigurationValue("tabmine");
-      $tabcurrent = $config->getConfigurationValue("tabcurrent");
-      $tabcoming = $config->getConfigurationValue("tabcoming");
+      $tabmine = $config->getConfigurationValue("tabmine", 0);
+      $tabcurrent = $config->getConfigurationValue("tabcurrent", 1);
+      $tabcoming = $config->getConfigurationValue("tabcoming", 0);
 
       $tabs = [];
       if ($tabmine)
@@ -308,9 +308,9 @@ class PluginReservationMenu extends CommonGLPI
       }
 
       if ($includeFuture) {
-         echo "<tr><th colspan='" . $colums . "'>" . __('Current and future reservations') . "</th></tr>\n";
+         echo "<tr><th colspan='" . $colums . "'>" . __('Current and future reservations', 'reservation') . "</th></tr>\n";
       } else {
-         echo "<tr><th colspan='" . $colums . "'>" . __('Reservations in the selected timeline') . "</th></tr>\n";
+         echo "<tr><th colspan='" . $colums . "'>" . __('Reservations in the selected timeline', 'reservation') . "</th></tr>\n";
       }
       echo "<tr class='tab_bg_2'>";
       echo "<th>" . __('User') . "</a></th>";
@@ -324,7 +324,7 @@ class PluginReservationMenu extends CommonGLPI
       }
       echo "<th>" . __('Checkout', 'reservation') . "</th>";
       // Multi edit enabled by default
-      echo "<th colspan='" . $colums_action . "'>" . __('Action') . " (<label><input class='allowMultipleEditCheckbox' type='checkbox' onclick='onClickAllowMultipleEditCheckbox(this);' checked /> " . __('Allow multiple edit') . "</label>)</th>";
+      echo "<th colspan='" . $colums_action . "'>" . __('Action') . " (<label><input class='allowMultipleEditCheckbox' type='checkbox' onclick='onClickAllowMultipleEditCheckbox(this);' checked /> " . __('Allow multiple edit', 'reservation') . "</label>)</th>";
 
       echo "</tr></thead>";
       echo "<tbody>";
@@ -495,7 +495,7 @@ class PluginReservationMenu extends CommonGLPI
 
                   // case if multi edit enabled for first item
                   echo "<td class='showIfMultiEditEnabled' rowspan='" . $rowspan_line . "'>";
-                  echo "<a class='bouton' title='" . __('Edit multiple') . "' href='" .  'multiedit.form.php' . $str_multiEditParams . "'>" . __('Edit multiple') . "</a>";
+                  echo "<a class='bouton' title='" . __('Edit multiple', 'reservation') . "' href='" .  'multiedit.form.php' . $str_multiEditParams . "'>" . __('Edit multiple', 'reservation') . "</a>";
                   echo "</td>";
 
                   // case if multi edit disable for first item

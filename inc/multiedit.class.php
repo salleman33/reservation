@@ -74,7 +74,7 @@ class PluginReservationMultiEdit extends CommonDBTM
                         "reservation",
                         4,
                         "inventory",
-                        sprintf(__('%1$s updated the reservation %2$s with new dates'), $_SESSION["glpiname"], $resa_id)
+                        sprintf(__('%1$s updated the reservation %2$s with new dates', 'reservation'), $_SESSION["glpiname"], $resa_id)
                     );
                     Toolbox::logInFile('reservations_plugin', "multiedit_update : " . $resa_id . "\n", $force = false);
                 }
@@ -132,7 +132,7 @@ class PluginReservationMultiEdit extends CommonDBTM
                     "reservation",
                     4,
                     "inventory",
-                    sprintf(__('%1$s purges the reservation for item %2$s'), $_SESSION["glpiname"], $resa_id)
+                    sprintf(__('%1$s purges the reservation for item %2$s', 'reservation'), $_SESSION["glpiname"], $resa_id)
                 );
             }
 
@@ -159,7 +159,7 @@ class PluginReservationMultiEdit extends CommonDBTM
         echo "<form method='post' name=form action='" . $this->getFormURL() . "'>";
 
         echo "<table class='tab_cadre' width='700px'>";
-        echo "<tr><th colspan='2'>" . __('Update multiple items') . "</th></tr>\n";
+        echo "<tr><th colspan='2'>" . __('Update multiple items', 'reservation') . "</th></tr>\n";
 
         $confirmedSameUser = '';
         $confirmedSameBegin = '';

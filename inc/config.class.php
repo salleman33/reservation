@@ -144,7 +144,7 @@ class PluginReservationConfig extends CommonDBTM
       echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
       echo "<th>" . __('Tab Configuration', "reservation") . "</th>";
       // my reservation tab
-      $tabmine = $this->getConfigurationValue("tabmine", 1);
+      $tabmine = $this->getConfigurationValue("tabmine", 0);
       echo '<tr class="tab_bg_2">';
       echo "<input type=\"hidden\" name=\"tabmine\" value=\"0\">";
       echo "<td style=\"padding-left:20px;\">";
@@ -160,7 +160,7 @@ class PluginReservationConfig extends CommonDBTM
       echo __('Current Reservation tab', "reservation") . "</td>";
       echo "</tr>";
       // incoming reservation tab
-      $tabcoming = $this->getConfigurationValue("tabcoming");
+      $tabcoming = $this->getConfigurationValue("tabcoming", 0);
       echo '<tr class="tab_bg_2">';
       echo "<input type=\"hidden\" name=\"tabcoming\" value=\"0\">";
       echo "<td style=\"padding-left:20px;\">";
