@@ -15,6 +15,6 @@ RUN wget https://github.com/glpi-project/glpi/releases/download/9.5.7/glpi-9.5.7
 	tar xvf glpi-9.5.7.tgz && rm glpi-9.5.7.tgz
 RUN chown -R www-data glpi/files glpi/config
 
-ADD . glpi/plugins/reservations
+ADD . glpi/plugins/reservation
 
 
