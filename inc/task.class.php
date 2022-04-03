@@ -75,8 +75,8 @@ class PluginReservationTask extends CommonDBTM
       
       $time = time();
       $time -= ($time % MINUTE_TIMESTAMP);
-      $timout = $config->getConfigurationValue("checkin_timeout") * HOUR_TIMESTAMP;
-      $since = date("Y-m-d H:i:s", $time - $timout);
+      $timeout = $config->getConfigurationValue("checkin_timeout") * HOUR_TIMESTAMP;
+      $since = date("Y-m-d H:i:s", $time - $timeout);
       $task->log("Since : " . $since);
 
       $reservations_list = PluginReservationReservation::getAllReservations(["`begin` <= '".$since."'", 'effectivedate is null', 'checkindate is null']);
@@ -88,7 +88,7 @@ class PluginReservationTask extends CommonDBTM
 
 
          if ($config->getConfigurationValue("checkin_action", 2) == 2) {
-	    $task->log(sprintf(__('Deleting reservation (check in) : %1$s on item %2$s'),
+	         $task->log(sprintf(__('Deleting reservation (check in) : %1$s on item %2$s'),
 	   		$reservation->fields['id'], $item->fields['name']));	    
             $reservation->delete(['id' => $reservation->fields['id']]);
          }
