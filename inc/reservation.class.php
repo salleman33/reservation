@@ -230,6 +230,7 @@ class PluginReservationReservation extends CommonDBTM
       $input['begin']               = $resa->fields['begin'];
       $input['end']                 = $resa->fields['end'];
       $input['users_id']            = $resa->fields['users_id'];
+      $input = Toolbox::addslashes_deep($input);
       unset($rr->fields["id"]);
       Toolbox::logInFile('reservations_plugin', "addItemToResa INPUT : ".json_encode($input)."\n", $force = false);
       if ($newID = $rr->add($input)) {
@@ -251,7 +252,8 @@ class PluginReservationReservation extends CommonDBTM
 
       $input = $resa->fields;
       $input['reservationitems_id'] = $item_id;
-
+      $input = Toolbox::addslashes_deep($input);
+      
       if($resa->update($input)) {
          Event::log($reservation_id, "reservation", 4, "inventory",
                   sprintf(__('%1$s switchs the reservation %2$s with item %3$s'),
