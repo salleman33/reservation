@@ -110,7 +110,7 @@ msgstr "Retarder le début de la réservation en conflit"
 
 #: inc/config.class.php:107
 msgid "Enable check in"
-msgstr ""
+msgstr "activer l'acquittement de départ"
 
 #: inc/config.class.php:120
 msgid "Action when reservation are not checkin"
@@ -156,7 +156,7 @@ msgstr "Configuration des catégories"
 
 #: inc/config.class.php:180
 msgid "Use custom categories"
-msgstr ""
+msgstr "utiliser des categories de matériel personnalisées"
 
 #: inc/config.class.php:188
 msgid "Use items types when not in a custom category"
