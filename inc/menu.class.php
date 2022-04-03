@@ -323,7 +323,8 @@ class PluginReservationMenu extends CommonGLPI
          echo "<th>" . __('Checkin', 'reservation') . "</th>";
       }
       echo "<th>" . __('Checkout', 'reservation') . "</th>";
-      echo "<th colspan='" . $colums_action . "'>" . __('Action') . "</th>";
+      // Multi edit enabled by default
+      echo "<th colspan='" . $colums_action . "'>" . __('Action') . " (<label><input class='allowMultipleEditCheckbox' type='checkbox' onclick='onClickAllowMultipleEditCheckbox(this);' checked /> " . __('Allow multiple edit') . "</label>)</th>";
 
       echo "</tr></thead>";
       echo "<tbody>";
@@ -346,6 +347,8 @@ class PluginReservationMenu extends CommonGLPI
 
          $count = 0;
          $rowspan_end = 1;
+         $rowspan_end_bis = 1;
+         $multiEditParams = [];
          foreach ($reservations_user_list as $reservation_user_info) {
             $count++;
 
@@ -460,11 +463,63 @@ class PluginReservationMenu extends CommonGLPI
             echo "</ul>";
             echo "</td>";
 
-            echo "<td>";
-            echo "<ul>";
-            echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" href='" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
-            echo "</ul>";
-            echo "</td>";
+            // Edit
+            $rowspan_line = 1;
+            $multiEditParams = [];
+            $multiEditParams[$reservation_user_info['reservations_id']] = $reservation_user_info['reservations_id'];
+            if ($count == $rowspan_end_bis) {
+               $i = $count;
+               while ($i < count($reservations_user_list)) {
+                  if (
+                     $reservations_user_list[$i]['begin'] == $reservation_user_info['begin']
+                     && $reservations_user_list[$i]['end'] == $reservation_user_info['end']
+                  ) {
+                     $rowspan_line++;
+                     $multiEditParams[$reservations_user_list[$i]['reservations_id']] = $reservations_user_list[$i]['reservations_id'];
+                  } else {
+                     break;
+                  }
+                  $i++;
+               }
+               if ($rowspan_line > 1) {
+                  $rowspan_end_bis = $count + $rowspan_line;
+               } else {
+                  $rowspan_end_bis++;
+               }
+
+               if ($rowspan_line > 1) {
+                  $str_multiEditParams = "?";
+                  foreach ($multiEditParams as $key => $value) {
+                     $str_multiEditParams = $str_multiEditParams . "&ids[$key]=$value";
+                  }
+
+                  // case if multi edit enabled for first item
+                  echo "<td class='showIfMultiEditEnabled' rowspan='" . $rowspan_line . "'>";
+                  echo "<a class='bouton' title='" . __('Edit multiple') . "' href='" .  'multiedit.form.php' . $str_multiEditParams . "'>" . __('Edit multiple') . "</a>";
+                  echo "</td>";
+
+                  // case if multi edit disable for first item
+                  echo "<td class='hideIfMultiEditEnabled' style='display: none;'>";
+                  echo "<ul>";
+                  echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" href='" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
+                  echo "</ul>";
+                  echo "</td>";
+               } else {
+                  // normal case (no group)
+                  echo "<td>";
+                  echo "<ul>";
+                  echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" href='" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
+                  echo "</ul>";
+                  echo "</td>";
+               }
+            } else {
+               // case if multi edit enabled for other items
+               echo "<td class='hideIfMultiEditEnabled' style='display: none;'>";
+               echo "<ul>";
+               echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" href='" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
+               echo "</ul>";
+               echo "</td>";
+            }
 
             if (!$mode_auto) {
                echo "<td>";
