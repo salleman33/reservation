@@ -1,0 +1,32 @@
+version: '2.2'
+services:
+  glpi:
+    build: .
+    restart: always
+    image: glpi_reservations
+    container_name: glpi
+    depends_on:
+            - mariadb
+    ports:
+      - 8080:80
+    links:
+      - mariadb
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TIMEZONE=Europe/Paris
+  mariadb:
+    restart: always
+    image: mariadb:10.7
+    container_name: mariadb
+    expose:
+      - 3306
+    volumes:
+      - /tmp/mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_USER: "user"
+      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_PASSWORD: "password"
+      MYSQL_DATABASE: "database"
