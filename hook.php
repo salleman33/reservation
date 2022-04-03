@@ -169,6 +169,19 @@ function plugin_item_add_reservation($reservation) {
    ]
    );
    Toolbox::logInFile('reservations_plugin', "plugin_item_add_reservation : ".json_encode($reservation)."\n", $force = false);
+
+   $config = new PluginReservationConfig();
+   if ($config->getConfigurationValue("auto_checkin", 0) == 1) {
+      $time = time();
+      $until_auto_checkin = $config->getConfigurationValue("auto_checkin_time", 1) * MINUTE_TIMESTAMP;
+      $until = date("Y-m-d H:i:s", $time + $until_auto_checkin);
+      if ($reservation->fields['begin'] <= $until) {
+         Toolbox::logInFile('reservations_plugin', "auto-checkin enable : reservation ".json_encode($reservation->fields['id'])." is checkin automatically\n", $force = false);
+         PluginReservationReservation::checkinReservation($reservation->fields['id']);
+      }
+   }
+
+
 }
 
 /**

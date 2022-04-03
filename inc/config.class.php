@@ -100,11 +100,13 @@ class PluginReservationConfig extends CommonDBTM
       $checkin = $this->getConfigurationValue("checkin", 0);
       $checkin_timeout = $this->getConfigurationValue("checkin_timeout", 1);
       $checkin_action = $this->getConfigurationValue("checkin_action", '2');
+      $auto_checkin = $this->getConfigurationValue("auto_checkin", '0');
+      $auto_checkin_time = $this->getConfigurationValue("auto_checkin_time", '1');
       echo '<tr class="tab_bg_2">';
       echo "<td style=\"padding-left:20px;\">";
       echo "<input type=\"hidden\" name=\"checkin\" value=\"0\">";
       echo "<input onclick=\"javascript:afficher_cacher_simple('checkin_config');\" type=\"checkbox\" name=\"checkin\" value=\"1\" " . ($checkin ? 'checked' : '') . "> ";
-      echo __('Enable check in', "reservation") . "</td>";
+      echo __('Enable check in', 'reservation') . "</td>";
       echo '</tr>';
 
       // checkin action
@@ -137,6 +139,37 @@ class PluginReservationConfig extends CommonDBTM
       echo "</select>";
       echo '</td>';
       echo "</tr>";
+
+      // auto checkin
+      echo '<tr>';
+      echo "<td>";
+      echo "<input type=\"hidden\" name=\"auto_checkin\" value=\"0\">";
+      echo "<input onclick=\"javascript:afficher_cacher_simple('auto_checkin_config');\" type=\"checkbox\" name=\"auto_checkin\" value=\"1\" " . ($auto_checkin ? 'checked' : '') . "> ";
+      echo __('Enable auto check in', 'reservation') . "</td>";
+      echo '<tr class="tab_bg_2">';
+      echo "<td>";
+      if ($auto_checkin) {
+         echo '<table id="auto_checkin_config">';
+      } else {
+         echo '<table id="auto_checkin_config" style="display:none;" >';
+      }
+      echo '<tr>';
+      echo "<td>";
+      echo __('for reservations made until (in minutes) ', "reservation") . " : ";
+      echo "<select name=\"auto_checkin_time\">";
+      echo "<option value=\"" . $h . "\" " . ($auto_checkin_time == '1' ? 'selected="selected"' : '') . ">" . '1' . " </option>";
+      for ($h = 5; $h <= 60; $h+=5) {
+         echo "<option value=\"" . $h . "\" " . ($auto_checkin_time == $h ? 'selected="selected"' : '') . ">" . $h . " </option>";
+      }
+      echo "</select>";
+      echo '</td>';
+      echo "</tr>";
+      echo '</table>';
+      echo '</td>';
+      echo "</tr>";
+      echo '</td>';
+      echo "</tr>";
+
       echo '</table>';
       echo "</table>";
 

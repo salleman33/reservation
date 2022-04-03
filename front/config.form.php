@@ -25,6 +25,8 @@ if ($plugin->isActivated("reservation")) {
       $PluginReservationConfig->setConfigurationValue("checkin", $_POST["checkin"]);
       $PluginReservationConfig->setConfigurationValue("checkin_timeout", $_POST["checkin_timeout"]);
       $PluginReservationConfig->setConfigurationValue("checkin_action", $_POST["checkin_action"]);
+      $PluginReservationConfig->setConfigurationValue("auto_checkin", $_POST["auto_checkin"]);
+      $PluginReservationConfig->setConfigurationValue("auto_checkin_time", $_POST["auto_checkin_time"]);
    }
    if (isset($_POST["custom_categories"])) {
       $PluginReservationConfig->setConfigurationValue("custom_categories", $_POST["custom_categories"]);
