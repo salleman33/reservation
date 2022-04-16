@@ -143,7 +143,7 @@ class PluginReservationMultiEdit extends CommonDBTM
         }
     }
 
-    public function showForm($ID)
+    public function showForm($ID, array $option = [])
     {
         global $CFG_GLPI;
 

@@ -43,7 +43,7 @@ class PluginReservationConfig extends CommonDBTM
    }
 
 
-   public function showForm()
+   public function showForm($ID, array $option = [])
    {
 
 

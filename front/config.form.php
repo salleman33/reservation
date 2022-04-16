@@ -52,7 +52,7 @@ if ($plugin->isActivated("reservation")) {
    }
 
    Html::header(PluginReservationReservation::getTypeName(2), '', "plugins", "Reservation");
-   $PluginReservationConfig->showForm();
+   $PluginReservationConfig->showForm(1);
    Html::footer();
 
 } else {

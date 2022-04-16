@@ -118,7 +118,6 @@ class PluginReservationReservation extends CommonDBTM
                             AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
                    $left
                    WHERE `glpi_reservationitems`.`is_active` = '1'
-                         AND `glpi_reservationitems`.`is_deleted` = '0'
                          AND `$itemtable`.`is_deleted` = '0'
                          $where ".
                          getEntitiesRestrictRequest(" AND", $itemtable, '',

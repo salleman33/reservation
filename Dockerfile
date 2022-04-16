@@ -10,8 +10,8 @@ RUN docker-php-ext-install -j$(nproc) opcache zip bz2 exif intl gd mysqli
 
 
 RUN cd /var/www/html 
-RUN wget https://github.com/glpi-project/glpi/releases/download/9.5.7/glpi-9.5.7.tgz && \
-	tar xvf glpi-9.5.7.tgz && rm glpi-9.5.7.tgz
+RUN wget https://github.com/glpi-project/glpi/releases/download/10.0.0-rc3/glpi-10.0.0-rc3.tgz && \
+	tar xvf glpi-10.0.0-rc3.tgz && rm glpi-10.0.0-rc3.tgz
 RUN chown -R www-data glpi/files glpi/config
 
 

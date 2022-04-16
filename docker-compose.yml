@@ -3,7 +3,7 @@ services:
   glpi:
     build: .
     restart: always
-    image: glpi_reservations
+    image: glpi10
     container_name: glpi
     depends_on:
             - mariadb
