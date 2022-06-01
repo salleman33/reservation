@@ -129,7 +129,7 @@ class PluginReservationTask extends CommonDBTM
 
          $conflict_reservations = PluginReservationReservation::getAllReservations(["`begin` >= '".$reservation->fields['end']."'",
                                                                            "`begin` <= '".$end."'",
-                                                                           "`effectivedate` != NULL",
+                                                                           "effectivedate is null",
                                                                            "reservationitems_id = ".$res['reservationitems_id']]);
 
          $query = "UPDATE `glpi_reservations` 
