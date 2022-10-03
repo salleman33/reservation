@@ -136,6 +136,9 @@ class PluginReservationTask extends CommonDBTM
                         SET `end` = '".$end."' 
                         WHERE `id`='" . $reservation->fields["id"] . "'";
          $DB->query($query) or die("error on 'update' into checkReservations : " . $DB->error());
+         if (count($conflict_reservations) == 0 ) {
+            $task->log(sprintf(__('no conflict reservation !')));
+         }
 
          foreach ($conflict_reservations as $conflict) {
             $conflict_reservation = new Reservation();
@@ -168,28 +171,29 @@ class PluginReservationTask extends CommonDBTM
                         SET `baselinedate` = '".$conflict_reservation->fields["end"]."'
                         WHERE `reservations_id`='" . $reservation->fields["id"] . "'";
                $DB->query($query) or die("error on 'update' into checkReservations conflict : " . $DB->error());
+               $task->log(sprintf(__('Deleting reservation %1$s on item %2$s because a new reservation is made by same user'), $conflict_reservation->fields['id'], $item->fields['name']));
+               $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
+               continue;
             } else {
-	       $task->log(sprintf(__('conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)'), 
-		       $conflict_reservation->fields['id'], 
-		       $item->fields['name'], 
-		       $formatName, 
-		       date("d-m-Y \à H:i:s", strtotime($conflict['begin'])), 
-		       date("d-m-Y \à H:i:s", strtotime($conflict['end']))
-	               )
-	       );
-               
+	            $task->log(sprintf(__('conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)'), 
+                  $conflict_reservation->fields['id'], 
+                  $item->fields['name'], 
+                  $formatName, 
+                  date("d-m-Y \à H:i:s", strtotime($conflict['begin'])), 
+                  date("d-m-Y \à H:i:s", strtotime($conflict['end'])))
+	            );
             }
             $PluginReservationConfig = new PluginReservationConfig();
             $conflict_action = $PluginReservationConfig->getConfigurationValue("conflict_action");
             switch ($conflict_action) {
                case "delete":
                   $task->log(sprintf(__('Deleting reservation %1$s on item %2$s'), $conflict_reservation->fields['id'], $item->fields['name']));
-		  $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
-		  NotificationEvent::raiseEvent('plugin_reservation_conflict_new_user', $conflict_reservation, ['other_user_id' => $res['users_id']]);
+                  $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
+                  NotificationEvent::raiseEvent('plugin_reservation_conflict_new_user', $conflict_reservation, ['other_user_id' => $res['users_id']]);
                   NotificationEvent::raiseEvent('plugin_reservation_conflict_previous_user', $reservation, ['other_user_id' => $conflict['users_id']]);
                   break;
                case "delay":
-		  $end_plus_epsilon = date("Y-m-d H:i:s", $time + $delay + ($delay / 2));
+		            $end_plus_epsilon = date("Y-m-d H:i:s", $time + $delay + ($delay / 2));
                   if ($conflict_reservation->fields["end"] <= $end_plus_epsilon) {
                      $task->log(sprintf(__('Could not delay reservation %1$s on item %2$s'), $conflict_reservation->fields['id'], $item->fields['name']));
                      $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
