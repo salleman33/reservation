@@ -258,6 +258,8 @@ class PluginReservationReservation extends CommonDBTM
                   sprintf(__('%1$s switchs the reservation %2$s with item %3$s'),
                           $_SESSION["glpiname"], $reservation_id, $item_id));
          Toolbox::logInFile('reservations_plugin', "switchItemToResa : ".$item_id. " <=> ".$reservation_id."\n", $force = false);
+      } else {
+         Toolbox::logInFile('reservations_plugin', "PROBLEM pour switchItemToResa : ".$item_id. " <=> ".$reservation_id."\n", $force = false);
       }
       
    }
