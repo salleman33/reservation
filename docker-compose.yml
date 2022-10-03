@@ -3,7 +3,7 @@ services:
   glpi:
     build: .
     restart: always
-    image: glpi10
+    image: glpi
     container_name: glpi
     depends_on:
             - mariadb
@@ -30,4 +30,4 @@ services:
       MYSQL_USER: "user"
       MYSQL_ROOT_PASSWORD: "password"
       MYSQL_PASSWORD: "password"
-      MYSQL_DATABASE: "database"
+      MYSQL_DATABASE: "glpi"
