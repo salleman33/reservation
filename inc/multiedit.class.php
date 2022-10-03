@@ -33,8 +33,8 @@ class PluginReservationMultiEdit extends CommonDBTM
             return false;
         }
 
-        $areResaValidForUpdate = true;
         $reservations = [];
+        $inputForUpdate = [];
 
         foreach ($post["resa_ids"] as $resa_id) {
             $resa = new Reservation();
@@ -46,46 +46,42 @@ class PluginReservationMultiEdit extends CommonDBTM
                 return false;
             }
 
-            $areResaValidForUpdate &= $resa->prepareInputForUpdate([
+            $inputForUpdate = $resa->prepareInputForUpdate([
                 'begin' => $post["begin"],
-                'end'   => $post["end"]
+                'end'   => $post["end"],
+                'comment'   => $post["comment"]
             ]);
 
             $reservations[$resa_id] = $resa;
         }
 
-        if ($areResaValidForUpdate) {
-            $updateSuccessful = true;
-            foreach ($reservations as $resa_id => $resa_instance) {
-                $updateSuccessful &= $resa_instance->update(
-                    [
-                        'id'        => (int) $resa_id,
-                        'begin'     => $post["begin"],
-                        'end'       => $post["end"],
-                        'comment'   => $post["comment"]
-                    ]
+        $updateSuccessful = true;
+        foreach ($reservations as $resa_id => $resa_instance) {
+            $updateSuccessful &= $resa_instance->update(
+                [
+                    'id'        => (int) $resa_id,
+                    'begin'     => $inputForUpdate["begin"],
+                    'end'       => $inputForUpdate["end"],
+                    'comment'   => $inputForUpdate["comment"]
+                ]
+            );
+        }
+
+        if ($updateSuccessful) {
+            foreach ($reservations as $resa_id => $resa_instace) {
+                Event::log(
+                    $resa_id,
+                    "reservation",
+                    4,
+                    "inventory",
+                    sprintf(__('%1$s updated the reservation %2$s with new dates', 'reservation'), $_SESSION["glpiname"], $resa_id)
                 );
+                Toolbox::logInFile('reservations_plugin', "multiedit_update : " . $resa_id . "\n", $force = false);
             }
 
-            if ($updateSuccessful) {
-                foreach ($reservations as $resa_id => $resa_instace) {
-                    Event::log(
-                        $resa_id,
-                        "reservation",
-                        4,
-                        "inventory",
-                        sprintf(__('%1$s updated the reservation %2$s with new dates', 'reservation'), $_SESSION["glpiname"], $resa_id)
-                    );
-                    Toolbox::logInFile('reservations_plugin', "multiedit_update : " . $resa_id . "\n", $force = false);
-                }
-
-                return true;
-            } else {
-                // fail to update
-                return false;
-            }
+            return true;
         } else {
-            // can't update
+            // fail to update
             return false;
         }
     }
