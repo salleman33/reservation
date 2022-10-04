@@ -282,12 +282,39 @@ class PluginReservationMenu extends CommonGLPI
       self::displayTabReservations($begin, $end, $ReservationsByUser, true);
    }
 
+
+   private function filterEntitiesItems($ReservationsByUser) {
+      global $DB;
+      $filteredArray = [];
+
+      foreach ($ReservationsByUser as $reservation_user => $reservations_user_list) {
+         $itemsForUser = [];
+
+         foreach ($reservations_user_list as $reservation_user_info) {
+            $reservation = new Reservation();
+            $reservation->getFromDB($reservation_user_info['reservations_id']);
+            $reservationitems = $reservation->getConnexityItem('reservationitem', 'reservationitems_id');
+            $item = $reservationitems->getConnexityItem($reservationitems->fields['itemtype'], 'items_id');
+
+            if (Session::haveAccessToEntity($item->fields["entities_id"])) {
+                     array_push($itemsForUser, $reservation_user_info);
+            }
+         }
+
+         if (count($itemsForUser)) {
+            $filteredArray[$reservation_user] = $itemsForUser;
+         }
+      }
+      return $filteredArray;
+}
+
    /**
     *
     */
-   private static function displayTabReservations($begin, $end, $ReservationsByUser, $includeFuture)
+   private static function displayTabReservations($begin, $end, $listResaByUser, $includeFuture)
    {
       global $DB;
+      $ReservationsByUser = self::filterEntitiesItems($listResaByUser);
 
       $showentity = Session::isMultiEntitiesMode();
       $config = new PluginReservationConfig();
