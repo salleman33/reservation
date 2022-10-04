@@ -819,8 +819,8 @@ class PluginReservationMenu extends CommonGLPI
       if (!Session::haveRight("reservation", "1")) {
          return false;
       }
-      $mois_courant = intval(strftime("%m"));
-      $annee_courante = strftime("%Y");
+      $mois_courant = intval(date('m'));
+      $annee_courante = date('Y');
 
       $mois_courant = intval($mois_courant);
 
