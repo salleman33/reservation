@@ -4,3 +4,5 @@ vendor/
 *.min.*
 .vscode
 composer.lock
+reservation.tar
+reservation.zip
