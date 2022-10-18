@@ -283,7 +283,7 @@ class PluginReservationMenu extends CommonGLPI
    }
 
 
-   private function filterEntitiesItems($ReservationsByUser) {
+   private static function filterEntitiesItems($ReservationsByUser) {
       global $DB;
       $filteredArray = [];
 
