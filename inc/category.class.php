@@ -157,7 +157,7 @@ class PluginReservationCategory extends CommonDBTM
                   LEFT OUTER JOIN `$categories_table`
                      ON `$category_items_table`.`categories_id` = `$categories_table`.`id`
                   $left
-                  WHERE `glpi_reservationitems`.`is_deleted` = '0'
+                  WHERE `glpi_reservationitems`.`is_active` = '1'
                      " . ($filter_is_active ? "AND `glpi_reservationitems`.`is_active` = '1'" : "") . "
                      AND `$itemtable`.`is_deleted` = '0'
                      $where ".
