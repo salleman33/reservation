@@ -722,10 +722,6 @@ class PluginReservationMenu extends CommonGLPI
       global $CFG_GLPI;
       $form_dates = [];
 
-      if (isset($_SESSION['glpi_plugin_reservation_form_dates'])) {
-         $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
-      }
-
       $day = date("d", time());
       $month = date("m", time());
       $year = date("Y", time());
@@ -739,11 +735,19 @@ class PluginReservationMenu extends CommonGLPI
       $planning_begin_date = date("Y-m-d H:i:s", mktime($planning_begin_time[0], $planning_begin_time[1], 00, $month, $day, $year));
       $planning_end_date = date("Y-m-d H:i:s", mktime($planning_end_time[0], $planning_end_time[1], 00, $month, $day, $year));
 
-      $form_dates["begin"] = date("Y-m-d H:i:s", $begin_time);
-      if ($planning_end_date > date("Y-m-d H:i:s", time())) {
-         $form_dates['end'] = $planning_end_date;
+      if (isset($_GET['reset'])) {
+         unset($_SESSION['glpi_plugin_reservation_form_dates']);
+      }
+      
+      if (isset($_SESSION['glpi_plugin_reservation_form_dates'])) {
+         $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
       } else {
-         $form_dates['end'] = date("Y-m-d H:i:s", mktime(23, 59, 00, $month, $day, $year));
+         $form_dates["begin"] = date("Y-m-d H:i:s", $begin_time);
+         if ($planning_end_date > date("Y-m-d H:i:s", time())) {
+            $form_dates['end'] = $planning_end_date;
+         } else {
+            $form_dates['end'] = date("Y-m-d H:i:s", mktime(23, 59, 00, $month, $day, $year));
+         }
       }
 
       if (isset($_POST['date_begin'])) {
