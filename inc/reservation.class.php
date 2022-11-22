@@ -42,6 +42,10 @@ class PluginReservationReservation extends CommonDBTM
       return Reservation::canUpdate();
    }
 
+   public static function addEvents(NotificationTargetReservation $target) {
+      $target->events['plugin_reservation_checkin'] = __("Reservation Checkin (plugin)", "reservation");
+   }
+
 
    /**
     * get all reservations info merged with plugin_reservation info
@@ -206,6 +210,7 @@ class PluginReservationReservation extends CommonDBTM
                   sprintf(__('%1$s marks the reservation %2$s as gone'),
                            $_SESSION["glpiname"], $reservation_id));
          Toolbox::logInFile('reservations_plugin', "checkinReservation : ".$reservation_id."\n", $force = false);
+         NotificationEvent::raiseEvent('plugin_reservation_checkin', $resa);
          return true;
       }
       return false;
