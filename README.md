@@ -34,6 +34,7 @@ Use the notification events :
 - Reservation Conflict When Extended, previous user (plugin) : when there is a conflict to extends a reservation. ##reservation.user## is the current user, ##reservation.otheruser## is the next user
 - User Reservation Expired (plugin) : for automatic mode
 - User Reservation Not Checkin (plugin) : when a reservation has not been check in
+- User Reservation Checkin (plugin) : when a reservation is check in
 
 **For automatic actions, consider increasing the limit number of actions that can be run at the same time (default is 2).**
 
