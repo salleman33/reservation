@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 12:19+0100\n"
+"POT-Creation-Date: 2022-11-24 11:12+0100\n"
 "PO-Revision-Date: 2019-02-13 19:07+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,6 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Poedit 1.8.7.1\n"
+
+#: inc/task.class.php:153
+#, php-format
+msgid "%1$s created a new reservation for the same item : %2$s"
+msgstr ""
 
 #: inc/multiedit.class.php:131
 #, php-format
@@ -82,6 +87,15 @@ msgstr "Uvolnění"
 msgid "Checkout"
 msgstr "Uvolnění"
 
+#: inc/task.class.php:199
+#, php-format
+msgid "Could not delay reservation %1$s on item %2$s"
+msgstr ""
+
+#: inc/task.class.php:249
+msgid "Could not send notification"
+msgstr "Nedaří se poslat oznámení"
+
 #: inc/menu.class.php:606
 msgid "Create new reservation"
 msgstr "Vytvořit novou rezervaci"
@@ -110,8 +124,23 @@ msgstr ""
 msgid "Delay the start of the conflicted reservation"
 msgstr ""
 
+#: inc/task.class.php:209
+#, fuzzy, php-format
+msgid "Delaying reservation %1$s on item %2$s"
+msgstr "Prodloužení rezervace"
+
 #: inc/config.class.php:93
 msgid "Delete the conflicted reservation"
+msgstr ""
+
+#: inc/task.class.php:191
+#, fuzzy, php-format
+msgid "Deleting reservation %1$s on item %2$s"
+msgstr "Prodloužení rezervace"
+
+#: inc/task.class.php:92
+#, php-format
+msgid "Deleting reservation (check in) : %1$s on item %2$s"
 msgstr ""
 
 #: inc/config.class.php:124
@@ -137,6 +166,11 @@ msgstr ""
 #: inc/config.class.php:109
 msgid "Enable check in"
 msgstr ""
+
+#: inc/task.class.php:124
+#, fuzzy, php-format
+msgid "Extending reservation : %1$s"
+msgstr "Prodloužení rezervace"
 
 #: inc/config.class.php:201
 msgid "Incoming Reservation tab"
@@ -193,7 +227,7 @@ msgstr[0] "Rezervace"
 msgstr[1] "Rezervace"
 msgstr[2] "Rezervací"
 
-#: inc/reservation.class.php:46
+#: inc/task.class.php:15
 #, fuzzy
 msgid "Reservation Checkin (plugin)"
 msgstr "Rezervace v tomto měsící"
@@ -224,10 +258,19 @@ msgctxt "tooltip"
 msgid "Send an e-mail for the late reservation"
 msgstr "Poslat e-mail kvůli nevrácené rezervaci"
 
-#: inc/task.class.php:43
+#: inc/task.class.php:44
 #, fuzzy
 msgid "Send an e-mail to users with expired reservations"
 msgstr "Poslat e-mail uživatelům, kteří nevrátili zapůjčené"
+
+#: inc/task.class.php:247
+msgid "Sending an e-mail"
+msgstr "Poslat e-mail"
+
+#: inc/task.class.php:244
+#, php-format
+msgid "Sending e-mail for reservation %1$s"
+msgstr "Poslat e-mail pro rezervaci %1$s"
 
 #: inc/menu.class.php:448
 msgctxt "tooltip"
@@ -250,6 +293,11 @@ msgstr "Nástrojový tip"
 #: inc/config.class.php:231
 msgid "ToolTip Configuration"
 msgstr "Nastavení nástrojového tipu"
+
+#: inc/task.class.php:117
+#, php-format
+msgid "Until : %1$s"
+msgstr ""
 
 #: inc/multiedit.class.php:158
 msgid "Update multiple items"
@@ -284,13 +332,24 @@ msgstr ""
 msgid "Warn and delete unclaimed reservation"
 msgstr "Poslat e-mail kvůli nevrácené rezervaci"
 
-#: inc/task.class.php:41
+#: inc/task.class.php:42
 msgid "Watch Reservations"
 msgstr "Sledovat rezervace"
+
+#: inc/task.class.php:179
+#, php-format
+msgid ""
+"conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
+msgstr ""
 
 #: inc/config.class.php:158
 msgid "for reservations made until (in minutes) "
 msgstr ""
+
+#: inc/task.class.php:141
+#, fuzzy
+msgid "no conflict reservation !"
+msgstr "Panel nacházející rezervace"
 
 #~ msgid "Setup"
 #~ msgstr "Nastavení"
@@ -387,25 +446,8 @@ msgstr ""
 #~ msgid "plugin"
 #~ msgstr "zásuvný modul"
 
-#, fuzzy
-#~ msgid "Extending reservation : %1$s"
-#~ msgstr "Prodloužení rezervace"
-
-#, fuzzy
-#~ msgid "no conflict reservation !"
-#~ msgstr "Panel nacházející rezervace"
-
-#~ msgid "Sending e-mail for reservation %1$s"
-#~ msgstr "Poslat e-mail pro rezervaci %1$s"
-
 #~ msgid "Expected return time was : %1$s"
 #~ msgstr "Očekávaný okamžik návrácení byl: %1$s"
-
-#~ msgid "Sending an e-mail"
-#~ msgstr "Poslat e-mail"
-
-#~ msgid "Could not send notification"
-#~ msgstr "Nedaří se poslat oznámení"
 
 #~ msgid "Using the configurable automatic action"
 #~ msgstr "Použít nastavitelnou automatickou akci"

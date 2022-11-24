@@ -12,6 +12,7 @@ class PluginReservationTask extends CommonDBTM
       $target->events['plugin_reservation_conflict_previous_user'] = __("Reservation Conflict When Extended, previous user (plugin)", "reservation");
       $target->events['plugin_reservation_expiration'] = __("User Reservation Expired (plugin)", "reservation");
       $target->events['plugin_reservation_not_checkin'] = __("User Reservation Not Checkin (plugin)", "reservation");
+      $target->events['plugin_reservation_checkin'] = __("Reservation Checkin (plugin)", "reservation");
    }
 
    public static function addData(NotificationTargetReservation $target) {

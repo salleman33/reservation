@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 12:23+0100\n"
+"POT-Creation-Date: 2022-11-24 11:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: inc/task.class.php:153
+#, php-format
+msgid "%1$s created a new reservation for the same item : %2$s"
+msgstr ""
 
 #: inc/multiedit.class.php:131
 #, php-format
@@ -78,6 +83,15 @@ msgstr ""
 msgid "Checkout"
 msgstr ""
 
+#: inc/task.class.php:199
+#, php-format
+msgid "Could not delay reservation %1$s on item %2$s"
+msgstr ""
+
+#: inc/task.class.php:249
+msgid "Could not send notification"
+msgstr ""
+
 #: inc/menu.class.php:606
 msgid "Create new reservation"
 msgstr ""
@@ -106,8 +120,23 @@ msgstr ""
 msgid "Delay the start of the conflicted reservation"
 msgstr ""
 
+#: inc/task.class.php:209
+#, php-format
+msgid "Delaying reservation %1$s on item %2$s"
+msgstr ""
+
 #: inc/config.class.php:93
 msgid "Delete the conflicted reservation"
+msgstr ""
+
+#: inc/task.class.php:191
+#, php-format
+msgid "Deleting reservation %1$s on item %2$s"
+msgstr ""
+
+#: inc/task.class.php:92
+#, php-format
+msgid "Deleting reservation (check in) : %1$s on item %2$s"
 msgstr ""
 
 #: inc/config.class.php:124
@@ -132,6 +161,11 @@ msgstr ""
 
 #: inc/config.class.php:109
 msgid "Enable check in"
+msgstr ""
+
+#: inc/task.class.php:124
+#, php-format
+msgid "Extending reservation : %1$s"
 msgstr ""
 
 #: inc/config.class.php:201
@@ -185,7 +219,7 @@ msgid_plural "Reservations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/reservation.class.php:46
+#: inc/task.class.php:15
 msgid "Reservation Checkin (plugin)"
 msgstr ""
 
@@ -215,8 +249,17 @@ msgctxt "tooltip"
 msgid "Send an e-mail for the late reservation"
 msgstr ""
 
-#: inc/task.class.php:43
+#: inc/task.class.php:44
 msgid "Send an e-mail to users with expired reservations"
+msgstr ""
+
+#: inc/task.class.php:247
+msgid "Sending an e-mail"
+msgstr ""
+
+#: inc/task.class.php:244
+#, php-format
+msgid "Sending e-mail for reservation %1$s"
 msgstr ""
 
 #: inc/menu.class.php:448
@@ -239,6 +282,11 @@ msgstr ""
 
 #: inc/config.class.php:231
 msgid "ToolTip Configuration"
+msgstr ""
+
+#: inc/task.class.php:117
+#, php-format
+msgid "Until : %1$s"
 msgstr ""
 
 #: inc/multiedit.class.php:158
@@ -273,10 +321,20 @@ msgstr ""
 msgid "Warn and delete unclaimed reservation"
 msgstr ""
 
-#: inc/task.class.php:41
+#: inc/task.class.php:42
 msgid "Watch Reservations"
+msgstr ""
+
+#: inc/task.class.php:179
+#, php-format
+msgid ""
+"conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
 msgstr ""
 
 #: inc/config.class.php:158
 msgid "for reservations made until (in minutes) "
+msgstr ""
+
+#: inc/task.class.php:141
+msgid "no conflict reservation !"
 msgstr ""

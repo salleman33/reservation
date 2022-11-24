@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 12:19+0100\n"
+"POT-Creation-Date: 2022-11-24 11:12+0100\n"
 "PO-Revision-Date: 2021-12-07 16:18+0100\n"
 "Last-Translator: \n"
 "Language-Team:  none\n"
@@ -17,6 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: inc/task.class.php:153
+#, fuzzy, php-format
+msgid "%1$s created a new reservation for the same item : %2$s"
+msgstr "%1$s fügt die Reservierung für den selben Artikel %2$s hinzu"
 
 #: inc/multiedit.class.php:131
 #, fuzzy, php-format
@@ -82,6 +87,15 @@ msgstr "Check-In"
 msgid "Checkout"
 msgstr "Check-Out"
 
+#: inc/task.class.php:199
+#, fuzzy, php-format
+msgid "Could not delay reservation %1$s on item %2$s"
+msgstr "Konnte Reservierung %1$s für Artikel %2$s nicht verlängern"
+
+#: inc/task.class.php:249
+msgid "Could not send notification"
+msgstr "Kann keine Benachrichtigung versenden"
+
 #: inc/menu.class.php:606
 msgid "Create new reservation"
 msgstr "Neue Reservierung"
@@ -110,9 +124,24 @@ msgstr "Standard"
 msgid "Delay the start of the conflicted reservation"
 msgstr "Verzögere den Beginn der in Konflikt geratenen Reservierung"
 
+#: inc/task.class.php:209
+#, fuzzy, php-format
+msgid "Delaying reservation %1$s on item %2$s"
+msgstr "Verlängere Reservierung %1$s für Artikel %2$s"
+
 #: inc/config.class.php:93
 msgid "Delete the conflicted reservation"
 msgstr "Lösche die in Konflikt geratene Reservierung"
+
+#: inc/task.class.php:191
+#, fuzzy, php-format
+msgid "Deleting reservation %1$s on item %2$s"
+msgstr "Lösche Reservierung %1$s für Artikel %2$s"
+
+#: inc/task.class.php:92
+#, php-format
+msgid "Deleting reservation (check in) : %1$s on item %2$s"
+msgstr "Lösche Reservierung (Check-In) : %1$s für Artikel %2$s"
 
 #: inc/config.class.php:124
 msgid "Do Nothing"
@@ -140,6 +169,11 @@ msgstr "Aktiviere Check-In Funktion"
 #: inc/config.class.php:109
 msgid "Enable check in"
 msgstr "Aktiviere Check-In Funktion"
+
+#: inc/task.class.php:124
+#, fuzzy, php-format
+msgid "Extending reservation : %1$s"
+msgstr "Reservierung verlängern : %1$s"
 
 #: inc/config.class.php:201
 msgid "Incoming Reservation tab"
@@ -195,7 +229,7 @@ msgid_plural "Reservations"
 msgstr[0] "Reservierung"
 msgstr[1] "Reservierungen"
 
-#: inc/reservation.class.php:46
+#: inc/task.class.php:15
 #, fuzzy
 msgid "Reservation Checkin (plugin)"
 msgstr "Nutzerreservierung ohne Check-In (plugin)"
@@ -228,10 +262,19 @@ msgctxt "tooltip"
 msgid "Send an e-mail for the late reservation"
 msgstr "Sende eine Mail wegen verspäteter Reservierung"
 
-#: inc/task.class.php:43
+#: inc/task.class.php:44
 #, fuzzy
 msgid "Send an e-mail to users with expired reservations"
 msgstr "Sende eine Mail an Nutzer mit verspäteten Reservierungen"
+
+#: inc/task.class.php:247
+msgid "Sending an e-mail"
+msgstr "Mail versenden"
+
+#: inc/task.class.php:244
+#, php-format
+msgid "Sending e-mail for reservation %1$s"
+msgstr "Sende Mail für Reservierung %1$s"
 
 #: inc/menu.class.php:448
 #, fuzzy
@@ -255,6 +298,11 @@ msgstr "ToolTip"
 #: inc/config.class.php:231
 msgid "ToolTip Configuration"
 msgstr "ToolTip Konfiguration"
+
+#: inc/task.class.php:117
+#, php-format
+msgid "Until : %1$s"
+msgstr "Bis : %1$s"
 
 #: inc/multiedit.class.php:158
 msgid "Update multiple items"
@@ -292,13 +340,26 @@ msgstr "Warne"
 msgid "Warn and delete unclaimed reservation"
 msgstr "Warne und lösche die nicht abgeholte Reservierung"
 
-#: inc/task.class.php:41
+#: inc/task.class.php:42
 msgid "Watch Reservations"
 msgstr "Zeige Reservierungen"
+
+#: inc/task.class.php:179
+#, php-format
+msgid ""
+"conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
+msgstr ""
+"Konflikt für Reservierung %1$s für Artikel %2$s verwendet von %3$s (von %4$s "
+"bis %5$s)"
 
 #: inc/config.class.php:158
 msgid "for reservations made until (in minutes) "
 msgstr ""
+
+#: inc/task.class.php:141
+#, fuzzy
+msgid "no conflict reservation !"
+msgstr "Lösche die in Konflikt geratene Reservierung"
 
 #~ msgid "Setup"
 #~ msgstr "Setup"
@@ -440,59 +501,14 @@ msgstr ""
 #~ msgid "plugin"
 #~ msgstr "Plugin"
 
-#~ msgid "Deleting reservation (check in) : %1$s on item %2$s"
-#~ msgstr "Lösche Reservierung (Check-In) : %1$s für Artikel %2$s"
-
-#~ msgid "Until : %1$s"
-#~ msgstr "Bis : %1$s"
-
-#, fuzzy
-#~ msgid "Extending reservation : %1$s"
-#~ msgstr "Reservierung verlängern : %1$s"
-
-#, fuzzy
-#~ msgid "no conflict reservation !"
-#~ msgstr "Lösche die in Konflikt geratene Reservierung"
-
-#, fuzzy
-#~ msgid "%1$s created a new reservation for the same item : %2$s"
-#~ msgstr "%1$s fügt die Reservierung für den selben Artikel %2$s hinzu"
-
 #, fuzzy
 #~ msgid ""
 #~ "Deleting reservation %1$s on item %2$s because a new reservation is made "
 #~ "by same user"
 #~ msgstr "Lösche Reservierung %1$s für Artikel %2$s"
 
-#~ msgid ""
-#~ "conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
-#~ msgstr ""
-#~ "Konflikt für Reservierung %1$s für Artikel %2$s verwendet von %3$s (von "
-#~ "%4$s bis %5$s)"
-
-#, fuzzy
-#~ msgid "Deleting reservation %1$s on item %2$s"
-#~ msgstr "Lösche Reservierung %1$s für Artikel %2$s"
-
-#, fuzzy
-#~ msgid "Could not delay reservation %1$s on item %2$s"
-#~ msgstr "Konnte Reservierung %1$s für Artikel %2$s nicht verlängern"
-
-#, fuzzy
-#~ msgid "Delaying reservation %1$s on item %2$s"
-#~ msgstr "Verlängere Reservierung %1$s für Artikel %2$s"
-
-#~ msgid "Sending e-mail for reservation %1$s"
-#~ msgstr "Sende Mail für Reservierung %1$s"
-
 #~ msgid "Expected return time was : %1$s"
 #~ msgstr "Erwartete Abgabezeit war : %1$s"
-
-#~ msgid "Sending an e-mail"
-#~ msgstr "Mail versenden"
-
-#~ msgid "Could not send notification"
-#~ msgstr "Kann keine Benachrichtigung versenden"
 
 #~ msgid "Item is not currently reserved"
 #~ msgstr "Artikel ist derzeit nicht reserviert"

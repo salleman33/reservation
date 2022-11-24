@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 12:19+0100\n"
+"POT-Creation-Date: 2022-11-24 11:12+0100\n"
 "PO-Revision-Date: 2022-02-10 15:47+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,6 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.0.1\n"
+
+#: inc/task.class.php:153
+#, php-format
+msgid "%1$s created a new reservation for the same item : %2$s"
+msgstr "%1$s a créé une nouvelle réservation avec le même matériel : %2$s"
 
 #: inc/multiedit.class.php:131
 #, php-format
@@ -80,6 +85,15 @@ msgstr "Acquittement"
 msgid "Checkout"
 msgstr "Acquittement"
 
+#: inc/task.class.php:199
+#, php-format
+msgid "Could not delay reservation %1$s on item %2$s"
+msgstr "Impossible de décaler la réservation %1$s pour le matériel %2$s"
+
+#: inc/task.class.php:249
+msgid "Could not send notification"
+msgstr "Notification impossible"
+
 #: inc/menu.class.php:606
 msgid "Create new reservation"
 msgstr "Créer une nouvelle réservation"
@@ -108,9 +122,26 @@ msgstr ""
 msgid "Delay the start of the conflicted reservation"
 msgstr "Retarder le début de la réservation en conflit"
 
+#: inc/task.class.php:209
+#, php-format
+msgid "Delaying reservation %1$s on item %2$s"
+msgstr "Décalage de la réservation %1$s avec le matériel %2$s"
+
 #: inc/config.class.php:93
 msgid "Delete the conflicted reservation"
 msgstr "Supprimer la réservation en conflit"
+
+#: inc/task.class.php:191
+#, php-format
+msgid "Deleting reservation %1$s on item %2$s"
+msgstr "Suppression de la réservation %1$s pour le matériel %2$s"
+
+#: inc/task.class.php:92
+#, php-format
+msgid "Deleting reservation (check in) : %1$s on item %2$s"
+msgstr ""
+"Suppression de la réservation (départ non acquitté) : %1$s avec le matériel "
+"%2$s"
 
 #: inc/config.class.php:124
 msgid "Do Nothing"
@@ -136,6 +167,11 @@ msgstr "activer l'acquittement de départ"
 #: inc/config.class.php:109
 msgid "Enable check in"
 msgstr "activer l'acquittement de départ"
+
+#: inc/task.class.php:124
+#, php-format
+msgid "Extending reservation : %1$s"
+msgstr "Prolongation d'une réservation : %1$s"
 
 #: inc/config.class.php:201
 msgid "Incoming Reservation tab"
@@ -190,18 +226,22 @@ msgid_plural "Reservations"
 msgstr[0] "Réservation"
 msgstr[1] "Réservations"
 
-#: inc/reservation.class.php:46
+#: inc/task.class.php:15
 #, fuzzy
 msgid "Reservation Checkin (plugin)"
 msgstr "Acquittement d'un départ (Plugin)"
 
 #: inc/task.class.php:11
 msgid "Reservation Conflict When Extended, new user (plugin)"
-msgstr "Conflit lors de la prolongation d'une réservation (Plugin) - pour l'emprunteur suivant"
+msgstr ""
+"Conflit lors de la prolongation d'une réservation (Plugin) - pour "
+"l'emprunteur suivant"
 
 #: inc/task.class.php:12
 msgid "Reservation Conflict When Extended, previous user (plugin)"
-msgstr "Conflit lors de la prolongation d'une réservation (Plugin) - pour l'emprunteur actuel"
+msgstr ""
+"Conflit lors de la prolongation d'une réservation (Plugin) - pour "
+"l'emprunteur actuel"
 
 #: inc/menu.class.php:862
 msgid "Reservations This Month"
@@ -221,9 +261,18 @@ msgctxt "tooltip"
 msgid "Send an e-mail for the late reservation"
 msgstr "Envoyer un email"
 
-#: inc/task.class.php:43
+#: inc/task.class.php:44
 msgid "Send an e-mail to users with expired reservations"
 msgstr "Envoi un email aux utilisateurs avec des réservations expirées"
+
+#: inc/task.class.php:247
+msgid "Sending an e-mail"
+msgstr "Envoi d'un email"
+
+#: inc/task.class.php:244
+#, php-format
+msgid "Sending e-mail for reservation %1$s"
+msgstr "Envoi d'un email pour la réservation %1$s"
 
 #: inc/menu.class.php:448
 msgctxt "tooltip"
@@ -247,6 +296,11 @@ msgstr "Info-bulle"
 msgid "ToolTip Configuration"
 msgstr "Configuration des info-bulles"
 
+#: inc/task.class.php:117
+#, php-format
+msgid "Until : %1$s"
+msgstr "Jusqu'à : %1$s"
+
 #: inc/multiedit.class.php:158
 msgid "Update multiple items"
 msgstr "Modifier un groupe de réservations"
@@ -257,7 +311,9 @@ msgstr "utiliser des categories de matériel personnalisées"
 
 #: inc/config.class.php:221
 msgid "Use items types when not in a custom category"
-msgstr "Utiliser le type de l'objet lorqu'il n'est pas dans une catégorie personnalisée"
+msgstr ""
+"Utiliser le type de l'objet lorqu'il n'est pas dans une catégorie "
+"personnalisée"
 
 #: inc/task.class.php:13
 msgid "User Reservation Expired (plugin)"
@@ -281,13 +337,26 @@ msgstr "Avertir"
 msgid "Warn and delete unclaimed reservation"
 msgstr "Avertir et supprimer la réservation"
 
-#: inc/task.class.php:41
+#: inc/task.class.php:42
 msgid "Watch Reservations"
 msgstr "Surveille les réservations"
+
+#: inc/task.class.php:179
+#, php-format
+msgid ""
+"conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
+msgstr ""
+"conflit pour la réservation %1$s avec le matériel %2$s utilisé par %3$s (de "
+"%4$s à %5$s)"
 
 #: inc/config.class.php:158
 msgid "for reservations made until (in minutes) "
 msgstr "pour les reservations faites jusqu'à (en minutes)"
+
+#: inc/task.class.php:141
+#, fuzzy
+msgid "no conflict reservation !"
+msgstr "Supprimer la réservation en conflit"
 
 #~ msgid "Setup"
 #~ msgstr "Installation"
@@ -386,53 +455,11 @@ msgstr "pour les reservations faites jusqu'à (en minutes)"
 #~ msgid "%1$s switchs the reservation %2$s with item %3$s"
 #~ msgstr "%1$s permutte la réservation %2$s pour le matériel %3$s"
 
-#~ msgid "Deleting reservation (check in) : %1$s on item %2$s"
-#~ msgstr ""
-#~ "Suppression de la réservation (départ non acquitté) : %1$s avec le "
-#~ "matériel %2$s"
-
-#~ msgid "Until : %1$s"
-#~ msgstr "Jusqu'à : %1$s"
-
-#~ msgid "Extending reservation : %1$s"
-#~ msgstr "Prolongation d'une réservation : %1$s"
-
-#, fuzzy
-#~ msgid "no conflict reservation !"
-#~ msgstr "Supprimer la réservation en conflit"
-
-#~ msgid "%1$s created a new reservation for the same item : %2$s"
-#~ msgstr "%1$s a créé une nouvelle réservation avec le même matériel : %2$s"
-
 #, fuzzy
 #~ msgid ""
 #~ "Deleting reservation %1$s on item %2$s because a new reservation is made "
 #~ "by same user"
 #~ msgstr "Suppression de la réservation %1$s pour le matériel %2$s"
 
-#~ msgid ""
-#~ "conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
-#~ msgstr ""
-#~ "conflit pour la réservation %1$s avec le matériel %2$s utilisé par %3$s "
-#~ "(de %4$s à %5$s)"
-
-#~ msgid "Deleting reservation %1$s on item %2$s"
-#~ msgstr "Suppression de la réservation %1$s pour le matériel %2$s"
-
-#~ msgid "Could not delay reservation %1$s on item %2$s"
-#~ msgstr "Impossible de décaler la réservation %1$s pour le matériel %2$s"
-
-#~ msgid "Delaying reservation %1$s on item %2$s"
-#~ msgstr "Décalage de la réservation %1$s avec le matériel %2$s"
-
-#~ msgid "Sending e-mail for reservation %1$s"
-#~ msgstr "Envoi d'un email pour la réservation %1$s"
-
 #~ msgid "Expected return time was : %1$s"
 #~ msgstr "Date de retour attendue : %1$s"
-
-#~ msgid "Sending an e-mail"
-#~ msgstr "Envoi d'un email"
-
-#~ msgid "Could not send notification"
-#~ msgstr "Notification impossible"

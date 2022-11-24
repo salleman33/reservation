@@ -42,10 +42,6 @@ class PluginReservationReservation extends CommonDBTM
       return Reservation::canUpdate();
    }
 
-   public static function addEvents(NotificationTargetReservation $target) {
-      $target->events['plugin_reservation_checkin'] = __("Reservation Checkin (plugin)", "reservation");
-   }
-
 
    /**
     * get all reservations info merged with plugin_reservation info
