@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-10 15:53+0100\n"
+"POT-Creation-Date: 2022-11-23 12:19+0100\n"
 "PO-Revision-Date: 2021-12-07 16:18+0100\n"
 "Last-Translator: \n"
 "Language-Team:  none\n"
@@ -18,37 +18,48 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: front/config.form.php:57
-msgid "Setup"
-msgstr "Setup"
+#: inc/multiedit.class.php:131
+#, fuzzy, php-format
+msgid "%1$s purges the reservation for item %2$s"
+msgstr "%1$s fügt die Reservierung %2$s für Artikel %3$s hinzu"
 
-#: front/config.form.php:60
-msgid "Please activate the plugin"
-msgstr "Bitte aktivieren Sie das Plugin"
+#: inc/multiedit.class.php:77
+#, fuzzy, php-format
+msgid "%1$s updated the reservation %2$s with new dates"
+msgstr "%1$s ändert die Reservierung %2$s mit Artikel %3$s"
 
-#: front/menu.php:10
-msgid "Simplified interface"
-msgstr "Vereinfachte Oberfläche"
+#: inc/config.class.php:122
+msgid "Action when reservation are not checkin"
+msgstr "Aktion, wenn Reservierungen nicht eingecheckt sind"
 
-#: inc/api.php:22
-msgid "Reservation Plugin Rest API"
-msgstr "Reservation Plugin Rest API"
+#: inc/menu.class.php:354
+msgid "Allow multiple edit"
+msgstr ""
 
-#: inc/api.php:84 inc/api.php:120
-msgid "resource not found"
-msgstr "Ressource nicht gefunden"
+#: inc/config.class.php:81
+msgid "Automatic"
+msgstr "Automatisch"
 
-#: inc/api.php:159
-msgid "missing params"
-msgstr "Fehlende Parameter"
+#: inc/menu.class.php:179
+msgid "Available Hardware"
+msgstr "Verfügbare Hardware"
 
-#: inc/api.php:200 inc/api.php:257
-msgid "custom categories is not enabled"
-msgstr "Eigene Kategorie ist nicht aktiviert"
+#: inc/config.class.php:65
+msgid ""
+"By defaut, use value of <b>step for the hours</b> defined in <I>General "
+"Setup > Assistance</I>"
+msgstr ""
+"Standardmäßig wird der Wert <b>Takt für die Stunde</b>, definiert unter "
+"<I>Allgemeine Konfiguration > Helpdesk</I> verwendet "
 
-#: inc/api.php:489
-msgid "check in function is not enabled"
-msgstr "Check-In Funktion ist nicht aktiviert"
+#: inc/config.class.php:207
+#, fuzzy
+msgid "Categories Configuration"
+msgstr "Kategorien Konfiguration"
+
+#: inc/config.class.php:301
+msgid "Categories customisation"
+msgstr "Kategorien Anpassung"
 
 #: inc/category.class.php:16
 msgid "Category"
@@ -62,297 +73,121 @@ msgid_plural "CategoriesItems"
 msgstr[0] "KategorieItem"
 msgstr[1] "KategorienItems"
 
-#: inc/config.class.php:57
-msgid "Configuration"
-msgstr "Konfiguration"
+#: inc/menu.class.php:350
+#, fuzzy
+msgid "Checkin"
+msgstr "Check-In"
 
-#: inc/config.class.php:63
-msgid "Duration added (in hour) to reservations expiring and not checkout"
-msgstr "Verleihzeit (in Stunden), die hinzugefügt wird, wenn eine Reservierung ausläuft und Check-Out noch nicht erfolgt ist"
+#: inc/menu.class.php:352
+msgid "Checkout"
+msgstr "Check-Out"
 
-#: inc/config.class.php:65
-msgid ""
-"By defaut, use value of <b>step for the hours</b> defined in <I>General "
-"Setup > Assistance</I>"
-msgstr "Standardmäßig wird der Wert <b>Takt für die Stunde</b>, definiert unter <I>Allgemeine Konfiguration > Helpdesk</I> verwendet "
+#: inc/menu.class.php:606
+msgid "Create new reservation"
+msgstr "Neue Reservierung"
+
+#: inc/config.class.php:193
+msgid "Current Reservation tab"
+msgstr "Aktuelle Reservierungen - Tab"
+
+#: inc/menu.class.php:172
+msgid "Current Reservations"
+msgstr "Aktuelle Reservierungen"
+
+#: inc/menu.class.php:176
+msgid "Current and Incoming Reservations"
+msgstr "Aktuelle und anstehende Reservierungen"
+
+#: inc/menu.class.php:338
+msgid "Current and future reservations"
+msgstr "Aktuelle und zukünftige Reservierungen"
 
 #: inc/config.class.php:67
 msgid "Default"
 msgstr "Standard"
 
-#: inc/config.class.php:79
-msgid "Method used to send e-mails to users with late reservations"
-msgstr "Genutzte Methode für das Senden von Mail bei verspäteten Reservierungen"
-
-#: inc/config.class.php:81
-msgid "Automatic"
-msgstr "Automatisch"
-
-#: inc/config.class.php:82
-msgid "Manual"
-msgstr "Manuell"
-
-#: inc/config.class.php:91
-msgid "Method used when there is a conflicted reservation"
-msgstr "Genutzte Methode, wenn es einen Konflikt bei der Reservierung gibt"
+#: inc/config.class.php:94
+msgid "Delay the start of the conflicted reservation"
+msgstr "Verzögere den Beginn der in Konflikt geratenen Reservierung"
 
 #: inc/config.class.php:93
 msgid "Delete the conflicted reservation"
 msgstr "Lösche die in Konflikt geratene Reservierung"
 
-#: inc/config.class.php:94
-msgid "Delay the start of the conflicted reservation"
-msgstr "Verzögere den Beginn der in Konflikt geratenen Reservierung"
-
-#: inc/config.class.php:107
-msgid "Enable check in"
-msgstr "Aktiviere Check-In Funktion"
-
-#: inc/config.class.php:120
-msgid "Action when reservation are not checkin"
-msgstr "Aktion, wenn Reservierungen nicht eingecheckt sind"
-
-#: inc/config.class.php:122
+#: inc/config.class.php:124
 msgid "Do Nothing"
 msgstr "Tue Nichts"
 
-#: inc/config.class.php:123
-msgid "Warn"
-msgstr "Warne"
-
-#: inc/config.class.php:124
-#, fuzzy
-msgid "Warn and delete unclaimed reservation"
-msgstr "Warne und lösche die nicht abgeholte Reservierung"
-
-#: inc/config.class.php:132
-msgid "Waiting time (in hour) to cancel the unclaimed reservation"
-msgstr "Wartezeit(in Stunden) nach der die nicht abgeholte Reservierung storniert wird"
-
-#: inc/config.class.php:145
-msgid "Tab Configuration"
-msgstr "Tab Konfiguration"
-
-#: inc/config.class.php:152
-msgid "Current Reservation tab"
-msgstr "Aktuelle Reservierungen - Tab"
-
-#: inc/config.class.php:160
-msgid "Incoming Reservation tab"
-msgstr "Anstehende Reservierungen - Tab"
-
-#: inc/config.class.php:166
-#, fuzzy
-msgid "Categories Configuration"
-msgstr "Kategorien Konfiguration"
-
-#: inc/config.class.php:172
-msgid "Use custom categories"
-msgstr "Nutze eigene Kategorien"
-
-#: inc/config.class.php:180
-msgid "Use items types when not in a custom category"
-msgstr "Nutze Hardwaretyp wenn keine eigene Kategorie angegeben ist"
-
-#: inc/config.class.php:190
-msgid "ToolTip Configuration"
-msgstr "ToolTip Konfiguration"
-
-#: inc/config.class.php:196
-msgid "ToolTip"
-msgstr "ToolTip"
-
-#: inc/config.class.php:204 inc/menu.class.php:281
-msgid "Comment"
-msgstr "Kommentar"
-
-#: inc/config.class.php:211 inc/menu.class.php:29
-msgid "Location"
-msgstr "Standort"
-
-#: inc/config.class.php:218 inc/menu.class.php:39
-msgid "Serial number"
-msgstr "Seriennummer"
-
-#: inc/config.class.php:225 inc/menu.class.php:36
-msgid "Inventory number"
-msgstr "Inventarnummer"
-
-#: inc/config.class.php:232 inc/menu.class.php:33
-msgid "Group"
-msgstr "Gruppe"
-
-#: inc/config.class.php:239 inc/menu.class.php:44
-msgid "Manufacturer"
-msgstr "Hersteller"
-
-#: inc/config.class.php:239 inc/menu.class.php:44
-msgid "Model"
-msgstr "Modell"
-
-#: inc/config.class.php:246 inc/menu.class.php:48
-msgid "Status"
-msgstr "Status"
-
-#: inc/config.class.php:250 inc/menu.class.php:416
-msgctxt "button"
-msgid "Save"
-msgstr "Speichern"
-
-#: inc/config.class.php:260
-msgid "Categories customisation"
-msgstr "Kategorien Anpassung"
-
-#: inc/config.class.php:262
-msgid "Make your own category !"
-msgstr "Eigene Kategorie erstellen"
-
-#: inc/config.class.php:263
+#: inc/config.class.php:304
 msgid "Drag and drop items on a custom category :"
 msgstr "Drag-and-Drop Hardware auf eigene Kategorie :"
 
-#: inc/config.class.php:269 inc/menu.class.php:403
-msgctxt "button"
-msgid "Add"
-msgstr "Hinzufügen"
+#: inc/config.class.php:63
+msgid "Duration added (in hour) to reservations expiring and not checkout"
+msgstr ""
+"Verleihzeit (in Stunden), die hinzugefügt wird, wenn eine Reservierung "
+"ausläuft und Check-Out noch nicht erfolgt ist"
 
-#: inc/menu.class.php:154
-msgid "Current Reservations"
-msgstr "Aktuelle Reservierungen"
+#: inc/menu.class.php:525
+msgid "Edit multiple"
+msgstr ""
 
-#: inc/menu.class.php:158
-msgid "Current and Incoming Reservations"
-msgstr "Aktuelle und anstehende Reservierungen"
-
-#: inc/menu.class.php:161
-msgid "Available Hardware"
-msgstr "Verfügbare Hardware"
-
-#: inc/menu.class.php:272
-msgid "Current and future reservations"
-msgstr "Aktuelle und zukünftige Reservierungen"
-
-#: inc/menu.class.php:274
-msgid "Reservations in the selected timeline"
-msgstr "Reservierungen im bestimmten Zeitraum"
-
-#: inc/menu.class.php:277
-msgid "User"
-msgstr "Benutzer"
-
-#: inc/menu.class.php:278
-msgid "Item"
-msgstr "Artikel"
-
-#: inc/menu.class.php:279
-msgid "Begin"
-msgstr "Beginn"
-
-#: inc/menu.class.php:280
-msgid "End"
-msgstr "Ende"
-
-#: inc/menu.class.php:282
-msgid "Moves"
-msgstr "Bewegungen"
-
-#: inc/menu.class.php:284
+#: inc/config.class.php:148
 #, fuzzy
-msgid "Checkin"
-msgstr "Check-In"
+msgid "Enable auto check in"
+msgstr "Aktiviere Check-In Funktion"
 
-#: inc/menu.class.php:286
-msgid "Checkout"
-msgstr "Check-Out"
+#: inc/config.class.php:109
+msgid "Enable check in"
+msgstr "Aktiviere Check-In Funktion"
 
-#: inc/menu.class.php:287
-msgid "Action"
-msgstr "Aktion"
+#: inc/config.class.php:201
+msgid "Incoming Reservation tab"
+msgstr "Anstehende Reservierungen - Tab"
 
-#: inc/menu.class.php:377
-#, fuzzy
-msgctxt "tooltip"
-msgid "Set As Gone"
-msgstr "Als Ausgegeben setzen"
-
-#: inc/menu.class.php:385
-msgctxt "tooltip"
-msgid "Set As Returned"
-msgstr "Als Zurückgegeben setzen"
-
-#: inc/menu.class.php:394
-msgctxt "button"
-msgid "Add an item"
-msgstr "Artikel hinzufügen"
-
-#: inc/menu.class.php:408
-msgctxt "button"
-msgid "Replace an item"
-msgstr "Artikel ersetzen"
-
-#: inc/menu.class.php:424
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: inc/menu.class.php:424
-msgctxt "button"
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: inc/menu.class.php:432
-msgctxt "tooltip"
-msgid "Send an e-mail for the late reservation"
-msgstr "Sende eine Mail wegen verspäteter Reservierung"
-
-#: inc/menu.class.php:432
-msgctxt "button"
-msgid "Send an e-mail"
-msgstr "Sende eine Mail"
-
-#: inc/menu.class.php:434
+#: inc/menu.class.php:557
 msgid "Last e-mail sent on"
 msgstr "Letzte Mail am"
 
-#: inc/menu.class.php:484
-msgid "Create new reservation"
-msgstr "Neue Reservierung"
+#: inc/config.class.php:303
+msgid "Make your own category !"
+msgstr "Eigene Kategorie erstellen"
 
-#: inc/menu.class.php:676
-msgid "Date"
-msgstr "Datum"
+#: inc/config.class.php:82
+msgid "Manual"
+msgstr "Manuell"
 
-#: inc/menu.class.php:682
-msgid "Previous"
-msgstr "Zurück"
+#: inc/config.class.php:79
+msgid "Method used to send e-mails to users with late reservations"
+msgstr ""
+"Genutzte Methode für das Senden von Mail bei verspäteten Reservierungen"
 
-#: inc/menu.class.php:685
-msgid "Start date"
-msgstr "Startdatum"
+#: inc/config.class.php:91
+msgid "Method used when there is a conflicted reservation"
+msgstr "Genutzte Methode, wenn es einen Konflikt bei der Reservierung gibt"
 
-#: inc/menu.class.php:688
+#: inc/menu.class.php:348
+msgid "Moves"
+msgstr "Bewegungen"
+
+#: inc/config.class.php:185
+#, fuzzy
+msgid "My Reservation tab"
+msgstr "Aktuelle Reservierungen - Tab"
+
+#: inc/menu.class.php:168
+#, fuzzy
+msgid "My Reservations"
+msgstr "Reservierung"
+
+#: front/config.form.php:62 front/multiedit.form.php:53
+msgid "Please activate the plugin"
+msgstr "Bitte aktivieren Sie das Plugin"
+
+#: inc/menu.class.php:479
 msgctxt "button"
-msgid "Search"
-msgstr "Suche"
-
-#: inc/menu.class.php:691
-msgid "Next"
-msgstr "Vor"
-
-#: inc/menu.class.php:694
-msgid "Reset"
-msgstr "Reset"
-
-#: inc/menu.class.php:698
-msgid "End date"
-msgstr "Enddatum"
-
-#: inc/menu.class.php:726
-msgid "Show all"
-msgstr "Zeige alle"
-
-#: inc/menu.class.php:730
-msgid "Reservations This Month"
-msgstr "Reservierungen diesen Monat"
+msgid "Replace an item"
+msgstr "Artikel ersetzen"
 
 #: inc/reservation.class.php:24
 msgid "Reservation"
@@ -360,30 +195,10 @@ msgid_plural "Reservations"
 msgstr[0] "Reservierung"
 msgstr[1] "Reservierungen"
 
-#: inc/reservation.class.php:155
-#, php-format
-msgid "%1$s sends email for the reservation %2$s"
-msgstr "%1$s sendet Mail wegen der Reservierung %2$s"
-
-#: inc/reservation.class.php:177
-#, php-format
-msgid "%1$s marks the reservation %2$s as returned"
-msgstr "%1$s markiert die Reservierung %2$s als 'zurückgegeben'"
-
-#: inc/reservation.class.php:207
-#, fuzzy, php-format
-msgid "%1$s marks the reservation %2$s as gone"
-msgstr "%1$s markiert die Reservierung %2$s als 'ausgegeben'"
-
-#: inc/reservation.class.php:237
-#, php-format
-msgid "%1$s adds the reservation %2$s for item %3$s"
-msgstr "%1$s fügt die Reservierung %2$s für Artikel %3$s hinzu"
-
-#: inc/reservation.class.php:257
-#, php-format
-msgid "%1$s switchs the reservation %2$s with item %3$s"
-msgstr "%1$s ändert die Reservierung %2$s mit Artikel %3$s"
+#: inc/reservation.class.php:46
+#, fuzzy
+msgid "Reservation Checkin (plugin)"
+msgstr "Nutzerreservierung ohne Check-In (plugin)"
 
 #: inc/task.class.php:11
 #, fuzzy
@@ -395,6 +210,64 @@ msgstr "Reservierungskonflikt bei Verlämngerungen, neuer Nutzer(Plugin)"
 msgid "Reservation Conflict When Extended, previous user (plugin)"
 msgstr "Reservierungskonflikt bei Verlämngerungen, vorheriger Nutzer(Plugin)"
 
+#: inc/menu.class.php:862
+msgid "Reservations This Month"
+msgstr "Reservierungen diesen Monat"
+
+#: inc/menu.class.php:340
+msgid "Reservations in the selected timeline"
+msgstr "Reservierungen im bestimmten Zeitraum"
+
+#: inc/menu.class.php:555
+msgctxt "button"
+msgid "Send an e-mail"
+msgstr "Sende eine Mail"
+
+#: inc/menu.class.php:555
+msgctxt "tooltip"
+msgid "Send an e-mail for the late reservation"
+msgstr "Sende eine Mail wegen verspäteter Reservierung"
+
+#: inc/task.class.php:43
+#, fuzzy
+msgid "Send an e-mail to users with expired reservations"
+msgstr "Sende eine Mail an Nutzer mit verspäteten Reservierungen"
+
+#: inc/menu.class.php:448
+#, fuzzy
+msgctxt "tooltip"
+msgid "Set As Gone"
+msgstr "Als Ausgegeben setzen"
+
+#: inc/menu.class.php:456
+msgctxt "tooltip"
+msgid "Set As Returned"
+msgstr "Als Zurückgegeben setzen"
+
+#: inc/config.class.php:178
+msgid "Tab Configuration"
+msgstr "Tab Konfiguration"
+
+#: inc/config.class.php:237
+msgid "ToolTip"
+msgstr "ToolTip"
+
+#: inc/config.class.php:231
+msgid "ToolTip Configuration"
+msgstr "ToolTip Konfiguration"
+
+#: inc/multiedit.class.php:158
+msgid "Update multiple items"
+msgstr ""
+
+#: inc/config.class.php:213
+msgid "Use custom categories"
+msgstr "Nutze eigene Kategorien"
+
+#: inc/config.class.php:221
+msgid "Use items types when not in a custom category"
+msgstr "Nutze Hardwaretyp wenn keine eigene Kategorie angegeben ist"
+
 #: inc/task.class.php:13
 msgid "User Reservation Expired (plugin)"
 msgstr "Nutzerreservierung abgelaufen (plugin)"
@@ -404,81 +277,222 @@ msgstr "Nutzerreservierung abgelaufen (plugin)"
 msgid "User Reservation Not Checkin (plugin)"
 msgstr "Nutzerreservierung ohne Check-In (plugin)"
 
-#: inc/task.class.php:30
-msgid "Writer"
-msgstr "Autor"
+#: inc/config.class.php:134
+msgid "Waiting time (in hour) to cancel the unclaimed reservation"
+msgstr ""
+"Wartezeit(in Stunden) nach der die nicht abgeholte Reservierung storniert "
+"wird"
+
+#: inc/config.class.php:125
+msgid "Warn"
+msgstr "Warne"
+
+#: inc/config.class.php:126
+#, fuzzy
+msgid "Warn and delete unclaimed reservation"
+msgstr "Warne und lösche die nicht abgeholte Reservierung"
 
 #: inc/task.class.php:41
 msgid "Watch Reservations"
 msgstr "Zeige Reservierungen"
 
-#: inc/task.class.php:41 inc/task.class.php:43
-msgid "plugin"
-msgstr "Plugin"
+#: inc/config.class.php:158
+msgid "for reservations made until (in minutes) "
+msgstr ""
 
-#: inc/task.class.php:43
+#~ msgid "Setup"
+#~ msgstr "Setup"
+
+#~ msgid "Simplified interface"
+#~ msgstr "Vereinfachte Oberfläche"
+
+#~ msgid "Reservation Plugin Rest API"
+#~ msgstr "Reservation Plugin Rest API"
+
+#~ msgid "resource not found"
+#~ msgstr "Ressource nicht gefunden"
+
+#~ msgid "missing params"
+#~ msgstr "Fehlende Parameter"
+
+#~ msgid "custom categories is not enabled"
+#~ msgstr "Eigene Kategorie ist nicht aktiviert"
+
+#~ msgid "check in function is not enabled"
+#~ msgstr "Check-In Funktion ist nicht aktiviert"
+
+#~ msgid "Configuration"
+#~ msgstr "Konfiguration"
+
+#~ msgid "Comment"
+#~ msgstr "Kommentar"
+
+#~ msgid "Location"
+#~ msgstr "Standort"
+
+#~ msgid "Serial number"
+#~ msgstr "Seriennummer"
+
+#~ msgid "Inventory number"
+#~ msgstr "Inventarnummer"
+
+#~ msgid "Group"
+#~ msgstr "Gruppe"
+
+#~ msgid "Manufacturer"
+#~ msgstr "Hersteller"
+
+#~ msgid "Model"
+#~ msgstr "Modell"
+
+#~ msgid "Status"
+#~ msgstr "Status"
+
+#~ msgctxt "button"
+#~ msgid "Save"
+#~ msgstr "Speichern"
+
+#~ msgctxt "button"
+#~ msgid "Add"
+#~ msgstr "Hinzufügen"
+
+#~ msgid "User"
+#~ msgstr "Benutzer"
+
 #, fuzzy
-msgid "Send an e-mail to users with expired reservations"
-msgstr "Sende eine Mail an Nutzer mit verspäteten Reservierungen"
+#~ msgid "Item"
+#~ msgid_plural "Items"
+#~ msgstr[0] "Artikel"
+#~ msgstr[1] "Artikel"
 
-#: inc/task.class.php:91
-#, php-format
-msgid "Deleting reservation (check in) : %1$s on item %2$s"
-msgstr "Lösche Reservierung (Check-In) : %1$s für Artikel %2$s"
+#~ msgid "Begin"
+#~ msgstr "Beginn"
 
-#: inc/task.class.php:116
-#, php-format
-msgid "Until : %1$s"
-msgstr "Bis : %1$s"
+#~ msgid "End"
+#~ msgstr "Ende"
 
-#: inc/task.class.php:123
-#, fuzzy, php-format
-msgid "Extending reservation : %1$s"
-msgstr "Reservierung verlängern : %1$s"
+#~ msgid "Action"
+#~ msgstr "Aktion"
 
-#: inc/task.class.php:148
-#, fuzzy, php-format
-msgid "%1$s created a new reservation for the same item : %2$s"
-msgstr "%1$s fügt die Reservierung für den selben Artikel %2$s hinzu"
+#~ msgctxt "button"
+#~ msgid "Add an item"
+#~ msgstr "Artikel hinzufügen"
 
-#: inc/task.class.php:171
-#, php-format
-msgid ""
-"conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
-msgstr "Konflikt für Reservierung %1$s für Artikel %2$s verwendet von %3$s (von %4$s bis %5$s)"
+#~ msgid "Edit"
+#~ msgstr "Bearbeiten"
 
-#: inc/task.class.php:186
-#, fuzzy, php-format
-msgid "Deleting reservation %1$s on item %2$s"
-msgstr "Lösche Reservierung %1$s für Artikel %2$s"
+#~ msgctxt "button"
+#~ msgid "Edit"
+#~ msgstr "Bearbeiten"
 
-#: inc/task.class.php:192
-#, fuzzy, php-format
-msgid "Could not delay reservation %1$s on item %2$s"
-msgstr "Konnte Reservierung %1$s für Artikel %2$s nicht verlängern"
+#~ msgid "Date"
+#~ msgstr "Datum"
 
-#: inc/task.class.php:200
-#, fuzzy, php-format
-msgid "Delaying reservation %1$s on item %2$s"
-msgstr "Verlängere Reservierung %1$s für Artikel %2$s"
+#~ msgid "Previous"
+#~ msgstr "Zurück"
 
-#: inc/task.class.php:235
-#, php-format
-msgid "Sending e-mail for reservation %1$s"
-msgstr "Sende Mail für Reservierung %1$s"
+#~ msgid "Start date"
+#~ msgstr "Startdatum"
 
-#: inc/task.class.php:236
-#, php-format
-msgid "Expected return time was : %1$s"
-msgstr "Erwartete Abgabezeit war : %1$s"
+#~ msgctxt "button"
+#~ msgid "Search"
+#~ msgstr "Suche"
 
-#: inc/task.class.php:238
-msgid "Sending an e-mail"
-msgstr "Mail versenden"
+#~ msgid "Next"
+#~ msgstr "Vor"
 
-#: inc/task.class.php:240
-msgid "Could not send notification"
-msgstr "Kann keine Benachrichtigung versenden"
+#~ msgid "Reset"
+#~ msgstr "Reset"
+
+#~ msgid "End date"
+#~ msgstr "Enddatum"
+
+#~ msgid "Show all"
+#~ msgstr "Zeige alle"
+
+#, fuzzy
+#~ msgid "Duration"
+#~ msgstr "Konfiguration"
+
+#, fuzzy
+#~ msgid "Comments"
+#~ msgstr "Kommentar"
+
+#~ msgid "%1$s sends email for the reservation %2$s"
+#~ msgstr "%1$s sendet Mail wegen der Reservierung %2$s"
+
+#~ msgid "%1$s marks the reservation %2$s as returned"
+#~ msgstr "%1$s markiert die Reservierung %2$s als 'zurückgegeben'"
+
+#, fuzzy
+#~ msgid "%1$s marks the reservation %2$s as gone"
+#~ msgstr "%1$s markiert die Reservierung %2$s als 'ausgegeben'"
+
+#~ msgid "%1$s adds the reservation %2$s for item %3$s"
+#~ msgstr "%1$s fügt die Reservierung %2$s für Artikel %3$s hinzu"
+
+#~ msgid "%1$s switchs the reservation %2$s with item %3$s"
+#~ msgstr "%1$s ändert die Reservierung %2$s mit Artikel %3$s"
+
+#~ msgid "Writer"
+#~ msgstr "Autor"
+
+#~ msgid "plugin"
+#~ msgstr "Plugin"
+
+#~ msgid "Deleting reservation (check in) : %1$s on item %2$s"
+#~ msgstr "Lösche Reservierung (Check-In) : %1$s für Artikel %2$s"
+
+#~ msgid "Until : %1$s"
+#~ msgstr "Bis : %1$s"
+
+#, fuzzy
+#~ msgid "Extending reservation : %1$s"
+#~ msgstr "Reservierung verlängern : %1$s"
+
+#, fuzzy
+#~ msgid "no conflict reservation !"
+#~ msgstr "Lösche die in Konflikt geratene Reservierung"
+
+#, fuzzy
+#~ msgid "%1$s created a new reservation for the same item : %2$s"
+#~ msgstr "%1$s fügt die Reservierung für den selben Artikel %2$s hinzu"
+
+#, fuzzy
+#~ msgid ""
+#~ "Deleting reservation %1$s on item %2$s because a new reservation is made "
+#~ "by same user"
+#~ msgstr "Lösche Reservierung %1$s für Artikel %2$s"
+
+#~ msgid ""
+#~ "conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
+#~ msgstr ""
+#~ "Konflikt für Reservierung %1$s für Artikel %2$s verwendet von %3$s (von "
+#~ "%4$s bis %5$s)"
+
+#, fuzzy
+#~ msgid "Deleting reservation %1$s on item %2$s"
+#~ msgstr "Lösche Reservierung %1$s für Artikel %2$s"
+
+#, fuzzy
+#~ msgid "Could not delay reservation %1$s on item %2$s"
+#~ msgstr "Konnte Reservierung %1$s für Artikel %2$s nicht verlängern"
+
+#, fuzzy
+#~ msgid "Delaying reservation %1$s on item %2$s"
+#~ msgstr "Verlängere Reservierung %1$s für Artikel %2$s"
+
+#~ msgid "Sending e-mail for reservation %1$s"
+#~ msgstr "Sende Mail für Reservierung %1$s"
+
+#~ msgid "Expected return time was : %1$s"
+#~ msgstr "Erwartete Abgabezeit war : %1$s"
+
+#~ msgid "Sending an e-mail"
+#~ msgstr "Mail versenden"
+
+#~ msgid "Could not send notification"
+#~ msgstr "Kann keine Benachrichtigung versenden"
 
 #~ msgid "Item is not currently reserved"
 #~ msgstr "Artikel ist derzeit nicht reserviert"
