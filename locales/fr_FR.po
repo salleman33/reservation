@@ -160,7 +160,6 @@ msgid "Edit multiple"
 msgstr "Modifier le groupe"
 
 #: inc/config.class.php:148
-#, fuzzy
 msgid "Enable auto check in"
 msgstr "activer l'acquittement de départ"
 
@@ -227,7 +226,6 @@ msgstr[0] "Réservation"
 msgstr[1] "Réservations"
 
 #: inc/task.class.php:15
-#, fuzzy
 msgid "Reservation Checkin (plugin)"
 msgstr "Acquittement d'un départ (Plugin)"
 
@@ -354,7 +352,6 @@ msgid "for reservations made until (in minutes) "
 msgstr "pour les reservations faites jusqu'à (en minutes)"
 
 #: inc/task.class.php:141
-#, fuzzy
 msgid "no conflict reservation !"
 msgstr "Supprimer la réservation en conflit"
 
@@ -455,11 +452,10 @@ msgstr "Supprimer la réservation en conflit"
 #~ msgid "%1$s switchs the reservation %2$s with item %3$s"
 #~ msgstr "%1$s permutte la réservation %2$s pour le matériel %3$s"
 
-#, fuzzy
 #~ msgid ""
 #~ "Deleting reservation %1$s on item %2$s because a new reservation is made "
 #~ "by same user"
-#~ msgstr "Suppression de la réservation %1$s pour le matériel %2$s"
+#~ msgstr "Suppression de la réservation %1$s pour le matériel %2$s car l'utilisateur a refait une reservation"
 
 #~ msgid "Expected return time was : %1$s"
 #~ msgstr "Date de retour attendue : %1$s"
