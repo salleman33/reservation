@@ -1,10 +1,10 @@
 .bouton
 {
-cursor:pointer;
-   font-weight: bold;
-   text-decoration: none;
-   color : #659900;
-   font-size : 11px;
+    cursor:pointer;
+    font-weight: bold;
+    text-decoration: none;
+    color : #659900;
+    font-size : 11px;
 }
 .bouton:hover
 {
