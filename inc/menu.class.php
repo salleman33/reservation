@@ -445,7 +445,11 @@ class PluginReservationMenu extends CommonGLPI
                if ($reservation_user_info['checkindate'] != null) {
                   echo "<td>" . date(self::getDateFormat() . " H:i", strtotime($reservation_user_info['checkindate'])) . "</td>";
                } else {
-                  echo "<td><center><a href=\"" . Toolbox::getItemTypeSearchURL(__CLASS__) . "?checkin=" . $reservation_user_info['reservations_id'] . "\"><img title=\"" . _sx('tooltip', 'Set As Gone', "reservation") . "\" alt=\"\" src=\"../pics/redbutton.png\"></img></a></center></td>";
+                  echo '<td id="#checkin'.$reservation_user_info['reservations_id'].'">';
+                  echo '<center>';
+                  echo '<a class="bouton" href="javascript:void(0);" onclick="checkin('.$reservation_user_info['reservations_id'].')">';
+                  echo '<img title="'. _sx('tooltip', 'Set As Gone', "reservation") .'" alt="" src="../pics/redbutton.png"></img>';
+                  echo '</a></center></td>';
                }
             }
 
@@ -453,13 +457,17 @@ class PluginReservationMenu extends CommonGLPI
             if ($reservation_user_info['effectivedate'] != null) {
                echo "<td>" . date(self::getDateFormat() . " \à H:i:s", strtotime($reservation_user_info['effectivedate'])) . "</td>";
             } else {
-               echo "<td><center><a href=\"" . Toolbox::getItemTypeSearchURL(__CLASS__) . "?checkout=" . $reservation_user_info['reservations_id'] . "\"><img title=\"" . _sx('tooltip', 'Set As Returned', "reservation") . "\" alt=\"\" src=\"../pics/greenbutton.png\"></img></a></center></td>";
+               echo '<td id="#checkout'.$reservation_user_info['reservations_id'].'">';
+               echo '<center>';
+               echo '<a class="bouton" href="javascript:void(0);" onclick="checkout('.$reservation_user_info['reservations_id'].')">';
+               echo '<img title="' . _sx('tooltip', 'Set As Returned', "reservation") . '" alt="" src="../pics/greenbutton.png"></img>';
+               echo '</a></center></td>';
             }
 
             // action
             $available_reservationsitem = PluginReservationReservation::getAvailablesItems($reservation->fields['begin'], $reservation->fields['end']);
             echo "<td>";
-            echo "<ul>";
+            echo '<ul style="list-style: none";>';
 
             // add item
             echo "<li><span class=\"bouton\" id=\"bouton_add" . $reservation_user_info['reservations_id'] . "\" onclick=\"javascript:afficher_cacher('add" . $reservation_user_info['reservations_id'] . "');\">" . _sx('button', 'Add an item') . "</span>
@@ -527,14 +535,14 @@ class PluginReservationMenu extends CommonGLPI
 
                   // case if multi edit disable for first item
                   echo "<td class='hideIfMultiEditEnabled' style='display: none;'>";
-                  echo "<ul>";
+                  echo '<ul style="list-style: none;">';
                   echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" href='" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
                   echo "</ul>";
                   echo "</td>";
                } else {
                   // normal case (no group)
                   echo "<td>";
-                  echo "<ul>";
+                  echo '<ul style="list-style: none;">';
                   echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" href='" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
                   echo "</ul>";
                   echo "</td>";
@@ -542,7 +550,7 @@ class PluginReservationMenu extends CommonGLPI
             } else {
                // case if multi edit enabled for other items
                echo "<td class='hideIfMultiEditEnabled' style='display: none;'>";
-               echo "<ul>";
+               echo '<ul style="list-style: none;">';
                echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" href='" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
                echo "</ul>";
                echo "</td>";
@@ -550,9 +558,12 @@ class PluginReservationMenu extends CommonGLPI
 
             if (!$mode_auto) {
                echo "<td>";
-               echo "<ul>";
-               if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i", time()) && $reservation_user_info['effectivedate'] == null) {
-                  echo "<li><a class=\"bouton\" title=\"" . _sx('tooltip', 'Send an e-mail for the late reservation', "reservation") . "\" href=\"" . Toolbox::getItemTypeSearchURL(__CLASS__) . "?mailuser=" . $reservation_user_info['reservations_id'] . "\">" . _sx('button', 'Send an e-mail', "reservation") . "</a></li>";
+               echo '<ul style="list-style: none;">';
+               if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i", time()) && $reservation_user_info['effectivedate'] == null) {                
+                  echo '<li id="#mailed'.$reservation_user_info['reservations_id'].'">';
+                  echo '<a class="bouton" href="javascript:void(0);" onclick="mailuser('.$reservation_user_info['reservations_id'].')" title="' . _sx('tooltip', 'Send an e-mail for the late reservation', "reservation") . '">';
+                  echo _sx('button', 'Send an e-mail', "reservation");
+                  echo '</a></li>';
                   if (isset($reservation_user_info['mailingdate'])) {
                      echo "<li>" . __('Last e-mail sent on', "reservation") . " </li>";
                      echo "<li>" . date(self::getDateFormat() . " H:i", strtotime($reservation_user_info['mailingdate'])) . "</li>";

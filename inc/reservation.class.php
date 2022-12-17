@@ -154,6 +154,7 @@ class PluginReservationReservation extends CommonDBTM
                   sprintf(__('%1$s sends email for the reservation %2$s'),
                            $_SESSION["glpiname"], $reservation_id));
       Toolbox::logInFile('reservations_plugin', "sendMail : ".$reservation_id."\n", $force = false);
+      return true;
    }
 
    /**
@@ -176,6 +177,7 @@ class PluginReservationReservation extends CommonDBTM
                   sprintf(__('%1$s marks the reservation %2$s as returned'),
                            $_SESSION["glpiname"], $reservation_id));
       Toolbox::logInFile('reservations_plugin', "checkoutReservation : ".$reservation_id."\n", $force = false);
+      return true;
    }
 
    /**
@@ -232,13 +234,16 @@ class PluginReservationReservation extends CommonDBTM
       $input['users_id']            = $resa->fields['users_id'];
       $input = Toolbox::addslashes_deep($input);
       unset($rr->fields["id"]);
-      Toolbox::logInFile('reservations_plugin', "addItemToResa INPUT : ".json_encode($input)."\n", $force = false);
       if ($newID = $rr->add($input)) {
          Event::log($newID, "reservation", 4, "inventory",
                   sprintf(__('%1$s adds the reservation %2$s for item %3$s'),
                            $_SESSION["glpiname"], $newID, $item_id));
+         Toolbox::logInFile('reservations_plugin', "addItemToResa : ".$item_id. " => ".$reservation_id."\n", $force = false);
+         return true;
+      } else {
+         Toolbox::logInFile('reservations_plugin', "Error in addItemToResa : ".$item_id. " <=> ".$reservation_id."\n", $force = false);
       }
-      Toolbox::logInFile('reservations_plugin', "addItemToResa : ".$item_id. " => ".$reservation_id."\n", $force = false);
+      return false;
    }
 
    /**
@@ -259,10 +264,11 @@ class PluginReservationReservation extends CommonDBTM
                   sprintf(__('%1$s switchs the reservation %2$s with item %3$s'),
                           $_SESSION["glpiname"], $reservation_id, $item_id));
          Toolbox::logInFile('reservations_plugin', "switchItemToResa : ".$item_id. " <=> ".$reservation_id."\n", $force = false);
+         return true;
       } else {
-         Toolbox::logInFile('reservations_plugin', "PROBLEM pour switchItemToResa : ".$item_id. " <=> ".$reservation_id."\n", $force = false);
+         Toolbox::logInFile('reservations_plugin', "Error in switchItemToResa : ".$item_id. " <=> ".$reservation_id."\n", $force = false);
       }
-      
+      return false;      
    }
 
 }

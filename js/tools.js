@@ -165,3 +165,46 @@ function onClickAllowMultipleEditCheckbox(checkbox) {
    for (var i = 0; i < allowMultipleEditCheckboxElements.length; i++)
       allowMultipleEditCheckboxElements[i].checked = checkbox.checked;
 }
+
+
+function checkin(resa_id) {
+   $.ajax({
+      type: "GET",
+      url: window.location.href+'/../query.php',
+      data: "checkin="+resa_id,
+      success: function() {
+         document.getElementById('#checkin'+resa_id).innerHTML = "checked in !";
+      },
+      error: function() {
+         document.getElementById('#checkin'+resa_id).innerHTML = "error...";
+      }
+   });
+}
+
+function checkout(resa_id) {
+   $.ajax({
+      type: "GET",
+      url: window.location.href+'/../query.php',
+      data: "checkout="+resa_id,
+      success: function() {
+         document.getElementById('#checkout'+resa_id).innerHTML = "checked out !";
+      },
+      error: function() {
+         document.getElementById('#checkout'+resa_id).innerHTML = "error...";
+      }
+   });
+}
+
+function mailuser(resa_id) {
+   $.ajax({
+      type: "GET",
+      url: window.location.href+'/../query.php',
+      data: "mailuser="+resa_id,
+      success: function() {
+         document.getElementById('#mailed'+resa_id).innerHTML = "mail sent";
+      },
+      error: function() {
+         document.getElementById('#mailed'+resa_id).innerHTML = "error...";
+      }
+   });
+}
