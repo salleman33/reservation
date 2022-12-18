@@ -130,24 +130,14 @@ var updateHiddenConfig = function (e, ui) {
 
 
 
-   (function () {
+(function () {
 
-      $('.noEnterSubmit').keypress(function (e) {
-         // if ( e.which == 13 ) return false;
-         // //or...
-         if (e.which == 13) e.preventDefault();
-      });
-
-      $('.dropper').sortable(
-         {
-            connectWith: '.dropper',
-            items: 'tbody tr',
-	    helper: fixHelper,
-            stop: updateHiddenConfig,
-            receive: function (e, ui) { $(this).find("tbody").append(ui.item); }
-         }).disableSelection();
-
-   })();
+   $('.noEnterSubmit').keypress(function (e) {
+      // if ( e.which == 13 ) return false;
+      // //or...
+      if (e.which == 13) e.preventDefault();
+   });
+})();
 
 
 // Handle click event on the Allow Multiple Edit checkbox on the menu.class.php
@@ -173,10 +163,10 @@ function checkin(resa_id) {
       url: window.location.href+'/../query.php',
       data: "checkin="+resa_id,
       success: function() {
-         document.getElementById('#checkin'+resa_id).innerHTML = "checked in !";
+         document.getElementById('checkin'+resa_id).innerHTML = "checked in !";
       },
       error: function() {
-         document.getElementById('#checkin'+resa_id).innerHTML = "error...";
+         document.getElementById('checkin'+resa_id).innerHTML = "error...";
       }
    });
 }
@@ -187,10 +177,10 @@ function checkout(resa_id) {
       url: window.location.href+'/../query.php',
       data: "checkout="+resa_id,
       success: function() {
-         document.getElementById('#checkout'+resa_id).innerHTML = "checked out !";
+         document.getElementById('checkout'+resa_id).innerHTML = "checked out !";
       },
       error: function() {
-         document.getElementById('#checkout'+resa_id).innerHTML = "error...";
+         document.getElementById('checkout'+resa_id).innerHTML = "error...";
       }
    });
 }
@@ -201,10 +191,10 @@ function mailuser(resa_id) {
       url: window.location.href+'/../query.php',
       data: "mailuser="+resa_id,
       success: function() {
-         document.getElementById('#mailed'+resa_id).innerHTML = "mail sent";
+         document.getElementById('mailed'+resa_id).innerHTML = "mail sent";
       },
       error: function() {
-         document.getElementById('#mailed'+resa_id).innerHTML = "error...";
+         document.getElementById('mailed'+resa_id).innerHTML = "error...";
       }
    });
 }

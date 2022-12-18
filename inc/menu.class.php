@@ -445,7 +445,7 @@ class PluginReservationMenu extends CommonGLPI
                if ($reservation_user_info['checkindate'] != null) {
                   echo "<td>" . date(self::getDateFormat() . " H:i", strtotime($reservation_user_info['checkindate'])) . "</td>";
                } else {
-                  echo '<td id="#checkin'.$reservation_user_info['reservations_id'].'">';
+                  echo '<td id="checkin'.$reservation_user_info['reservations_id'].'">';
                   echo '<center>';
                   echo '<a class="bouton" href="javascript:void(0);" onclick="checkin('.$reservation_user_info['reservations_id'].')">';
                   echo '<img title="'. _sx('tooltip', 'Set As Gone', "reservation") .'" alt="" src="../pics/redbutton.png"></img>';
@@ -457,7 +457,7 @@ class PluginReservationMenu extends CommonGLPI
             if ($reservation_user_info['effectivedate'] != null) {
                echo "<td>" . date(self::getDateFormat() . " \à H:i:s", strtotime($reservation_user_info['effectivedate'])) . "</td>";
             } else {
-               echo '<td id="#checkout'.$reservation_user_info['reservations_id'].'">';
+               echo '<td id="checkout'.$reservation_user_info['reservations_id'].'">';
                echo '<center>';
                echo '<a class="bouton" href="javascript:void(0);" onclick="checkout('.$reservation_user_info['reservations_id'].')">';
                echo '<img title="' . _sx('tooltip', 'Set As Returned', "reservation") . '" alt="" src="../pics/greenbutton.png"></img>';
@@ -560,7 +560,7 @@ class PluginReservationMenu extends CommonGLPI
                echo "<td>";
                echo '<ul style="list-style: none;">';
                if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i", time()) && $reservation_user_info['effectivedate'] == null) {                
-                  echo '<li id="#mailed'.$reservation_user_info['reservations_id'].'">';
+                  echo '<li id="mailed'.$reservation_user_info['reservations_id'].'">';
                   echo '<a class="bouton" href="javascript:void(0);" onclick="mailuser('.$reservation_user_info['reservations_id'].')" title="' . _sx('tooltip', 'Send an e-mail for the late reservation', "reservation") . '">';
                   echo _sx('button', 'Send an e-mail', "reservation");
                   echo '</a></li>';
@@ -724,84 +724,11 @@ class PluginReservationMenu extends CommonGLPI
       echo "</td>";
    }
 
-
-   /**
-    *
-    */
-   public function getFormDates()
-   {
-      global $CFG_GLPI;
-      $form_dates = [];
-
-      $day = date("d", time());
-      $month = date("m", time());
-      $year = date("Y", time());
-
-      $begin_time = time();
-
-      $planning_begin = $CFG_GLPI['planning_begin'];
-      $planning_end = $CFG_GLPI['planning_end'];
-      $planning_begin_time = explode(":", $planning_begin);
-      $planning_end_time = explode(":", $planning_end);
-      $planning_begin_date = date("Y-m-d H:i:s", mktime($planning_begin_time[0], $planning_begin_time[1], 00, $month, $day, $year));
-      $planning_end_date = date("Y-m-d H:i:s", mktime($planning_end_time[0], $planning_end_time[1], 00, $month, $day, $year));
-
-      if (isset($_GET['reset'])) {
-         unset($_SESSION['glpi_plugin_reservation_form_dates']);
-      }
-      
-      if (isset($_SESSION['glpi_plugin_reservation_form_dates'])) {
-         $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
-      } else {
-         $form_dates["begin"] = date("Y-m-d H:i:s", $begin_time);
-         if ($planning_end_date > date("Y-m-d H:i:s", time())) {
-            $form_dates['end'] = $planning_end_date;
-         } else {
-            $form_dates['end'] = date("Y-m-d H:i:s", mktime(23, 59, 00, $month, $day, $year));
-         }
-      }
-
-      if (isset($_POST['date_begin'])) {
-         $form_dates["begin"] = $_POST['date_begin'];
-      }
-      if (isset($_GET['date_begin'])) {
-         $form_dates["begin"] = $_GET['date_begin'];
-      }
-
-      if (isset($_POST['date_end'])) {
-         $form_dates["end"] = $_POST['date_end'];
-      }
-      if (isset($_GET['date_end'])) {
-         $form_dates["end"] = $_GET['date_end'];
-      }
-      if (isset($_POST['nextday']) || isset($_GET['nextday'])) {
-         $day = date("d", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
-         $month = date("m", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
-         $year = date("Y", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
-
-         $form_dates["begin"] = date("Y-m-d H:i:s", mktime($planning_begin_time[0], $planning_begin_time[1], 00, $month, $day, $year));
-         $form_dates["end"] = date("Y-m-d H:i:s", mktime($planning_end_time[0], $planning_end_time[1], 00, $month, $day, $year));
-      }
-      if (isset($_POST['previousday']) || isset($_GET['previousday'])) {
-         $day = date("d", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
-         $month = date("m", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
-         $year = date("Y", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
-
-         $form_dates["begin"] = date("Y-m-d H:i:s", mktime($planning_begin_time[0], $planning_begin_time[1], 00, $month, $day, $year));
-         $form_dates["end"] = date("Y-m-d H:i:s", mktime($planning_end_time[0], $planning_end_time[1], 00, $month, $day, $year));
-      }
-
-      $_SESSION['glpi_plugin_reservation_form_dates'] = $form_dates;
-   }
-
-
    /**
     * Display the form with begin and end dates, next day, previous day, etc.
     */
    public function showFormDate()
    {
-      $this->getFormDates();
-
       $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
 
       echo "<div id='viewresasearch'  class='center'>";
