@@ -13,7 +13,7 @@ if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')
 }
 
 if (! Session::haveRightsOr("reservation", [CREATE, UPDATE, DELETE])) {
-   return http_response_code(400);
+   return http_response_code(401);
 }
 
 if (isset($_GET['mailuser'])) {
