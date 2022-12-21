@@ -56,6 +56,7 @@ if (isset($_GET['date_end'])) {
    $form_dates["end"] = $_GET['date_end'];
 }
 if (isset($_POST['nextday']) || isset($_GET['nextday'])) {
+   $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
    $day = date("d", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
    $month = date("m", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
    $year = date("Y", strtotime($form_dates["begin"]) + DAY_TIMESTAMP);
@@ -64,6 +65,7 @@ if (isset($_POST['nextday']) || isset($_GET['nextday'])) {
    $form_dates["end"] = date("Y-m-d H:i:s", mktime($planning_end_time[0], $planning_end_time[1], 00, $month, $day, $year));
 }
 if (isset($_POST['previousday']) || isset($_GET['previousday'])) {
+   $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
    $day = date("d", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
    $month = date("m", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
    $year = date("Y", strtotime($form_dates["begin"]) - DAY_TIMESTAMP);
@@ -75,17 +77,17 @@ if (isset($_GET['reset'])) {
    unset($_SESSION['glpi_plugin_reservation_form_dates']);
 }
 if (isset($_POST['add_item_to_reservation'])) {
+   $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
    $current_reservation = $_POST['add_item_to_reservation'];
    $item_to_add = $_POST['add_item'];
    PluginReservationReservation::addItemToResa($item_to_add, $current_reservation);
-   $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+   
 }
-
 if (isset($_POST['switch_item_to_reservation'])) {
+   $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
    $current_reservation = $_POST['switch_item_to_reservation'];
    $item_to_switch = $_POST['switch_item'];
    PluginReservationReservation::switchItemToResa($item_to_switch, $current_reservation);
-   $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
 }
 
 $_SESSION['glpi_plugin_reservation_form_dates'] = $form_dates;
