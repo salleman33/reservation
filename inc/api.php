@@ -269,7 +269,7 @@ class PluginReservationApi extends API
          case "GET":
             $cat_id = PluginReservationCategory_Item::getCategoryId($id);
 
-            if (count($cat_id) == 1) {
+            if (is_countable($cat_id) && count($cat_id) == 1) {
                $response = [$cat_id];
                break;
             }
