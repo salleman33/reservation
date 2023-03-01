@@ -64,5 +64,5 @@ if ($plugin->isActivated("reservation")) {
 }
 
 function getAbsolutePath() {
-   return str_replace("plugins/reservation/front/config.form.php", "", $_SERVER['SCRIPT_FILENAME']);
+   return realpath("../../..") . "/";
 }
