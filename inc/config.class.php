@@ -306,7 +306,7 @@ class PluginReservationConfig extends CommonDBTM
       $menu .= '<button type="button" onclick="createCategory()">' . _sx('button', 'Add') . '</button>';
       // $menu .= '<div style="clear: left;" id="categoriesContainer">';
       $menu .= '<table class="listCustomCategories" id="categoriesContainer">';
-
+      $menu .= '<tbody>';
 
       $categories_names = PluginReservationCategory::getCategoriesNames();
       // $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, ["filter_is_active" => false]);
@@ -335,6 +335,7 @@ class PluginReservationConfig extends CommonDBTM
          // }
          // $menu .= $this->closeCategoryHtml();
       }
+      $menu .= '</tbody>';
       $menu .= '</table>';
       $menu .= '</td>';
       // $menu .= '<td>';
