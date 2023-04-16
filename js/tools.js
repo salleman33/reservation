@@ -26,29 +26,10 @@ function createCategoryEnter() {
 }
 
 function deleteCategory(category) {
-   var categorieOther = document.getElementById("itemsCategory_zzpluginnotcategorized");
-   var tbody_dst = categorieOther.getElementsByTagName('tbody')[0];
-
-   var element = document.getElementById("itemsCategory_" + category);
-   var tbody_source = element.getElementsByTagName('tbody')[0];
-   while (tbody_source.firstChild) {
-      if (/^item_[0-9]+$/.test(tbody_source.firstChild.id)) {
-
-         clonedElement = tbody_source.firstChild.cloneNode(true);
-         var input = clonedElement.getElementsByTagName('input')[0];
-         input.value = "zzpluginnotcategorized";
-
-         clonedElement = tbody_dst.appendChild(clonedElement);
-      }
-      tbody_source.removeChild(tbody_source.firstChild);
-   }
-   element.removeChild(tbody_source);
+   var element = document.getElementById("trConfigCategory_" + category);
+   // var tbody_source = element.getElementsByTagName('tbody')[0];
+   // element.removeChild(tbody_source);
    element.parentNode.removeChild(element);
-
-   // maj des index destination
-   for (var i = 0; i < tbody_dst.childNodes.length; i++) {
-      tbody_dst.childNodes[i].getElementsByClassName('index')[0].innerHTML = i + 1;
-   }
 }
 
 function createCategory() {
@@ -64,41 +45,30 @@ function createCategory() {
    titleField.style.backgroundColor = "initial";
    titleField.value = "";
    
-   var th = document.createElement("th");
-   th.appendChild(document.createTextNode(titleValue));
-   th.setAttribute('class', 'categoryTitle');
-   th.setAttribute('colspan', 3);
+   var tr = document.createElement('tr');
+   tr.setAttribute('class', 'listCustomCategories');
+   tr.setAttribute('id', 'trConfigCategory_' + titleValue);
+
+   var td1 = document.createElement("td");
+   td1.appendChild(document.createTextNode(titleValue));
+
+   var tdconfig = document.createElement("td");
+   tdconfig.appendChild(document.createTextNode("config"));
+   tdconfig.setAttribute('class', 'categoryConfig');
+   tdconfig.setAttribute('onclick', 'configCategory(\'' + titleValue + '\')');
 
    var del = document.createElement("td");
    del.appendChild(document.createTextNode("X"));
    del.setAttribute('class', 'categoryClose');
    del.setAttribute('onclick', 'deleteCategory(\'' + titleValue + '\')');
 
-   var thead = document.createElement("thead");
-   thead.appendChild(th);
-   thead.appendChild(del);   
+   tr.appendChild(td1);
+   tr.appendChild(tdconfig);
+   tr.appendChild(del);
 
-   var input = document.createElement("input");
-   input.setAttribute('type', 'hidden');
-   input.setAttribute('name', 'category_' + titleValue);
-   input.setAttribute('value', titleValue);
-
-   var table = document.createElement("table");
-   table.appendChild(thead);
-   table.appendChild(input);
-   table.appendChild(document.createElement("tbody"));
-   table.setAttribute('class', 'dropper');
-   table.setAttribute("id", "itemsCategory_" + titleValue);
-
-    	   
-   document.getElementById("categoriesContainer").appendChild(table);
-   $(table).sortable(
-      {
-         connectWith: '.dropper',
-         items: 'tbody tr',
-         stop: updateHiddenConfig,
-         receive: function (e, ui) { $(this).find("tbody").append(ui.item); }
-      }).disableSelection();
+   var table = document.getElementById('categoriesContainer');
+   var tbody_source = table.getElementsByTagName('tbody')[0];
+   tbody_source.appendChild(tr);
 }
 
 var fixHelper = function (e, ui) {

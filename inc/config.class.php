@@ -298,62 +298,65 @@ class PluginReservationConfig extends CommonDBTM
    {
       $menu = "<table class='tab_cadre_fixe'  cellpadding='2'>";
       $menu .= "<input type=\"hidden\" name=\"configCategoriesForm\">";
-      $menu .= "<th colspan=\"2\">" . __('Categories customisation', "reservation") . "</th>";
-      $menu .= '<tr>';
-      $menu .= "<td>" . __('Make your own category !', "reservation") . "</td>";
-      $menu .= "<td>" . __('Drag and drop items on a custom category :', "reservation") . "</td>";
-      $menu .= "</tr>";
+      $menu .= "<th>"  . __('Categories customisation', "reservation") . "</th>";
       $menu .= '<tr>';
 
       $menu .= '<td>';
       $menu .= '<input class="noEnterSubmit" onkeydown="createCategoryEnter()" type="text" id="newCategoryTitle" size="15"  title="Please enter a type">';
       $menu .= '<button type="button" onclick="createCategory()">' . _sx('button', 'Add') . '</button>';
-      $menu .= '<div style="clear: left;" id="categoriesContainer">';
+      // $menu .= '<div style="clear: left;" id="categoriesContainer">';
+      $menu .= '<table class="listCustomCategories" id="categoriesContainer">';
 
 
       $categories_names = PluginReservationCategory::getCategoriesNames();
-      $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, ["filter_is_active" => false]);
+      // $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, ["filter_is_active" => false]);
       foreach ($categories_names as $category_name) {
-         $filtered_array = array_filter(
-            $all_reservation_items,
-            function ($element) use ($category_name) {
-               return ($element['category_name'] == $category_name);
-            }
-         );
+         // $filtered_array = array_filter(
+         //    $all_reservation_items,
+         //    function ($element) use ($category_name) {
+         //       return ($element['category_name'] == $category_name);
+         //    }
+         // );
 
          $it = 0;
          if ($category_name === "zzpluginnotcategorized") {
             continue;
          }
-         $menu .= $this->openCategoryHtml($category_name, $category_name);
-         foreach ($filtered_array as $reservation_item) {
-            $it++;
-            $menu .= $this->makeItemHtml($reservation_item, $category_name, $it);
-         }
-         $menu .= $this->closeCategoryHtml();
+         $menu .= '<tr style="min-width: 200px;" id="trConfigCategory_'.$category_name.'" class="listCustomCategories" >';
+         $menu .= '<td>'. $category_name .'</td>';
+         $menu .= '<td onclick="configCategory(\'' . $category_name . '\')" class="categoryConfig" >config</td>';
+         $menu .= '</td>';
+         $menu .= '<td onclick="deleteCategory(\'' . $category_name . '\')" class="categoryClose" >X</td>';
+         $menu .= '</tr>';
+         // $menu .= $this->openCategoryHtml($category_name, $category_name);
+         // foreach ($filtered_array as $reservation_item) {
+         //    $it++;
+         //    $menu .= $this->makeItemHtml($reservation_item, $category_name, $it);
+         // }
+         // $menu .= $this->closeCategoryHtml();
       }
-      $menu .= '</div>';
+      $menu .= '</table>';
       $menu .= '</td>';
-      $menu .= '<td>';
+      // $menu .= '<td>';
 
-      $menu .= $this->openCategoryHtml('zzpluginnotcategorized', '', false);
-      // if (in_array('zzpluginnotcategorized', $categories_names)) {
-      $filtered_array = array_filter(
-         $all_reservation_items,
-         function ($element) {
-            return ($element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']));
-         }
-      );
-      $it = 0;
-      foreach ($filtered_array as $reservation_item) {
-         $it++;
-         $menu .= $this->makeItemHtml($reservation_item, 'zzpluginnotcategorized', $it);
-      }
+      // $menu .= $this->openCategoryHtml('zzpluginnotcategorized', '', false);
+      // // if (in_array('zzpluginnotcategorized', $categories_names)) {
+      // $filtered_array = array_filter(
+      //    $all_reservation_items,
+      //    function ($element) {
+      //       return ($element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']));
+      //    }
+      // );
+      // $it = 0;
+      // foreach ($filtered_array as $reservation_item) {
+      //    $it++;
+      //    $menu .= $this->makeItemHtml($reservation_item, 'zzpluginnotcategorized', $it);
       // }
-      $menu .= $this->closeCategoryHtml();
+      // // }
+      // $menu .= $this->closeCategoryHtml();
 
-      $menu .= '<div style="clear: left;"></div>';
-      $menu .= '</td>';
+      // $menu .= '<div style="clear: left;"></div>';
+      // $menu .= '</td>';
       $menu .= "</tr>";
       $menu .= "</table>";
 
