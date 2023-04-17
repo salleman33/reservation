@@ -25,6 +25,47 @@ function createCategoryEnter() {
    }
 }
 
+function addItemToCategory(category) {
+   var left = document.getElementById("categoryAvailableItems");
+   var right = document.getElementById("categorySelectedItems");
+
+   var collection = left.options;
+   for (let i = 0; i < collection.length; i++) {
+      var item = collection[i];
+      if (item.selected) {
+         const option = document.createElement('option');
+         option.setAttribute('value', item.value);
+         option.appendChild(document.createTextNode(item.innerText));
+         right.appendChild(option);
+      }      
+   }
+   $('#categoryAvailableItems option:selected').remove();
+}
+
+function removeItemFromCategory(category) {
+   const left = document.getElementById("categoryAvailableItems");
+   const right = document.getElementById("categorySelectedItems");
+
+   const collection = right.selectedOptions;
+   for (let i = 0; i < collection.length; i++) {
+      const option = document.createElement('option');
+      option.setAttribute('value', collection[i].value);
+      option.appendChild(document.createTextNode(collection[i].innerText));
+      left.appendChild(option);
+   }
+   $('#categorySelectedItems option:selected').remove();
+}
+
+function configCategory(category) {
+   const form = document.getElementById("formPluginReservationConfigs");
+   const hiddenField = document.createElement('input');
+   hiddenField.type = 'hidden';
+   hiddenField.name = 'configCategorySubmit';
+   hiddenField.value = category;
+   form.appendChild(hiddenField);
+   form.submit();
+}
+
 function deleteCategory(category) {
    var element = document.getElementById("trConfigCategory_" + category);
    // var tbody_source = element.getElementsByTagName('tbody')[0];

@@ -42,18 +42,75 @@ class PluginReservationConfig extends CommonDBTM
       $DB->query($query) or die($DB->error());
    }
 
-
    public function showForm($ID, array $option = [])
    {
-
-
-
       echo "<form id=\"formPluginReservationConfigs\" method='post' action='" . $this->getFormURL() . "'>";
-
+      if($ID === 1) {
+         $this->mainConfig();
+      }
+      if($ID === 2) {
+         $this->categoryConfig($option[0]);
+      }
+      Html::closeForm();
+   }
+   private function categoryConfig($category) 
+   {
+      $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, ["filter_is_active" => false]);
       echo "<div class='center'>";
-
       echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
+      echo '<tr>';
+      echo '<th>'. __('Available Items', "reservation") .'</th>';
+      echo '<th></th>';
+      echo '<th>'. __('Selected Items', "reservation") .'</th>';
+      echo '</tr>';
 
+      echo '<tr>';
+      echo '<td>';
+      $availableItems_array = array_filter(
+         $all_reservation_items,
+         function ($element) {
+            return ($element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']));
+         }
+      );
+      echo '<select id="categoryAvailableItems" multiple size="'.count($availableItems_array).'">';    
+      foreach ($availableItems_array as $item) {
+         echo '<option value="'.$item['id'].'">'.$item['name'].'</option>';
+      }
+      echo '</select>';
+
+      echo '</td>';
+      echo '<td>';
+      echo '<button class="submit"  type="button" onclick="addItemToCategory(\'' . $category . '\')" >'.__('Add').'</button>';
+      echo '<button type="button" onclick="removeItemFromCategory(\'' . $category . '\')"  >'.__('Delete').'</button>';
+      echo '</td>';
+      echo '<td>';
+      // echo json_encode($all_reservation_items);
+      $selectedItems_array = array_filter(
+         $all_reservation_items,
+         function ($element) use($category) {
+            return ($element['category_name'] === $category);
+         }
+      );
+      
+      echo '<select id="categorySelectedItems" multiple size="'.count($availableItems_array).'">';      
+      foreach ($selectedItems_array as $item) {
+         echo '<option value="'.$item['id'].'">'.$item['name'].'</option>';
+      }
+      echo '</select>';
+      echo '</td>';
+      echo '</tr>';
+      echo '<tr>';
+      echo '<td colspan="3">';
+      echo '<input class="submit" type="submit" value="'.__('VALIDER').'">';
+      echo '</td>';
+      echo '</tr>';
+      echo '</table>';
+   }
+
+   private function mainConfig()
+   {
+      echo "<div class='center'>";
+      echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
       echo "<th>" . __('Configuration') . "</th>";
 
       // extension time
@@ -290,8 +347,6 @@ class PluginReservationConfig extends CommonDBTM
       echo "</table>";
       echo "<input class=\"submit\" type=\"submit\" value='" . _sx('button', 'Save') . "'>";
       echo "</div>";
-
-      Html::closeForm();
    }
 
    private function showConfigCategoriesForm()
@@ -324,9 +379,8 @@ class PluginReservationConfig extends CommonDBTM
          }
          $menu .= '<tr style="min-width: 200px;" id="trConfigCategory_'.$category_name.'" class="listCustomCategories" >';
          $menu .= '<td>'. $category_name .'</td>';
-         $menu .= '<td onclick="configCategory(\'' . $category_name . '\')" class="categoryConfig" >config</td>';
-         $menu .= '</td>';
-         $menu .= '<td onclick="deleteCategory(\'' . $category_name . '\')" class="categoryClose" >X</td>';
+         $menu .= '<td><button type="button" onclick="configCategory(\'' . $category_name . '\')" class="categoryConfig" >config</td>';
+         $menu .= '<td><button type="button" onclick="deleteCategory(\'' . $category_name . '\')" class="categoryClose" >X</td>';
          $menu .= '<input type="hidden" name="category_' . $category_name . '" value="' . $category_name . '">';
          $menu .= '</tr>';
          // $menu .= $this->openCategoryHtml($category_name, $category_name);
