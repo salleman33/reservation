@@ -327,6 +327,7 @@ class PluginReservationConfig extends CommonDBTM
          $menu .= '<td onclick="configCategory(\'' . $category_name . '\')" class="categoryConfig" >config</td>';
          $menu .= '</td>';
          $menu .= '<td onclick="deleteCategory(\'' . $category_name . '\')" class="categoryClose" >X</td>';
+         $menu .= '<input type="hidden" name="category_' . $category_name . '" value="' . $category_name . '">';
          $menu .= '</tr>';
          // $menu .= $this->openCategoryHtml($category_name, $category_name);
          // foreach ($filtered_array as $reservation_item) {

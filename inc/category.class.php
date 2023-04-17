@@ -191,14 +191,6 @@ class PluginReservationCategory extends CommonDBTM
       $categories = [];
       $items = [];
       foreach ($POST as $key => $val) {
-         if (preg_match('/^item_([0-9]+)$/', $key, $match)) {
-            if (array_key_exists($val, $items)) {
-               array_push($items[$val], $match[1]);
-            } else {
-               $items[$val] = [];
-               array_push($items[$val], $match[1]);
-            }
-         }
          if (preg_match('/^category_([a-zA-Z0-9]+)$/', $key, $match)) {
             array_push($categories, $val);
          }

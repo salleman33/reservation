@@ -62,9 +62,15 @@ function createCategory() {
    del.setAttribute('class', 'categoryClose');
    del.setAttribute('onclick', 'deleteCategory(\'' + titleValue + '\')');
 
+   var input = document.createElement("input");
+   input.setAttribute('type', 'hidden');
+   input.setAttribute('name', 'category_' + titleValue);
+   input.setAttribute('value', titleValue);
+
    tr.appendChild(td1);
    tr.appendChild(tdconfig);
    tr.appendChild(del);
+   tr.appendChild(input);
 
    var table = document.getElementById('categoriesContainer');
    var tbody_source = table.getElementsByTagName('tbody')[0];
