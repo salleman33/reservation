@@ -58,6 +58,7 @@ class PluginReservationConfig extends CommonDBTM
       $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, ["filter_is_active" => false]);
       echo "<div class='center'>";
       echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
+      echo '<input type="hidden" name="configCategoryItems" value="'.$category.'">';
       echo '<tr>';
       echo '<th>'. __('Available Items', "reservation") .'</th>';
       echo '<th></th>';
@@ -72,7 +73,13 @@ class PluginReservationConfig extends CommonDBTM
             return ($element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']));
          }
       );
-      echo '<select id="categoryAvailableItems" multiple size="'.count($availableItems_array).'">';    
+      $selectedItems_array = array_filter(
+         $all_reservation_items,
+         function ($element) use($category) {
+            return ($element['category_name'] === $category);
+         }
+      );
+      echo '<select id="categoryAvailableItems" multiple size="'.count($availableItems_array)+count($selectedItems_array).'">';    
       foreach ($availableItems_array as $item) {
          echo '<option value="'.$item['id'].'">'.$item['name'].'</option>';
       }
@@ -85,16 +92,14 @@ class PluginReservationConfig extends CommonDBTM
       echo '</td>';
       echo '<td>';
       // echo json_encode($all_reservation_items);
-      $selectedItems_array = array_filter(
-         $all_reservation_items,
-         function ($element) use($category) {
-            return ($element['category_name'] === $category);
-         }
-      );
       
-      echo '<select id="categorySelectedItems" multiple size="'.count($availableItems_array).'">';      
+      
+      echo '<select id="categorySelectedItems" multiple size="'.count($availableItems_array)+count($selectedItems_array).'">';      
       foreach ($selectedItems_array as $item) {
          echo '<option value="'.$item['id'].'">'.$item['name'].'</option>';
+      }
+      foreach ($selectedItems_array as $item) {
+         echo '<input type="hidden" value="'.$item['id'].'" id="categorySelectedItem_'.$item['id'].'" name="categorySelectedItem_'.$item['id'].'">';
       }
       echo '</select>';
       echo '</td>';

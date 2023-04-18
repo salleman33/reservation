@@ -38,6 +38,10 @@ if ($plugin->isActivated("reservation")) {
       $PluginReservationCategory = new PluginReservationCategory();
       $PluginReservationCategory->applyCategoriesConfig($_POST);
    }
+   if (isset($_POST['configCategoryItems'])) {
+      $PluginReservationCategory = new PluginReservationCategory();
+      $PluginReservationCategory->applyCategoryItem($_POST);
+   }
 
    foreach ($toolTipConfig as $config) {
       if (isset($_POST[$config])) {

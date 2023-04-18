@@ -197,7 +197,66 @@ class PluginReservationCategory extends CommonDBTM
       }
 
       $this->updateCategories($categories);
-      $this->updateCategoryItems($items);
+   }
+
+   public function applyCategoryItem($POST)
+   {
+      global $DB;
+      $category = $_POST['configCategoryItems'];
+      $items_list = [];
+      foreach ($POST as $key => $val) {
+         if (preg_match('/^categorySelectedItem_([0-9]+)$/', $key, $match)) {
+            array_push($items_list, $match[1]);
+         }
+      }
+
+      $this->getFromDBByCrit(['name' => $category]);
+
+      for($i = 0; $i < count($items_list); ++$i) {
+         $items = new PluginReservationCategory_Item();
+         $items_table = $items->getTable();
+
+         if ($items->getFromDBByCrit(['reservationitems_id' => $items_list[$i]] )) {
+            $DB->updateOrDie(
+               $items_table,
+               [
+                  'categories_id' => $this->getId(),
+                  'priority' => $i+1,
+               ],
+               [
+                  'reservationitems_id' => $items_list[$i],
+               ]
+            );
+         } else {
+            $DB->insertOrDie(
+               $items_table,
+               [
+                  'categories_id' => $this->getId(),
+                  'reservationitems_id' => $items_list[$i],
+                  'priority' => $i+1,
+               ]
+            );
+         }
+      }
+
+
+      // Toolbox::logInFile('reservations_plugin', "TEST".json_encode($items)."\n", $force = false);
+
+      
+      // $categories = [];
+      // $items = [];
+      // foreach ($POST as $key => $val) {
+      //    if (preg_match('/^item_([0-9]+)$/', $key, $match)) {
+      //       if (array_key_exists($val, $items)) {
+      //          array_push($items[$val], $match[1]);
+      //       } else {
+      //          $items[$val] = [];
+      //          array_push($items[$val], $match[1]);
+      //       }
+      //    }
+      // }
+
+      // $this->updateCategoryItems($items);
    }
 
    /**
