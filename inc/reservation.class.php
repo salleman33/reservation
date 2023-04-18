@@ -197,6 +197,7 @@ class PluginReservationReservation extends CommonDBTM
 
       $input = $resa->fields;
       $input['begin'] = $now;
+      $input = Toolbox::addslashes_deep($input);
       if ($resa->update($input)) {
          $tablename = getTableForItemType(__CLASS__);
          $query = "UPDATE `".$tablename."` 
