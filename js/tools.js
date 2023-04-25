@@ -193,7 +193,7 @@ function onClickAllowMultipleEditCheckbox(checkbox) {
 function checkin(resa_id) {
    $.ajax({
       type: "GET",
-      url: window.location.href+'/../query.php',
+      url: window.location.origin + window.location.pathname+'/../query.php',
       data: "checkin="+resa_id,
       success: function() {
          document.getElementById('checkin'+resa_id).innerHTML = "checked in !";
@@ -207,7 +207,7 @@ function checkin(resa_id) {
 function checkout(resa_id) {
    $.ajax({
       type: "GET",
-      url: window.location.href+'/../query.php',
+      url: window.location.origin + window.location.pathname+'/../query.php',
       data: "checkout="+resa_id,
       success: function() {
          document.getElementById('checkout'+resa_id).innerHTML = "checked out !";
@@ -221,7 +221,7 @@ function checkout(resa_id) {
 function mailuser(resa_id) {
    $.ajax({
       type: "GET",
-      url: window.location.href+'/../query.php',
+      url: window.location.origin + window.location.pathname+'/../query.php',
       data: "mailuser="+resa_id,
       success: function() {
          document.getElementById('mailed'+resa_id).innerHTML = "mail sent";
