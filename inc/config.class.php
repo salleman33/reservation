@@ -83,6 +83,9 @@ class PluginReservationConfig extends CommonDBTM
       foreach ($availableItems_array as $item) {
          echo '<option value="'.$item['id'].'">'.$item['name'].'</option>';
       }
+      foreach ($availableItems_array as $item) {
+         echo '<input type="hidden" value="'.$item['id'].'" id="CategoryAvailableItem_'.$item['id'].'" name="CategoryAvailableItem_'.$item['id'].'">';
+      }
       echo '</select>';
 
       echo '</td>';

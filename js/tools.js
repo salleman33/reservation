@@ -43,6 +43,8 @@ function addItemToCategory(category) {
          newhidden.setAttribute('id','categorySelectedItem_'+item.value);
          newhidden.setAttribute('name','categorySelectedItem_'+item.value);
          right.appendChild(newhidden);
+         const oldhidden = document.getElementById("CategoryAvailableItem_" + collection[i].value);
+         oldhidden.remove();
       }      
    }
    $('#categoryAvailableItems option:selected').remove();
@@ -58,6 +60,12 @@ function removeItemFromCategory(category) {
       option.setAttribute('value', collection[i].value);
       option.appendChild(document.createTextNode(collection[i].innerText));
       left.appendChild(option);
+      const newhidden = document.createElement('input');
+      newhidden.setAttribute('type','hidden');
+      newhidden.setAttribute('value',item.value);
+      newhidden.setAttribute('id','CategoryAvailableItem_'+item.value);
+      newhidden.setAttribute('name','CategoryAvailableItem_'+item.value);
+      left.appendChild(newhidden);
       const oldhidden = document.getElementById("categorySelectedItem_" + collection[i].value);
       oldhidden.remove();
    }

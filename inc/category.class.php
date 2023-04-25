@@ -204,14 +204,17 @@ class PluginReservationCategory extends CommonDBTM
       global $DB;
       $category = $_POST['configCategoryItems'];
       $items_list = [];
+      $available_list = [];
       foreach ($POST as $key => $val) {
          if (preg_match('/^categorySelectedItem_([0-9]+)$/', $key, $match)) {
             array_push($items_list, $match[1]);
          }
+         if (preg_match('/^CategoryAvailableItem_([0-9]+)$/', $key, $match)) {
+            array_push($available_list, $match[1]);
+         }
       }
 
       $this->getFromDBByCrit(['name' => $category]);
-
       for($i = 0; $i < count($items_list); ++$i) {
          $items = new PluginReservationCategory_Item();
          $items_table = $items->getTable();
@@ -233,6 +236,34 @@ class PluginReservationCategory extends CommonDBTM
                [
                   'categories_id' => $this->getId(),
                   'reservationitems_id' => $items_list[$i],
+                  'priority' => $i+1,
+               ]
+            );
+         }
+      }
+
+      $this->getFromDBByCrit(['name' => 'zzpluginnotcategorized']);
+      for($i = 0; $i < count($available_list); ++$i) {
+         $items = new PluginReservationCategory_Item();
+         $items_table = $items->getTable();
+
+         if ($items->getFromDBByCrit(['reservationitems_id' => $available_list[$i]] )) {
+            $DB->updateOrDie(
+               $items_table,
+               [
+                  'categories_id' => $this->getId(),
+                  'priority' => $i+1,
+               ],
+               [
+                  'reservationitems_id' => $available_list[$i],
+               ]
+            );
+         } else {
+            $DB->insertOrDie(
+               $items_table,
+               [
+                  'categories_id' => $this->getId(),
+                  'reservationitems_id' => $available_list[$i],
                   'priority' => $i+1,
                ]
             );
