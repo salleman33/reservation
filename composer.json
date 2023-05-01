@@ -2,9 +2,22 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require-dev": {
-        "glpi-project/coding-standard": "^0.7.0"
+        "glpi-project/coding-standard": "^0.7.0",
+        "phpstan/extension-installer": "^1.2",
+        "php-parallel-lint/php-parallel-lint": "^1.3",
+        "phpstan/phpstan": "^1.10",
+        "phpstan/phpstan-deprecation-rules": "^1.1"
     },
     "require": {
         "glpi-project/tools": "^0.1.4"
+    },
+    "scripts": {
+        "cs": "phpcs -d memory_limit=512M --cache -p --extensions=php --ignore=\"/.git/,^$(pwd)/(config|files|lib|marketplace|node_modules|plugins|tests/config|vendor)/\" ./",
+        "lint": "parallel-lint --exclude vendor ."
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     }
 }
