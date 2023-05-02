@@ -95,7 +95,7 @@ Es bringt auch einige vereinfachte Aktionen auf Buchungen wie :
         <lang>fr_FR</lang>
         <lang>de_DE</lang>
     </langs>
-    <license>GLPv3</license>
+    <license>GPLv3</license>
     <screenshots>
         <screenshot>https://github.com/salleman33/reservation/raw/master/pics/screenshot_all.png</screenshot>
         <screenshot>https://github.com/salleman33/reservation/raw/master/pics/screenshot_b2.png</screenshot>
