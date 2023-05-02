@@ -38,4 +38,4 @@ Use the notification events :
 
 **For automatic actions, consider increasing the limit number of actions that can be run at the same time (default is 2).**
 
- [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+ [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
