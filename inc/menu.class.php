@@ -531,7 +531,7 @@ class PluginReservationMenu extends CommonGLPI
 
                         // case if multi edit enabled for first item
                         echo "<td class='showIfMultiEditEnabled' rowspan='" . $rowspan_line . "'>";
-                        echo "<a class='bouton' title='" . __('Edit multiple', 'reservation') . "' onclick=\"makeAChange('" .'multiedit.form.php' . $str_multiEditParams . "');\"   href=\"javascript:void(0);\">" . __('Edit multiple', 'reservation') . "</a>";
+                        echo "<a class='bouton' title='" . __('Edit multiple', 'reservation') . "' onclick=\"makeAChange('" . 'multiedit.form.php' . $str_multiEditParams . "');\"   href=\"javascript:void(0);\">" . __('Edit multiple', 'reservation') . "</a>";
                         echo "</td>";
 
                         // case if multi edit disable for first item

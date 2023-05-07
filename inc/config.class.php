@@ -86,7 +86,7 @@ class PluginReservationConfig extends CommonDBTM
         }
         echo '<select id="select_availableItems" size="' . count($availableItems_array) + count($selectedItems_array) . '">';
         foreach ($availableItems_array as $item) {
-            echo '<option value="' .$item['id']. '">' . $item['name'] . '</option>';
+            echo '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
         }
         echo '</select>';
         echo '</div>';
@@ -377,20 +377,11 @@ class PluginReservationConfig extends CommonDBTM
         $menu .= '<td>';
         $menu .= '<input class="noEnterSubmit" onkeydown="createCategoryEnter()" type="text" id="newCategoryTitle" size="15"  title="Please enter a type">';
         $menu .= '<button type="button" onclick="createCategory()">' . _sx('button', 'Add') . '</button>';
-        // $menu .= '<div style="clear: left;" id="categoriesContainer">';
         $menu .= '<table class="listCustomCategories" id="categoriesContainer">';
         $menu .= '<tbody>';
 
         $categories_names = PluginReservationCategory::getCategoriesNames();
-        // $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, ["filter_is_active" => false]);
         foreach ($categories_names as $category_name) {
-            // $filtered_array = array_filter(
-            //    $all_reservation_items,
-            //    function ($element) use ($category_name) {
-            //       return ($element['category_name'] == $category_name);
-            //    }
-            // );
-
             $it = 0;
             if ($category_name === "zzpluginnotcategorized") {
                 continue;
@@ -401,87 +392,13 @@ class PluginReservationConfig extends CommonDBTM
             $menu .= '<td><button type="button" onclick="deleteCategory(\'' . $category_name . '\')" class="categoryClose" >X</td>';
             $menu .= '<input type="hidden" name="category_' . $category_name . '" value="' . $category_name . '">';
             $menu .= '</tr>';
-            // $menu .= $this->openCategoryHtml($category_name, $category_name);
-            // foreach ($filtered_array as $reservation_item) {
-            //    $it++;
-            //    $menu .= $this->makeItemHtml($reservation_item, $category_name, $it);
-            // }
-            // $menu .= $this->closeCategoryHtml();
         }
         $menu .= '</tbody>';
         $menu .= '</table>';
         $menu .= '</td>';
-        // $menu .= '<td>';
-
-        // $menu .= $this->openCategoryHtml('zzpluginnotcategorized', '', false);
-        // // if (in_array('zzpluginnotcategorized', $categories_names)) {
-        // $filtered_array = array_filter(
-        //    $all_reservation_items,
-        //    function ($element) {
-        //       return ($element['category_name'] === 'zzpluginnotcategorized' || is_null($element['category_name']));
-        //    }
-        // );
-        // $it = 0;
-        // foreach ($filtered_array as $reservation_item) {
-        //    $it++;
-        //    $menu .= $this->makeItemHtml($reservation_item, 'zzpluginnotcategorized', $it);
-        // }
-        // // }
-        // $menu .= $this->closeCategoryHtml();
-
-        // $menu .= '<div style="clear: left;"></div>';
-        // $menu .= '</td>';
         $menu .= "</tr>";
         $menu .= "</table>";
 
         return $menu;
-    }
-
-    /**
-     * make html code for an item
-     * @param hash $reservation_item item
-     * @param string $category_name name of the category item
-     * @param integer $index index of the item
-     * @return string code html
-     */
-    private function makeItemHtml($reservation_item, $category_name, $index)
-    {
-        $html = '<tr class="draggable" ' . ($reservation_item['is_active'] == '1' ? '' : 'style="background-color:#f36647 "') . ' id="item_' . $reservation_item['id'] . '">';
-        $html .= '<input type="hidden" name="item_' . $reservation_item['id'] . '" value="' . $category_name . '">';
-        $html .= '<td>' . $reservation_item['name'] . '</td>';
-        $html .= '<td>' . nl2br($reservation_item['comment']) . '</td>';
-        $html .= '<td class="index">' . $index . '</td>';
-        $html .= '</tr>';
-        return $html;
-    }
-
-    /**
-     * make html code to open category
-     * @param string $category_name name of this category
-     * @param string $category_name title displayed
-     * @param boolean $deletable category is deletable or not
-     * @return string code html
-     */
-    private function openCategoryHtml($category_name, $category_title, $deletable = true)
-    {
-        $html = '<table class="dropper" id="itemsCategory_' . $category_name . '">';
-        $html .= '<thead>';
-        $html .= '<th colspan="3" class="categoryTitle">' . $category_title . '</th>';
-        $deletable && $html .= '<td onclick="deleteCategory(\'' . $category_name . '\')" class="categoryClose" >X</td>';
-        $html .= '</thead>';
-        $html .= '<input type="hidden" name="category_' . $category_name . '" value="' . $category_name . '">';
-        $html .= '<tbody>';
-        return $html;
-    }
-
-    /**
-     * make html code to close category
-     * @return string code html
-     */
-    private function closeCategoryHtml()
-    {
-        $html = '</tbody>';
-        $html .= "</table>";
-        return $html;
     }
 }

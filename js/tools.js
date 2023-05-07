@@ -80,7 +80,7 @@ function removeItemFromCategory() {
 function upItemInCategory() {
    var opt = $('#select_selectedItems option:selected');
   
-   if(opt.is(':last-child')) {
+   if(opt.is(':first-child')) {
       opt.insertAfter($('#select_selectedItems option:last-child'));
    }
    else {

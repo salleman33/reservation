@@ -77,7 +77,7 @@ class PluginReservationCategory extends CommonDBTM
 
         $items = new PluginReservationCategory_Item();
         $items_table = $items->getTable();
-        
+
         $DB->deleteOrDie(
             $items_table,
             [
@@ -94,31 +94,6 @@ class PluginReservationCategory extends CommonDBTM
     }
 
     /**
-     * Get current categories sorted and items config
-     * @return array array of items by categories like ["cat1" => [1,2,3,4], "cat2" => [5,6] ]
-     */
-    public static function getCategoriesConfig()
-    {
-        $result = [];
-        $list_reservationitems = self::getReservationItems();
-        foreach ($list_reservationitems as $item) {
-            $category_name = $item['category_name'];
-            if ($category_name === null) {
-                $category_name = 'zzpluginnotcategorized';
-            }
-
-            if (array_key_exists($category_name, $result)) {
-                array_push($result[$category_name], $item["items_id"]);
-            } else {
-                $result[$category_name] = [];
-                array_push($result[$category_name], $item["items_id"]);
-            }
-        }
-        ksort($result);
-        return $result;
-    }
-
-    /**
      * get reservation items merged with their category configs (id, name, priority)
      * @return array list of reservation items like [{"id":"1","comment":"Windows 10","name":"computer 1","entities_id":"0","category_name":"Windows","category_id":"11","items_priority":"1","items_id":"1","itemtype":"Computer"}{...}{...}],
      */
@@ -129,7 +104,6 @@ class PluginReservationCategory extends CommonDBTM
         if (isset($optional["filter_is_active"])) {
             $filter_is_active = $optional["filter_is_active"];
         }
-
         $result = [];
 
         foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
@@ -140,10 +114,18 @@ class PluginReservationCategory extends CommonDBTM
             $categories_table = getTableForItemType(__CLASS__);
             $category_items_table = getTableForItemType("PluginReservationCategory_Item");
 
-            $left = "LEFT JOIN `glpi_reservations`
-                        ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
-                            AND '" . $begin . "' < `glpi_reservations`.`end`
-                            AND '" . $end . "' > `glpi_reservations`.`begin`)";
+            $left = '';
+            if ($begin != '' && $end != '') {
+                $left .= "LEFT JOIN `glpi_reservations`
+                        ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`";
+                if ($begin != '') {
+                    $left .= "AND '" . $begin . "' < `glpi_reservations`.`end`";
+                }
+                if ($end != '') {
+                    $left .= "AND '" . $end . "' > `glpi_reservations`.`begin`";
+                }
+                $left .= ")";
+            }
 
             $where = $available ? " AND `glpi_reservations`.`id` IS NULL " : '';
 
@@ -166,9 +148,8 @@ class PluginReservationCategory extends CommonDBTM
                   LEFT OUTER JOIN `$categories_table`
                      ON `$category_items_table`.`categories_id` = `$categories_table`.`id`
                   $left
-                  WHERE `glpi_reservationitems`.`is_active` = '1'
+                  WHERE `$itemtable`.`is_deleted` = '0'
                      " . ($filter_is_active ? "AND `glpi_reservationitems`.`is_active` = '1'" : "") . "
-                     AND `$itemtable`.`is_deleted` = '0'
                      $where " .
             getEntitiesRestrictRequest(
                 " AND",
