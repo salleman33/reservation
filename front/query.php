@@ -19,16 +19,22 @@ if (!Session::haveRightsOr("reservation", [CREATE, UPDATE, DELETE])) {
 if (isset($_GET['mailuser'])) {
     if (PluginReservationReservation::sendMail($_GET['mailuser'])) {
         return http_response_code(200);
+    } else { 
+        return http_response_code(500);
     }
 }
 if (isset($_GET['checkout'])) {
     if (PluginReservationReservation::checkoutReservation($_GET['checkout'])) {
         return http_response_code(200);
+    } else { 
+        return http_response_code(500);
     }
 }
 if (isset($_GET['checkin'])) {
     if (PluginReservationReservation::checkinReservation($_GET['checkin'])) {
         return http_response_code(200);
+    } else { 
+        return http_response_code(500);
     }
 }
 
