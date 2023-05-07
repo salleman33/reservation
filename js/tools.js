@@ -26,7 +26,7 @@ function createCategoryEnter() {
 }
 
 function addItemToCategory(category) {
-   var left = document.getElementById("categoryAvailableItems");
+   var left = document.getElementById("select_availableItems");
    var right = document.getElementById("categorySelectedItems");
 
    var collection = left.options;
@@ -43,15 +43,15 @@ function addItemToCategory(category) {
          newhidden.setAttribute('id','categorySelectedItem_'+item.value);
          newhidden.setAttribute('name','categorySelectedItem_'+item.value);
          right.appendChild(newhidden);
-         const oldhidden = document.getElementById("CategoryAvailableItem_" + collection[i].value);
+         const oldhidden = document.getElementById("option_availableItem_" + collection[i].value);
          oldhidden.remove();
       }      
    }
-   $('#categoryAvailableItems option:selected').remove();
+   $('#select_availableItems option:selected').remove();
 }
 
 function removeItemFromCategory(category) {
-   const left = document.getElementById("categoryAvailableItems");
+   const left = document.getElementById("select_availableItems");
    const right = document.getElementById("categorySelectedItems");
 
    const collection = right.selectedOptions;
@@ -63,8 +63,8 @@ function removeItemFromCategory(category) {
       const newhidden = document.createElement('input');
       newhidden.setAttribute('type','hidden');
       newhidden.setAttribute('value',item.value);
-      newhidden.setAttribute('id','CategoryAvailableItem_'+item.value);
-      newhidden.setAttribute('name','CategoryAvailableItem_'+item.value);
+      newhidden.setAttribute('id','option_availableItem_'+item.value);
+      newhidden.setAttribute('name','option_availableItem_'+item.value);
       left.appendChild(newhidden);
       const oldhidden = document.getElementById("categorySelectedItem_" + collection[i].value);
       oldhidden.remove();

@@ -45,15 +45,16 @@ class PluginReservationConfig extends CommonDBTM
     {
         echo "<form id=\"formPluginReservationConfigs\" method='post' action='" . $this->getFormURL() . "'>";
         if ($ID === 1) {
-            $this->mainConfig();
+            $this->mainConfigView();
         }
         if ($ID === 2) {
-            $this->categoryConfig($option[0]);
+            $this->categoryConfigView($option[0]);
         }
         Html::closeForm();
         return true;
     }
-    private function categoryConfig($category)
+
+    private function categoryConfigView($category)
     {
         $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, ["filter_is_active" => false]);
         echo "<div class='center'>";
@@ -79,12 +80,12 @@ class PluginReservationConfig extends CommonDBTM
                 return ($element['category_name'] === $category);
             }
         );
-        echo '<select id="categoryAvailableItems" multiple size="' . count($availableItems_array) + count($selectedItems_array) . '">';
+        echo '<select id="select_availableItems" multiple size="' . count($availableItems_array) + count($selectedItems_array) . '">';
         foreach ($availableItems_array as $item) {
             echo '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
         }
         foreach ($availableItems_array as $item) {
-            echo '<input type="hidden" value="' . $item['id'] . '" id="CategoryAvailableItem_' . $item['id'] . '" name="CategoryAvailableItem_' . $item['id'] . '">';
+            echo '<input type="hidden" value="' . $item['id'] . '" id="option_availableItem_' . $item['id'] . '" name="CategoryAvailableItem_' . $item['id'] . '">';
         }
         echo '</select>';
 
@@ -114,7 +115,7 @@ class PluginReservationConfig extends CommonDBTM
         echo '</table>';
     }
 
-    private function mainConfig()
+    private function mainConfigView()
     {
         echo "<div class='center'>";
         echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
