@@ -58,6 +58,7 @@ class PluginReservationConfig extends CommonDBTM
     {
         $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, ["filter_is_active" => false]);
         echo "<div class='center'>";
+        echo '<h1>' . $category . '</h1>';
         echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
         echo '<input type="hidden" name="configCategoryItems" value="' . $category . '">';
         echo '<tr>';
