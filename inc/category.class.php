@@ -73,6 +73,17 @@ class PluginReservationCategory extends CommonDBTM
     {
         global $DB;
         $categories_table = getTableForItemType(__CLASS__);
+        $this->getFromDBByCrit(['name' => $name]);
+
+        $items = new PluginReservationCategory_Item();
+        $items_table = $items->getTable();
+        
+        $DB->deleteOrDie(
+            $items_table,
+            [
+                'categories_id' => $this->getId()
+            ]
+        );
 
         $DB->deleteOrDie(
             $categories_table,
@@ -195,26 +206,47 @@ class PluginReservationCategory extends CommonDBTM
         $this->updateCategories($categories);
     }
 
+    /**
+     * update categories in database
+     * @param string[] $next_config [optiona] array of categories like ["cat1", "cat2" ]
+     */
+    private function updateCategories($next_config = [])
+    {
+        $previous_config = $this->getCategoriesNames();
+
+        foreach (array_diff($next_config, $previous_config) as $to_add) {
+            // Toolbox::logInFile('reservations_plugin', "category to Add : ".json_encode($toAdd)."\n", $force = false);
+            $this->addCategory($to_add);
+        }
+        foreach (array_diff($previous_config, $next_config) as $to_delete) {
+            // Toolbox::logInFile('reservations_plugin', "category to Delete : ".json_encode($toDelete)."\n", $force = false);
+            $this->deleteCategory($to_delete);
+        }
+    }
+
+    /**
+     * Apply config of items in custom categories defined in $_POST
+     */
     public function applyCategoryItem($POST)
     {
         global $DB;
         $category = $_POST['configCategoryItems'];
         $items_list = [];
         $available_list = [];
+
         foreach ($POST as $key => $val) {
-            if (preg_match('/^categorySelectedItem_([0-9]+)$/', $key, $match)) {
+            if (preg_match('/^option_selectedItems_([0-9]+)$/', $key, $match)) {
                 array_push($items_list, $match[1]);
             }
-            if (preg_match('/^CategoryAvailableItem_([0-9]+)$/', $key, $match)) {
+            if (preg_match('/^option_availableItems_([0-9]+)$/', $key, $match)) {
                 array_push($available_list, $match[1]);
             }
         }
 
         $this->getFromDBByCrit(['name' => $category]);
+        $items = new PluginReservationCategory_Item();
+        $items_table = $items->getTable();
         for ($i = 0; $i < count($items_list); ++$i) {
-            $items = new PluginReservationCategory_Item();
-            $items_table = $items->getTable();
-
             if ($items->getFromDBByCrit(['reservationitems_id' => $items_list[$i]])) {
                 $DB->updateOrDie(
                     $items_table,
@@ -238,106 +270,14 @@ class PluginReservationCategory extends CommonDBTM
             }
         }
 
-        $this->getFromDBByCrit(['name' => 'zzpluginnotcategorized']);
         for ($i = 0; $i < count($available_list); ++$i) {
-            $items = new PluginReservationCategory_Item();
-            $items_table = $items->getTable();
-
             if ($items->getFromDBByCrit(['reservationitems_id' => $available_list[$i]])) {
-                $DB->updateOrDie(
+                $DB->deleteOrDie(
                     $items_table,
-                    [
-                        'categories_id' => $this->getId(),
-                        'priority' => $i + 1,
-                    ],
                     [
                         'reservationitems_id' => $available_list[$i],
                     ]
                 );
-            } else {
-                $DB->insertOrDie(
-                    $items_table,
-                    [
-                        'categories_id' => $this->getId(),
-                        'reservationitems_id' => $available_list[$i],
-                        'priority' => $i + 1,
-                    ]
-                );
-            }
-        }
-
-        // Toolbox::logInFile('reservations_plugin', "TEST".json_encode($items)."\n", $force = false);
-
-        // $categories = [];
-        // $items = [];
-        // foreach ($POST as $key => $val) {
-        //    if (preg_match('/^item_([0-9]+)$/', $key, $match)) {
-        //       if (array_key_exists($val, $items)) {
-        //          array_push($items[$val], $match[1]);
-        //       } else {
-        //          $items[$val] = [];
-        //          array_push($items[$val], $match[1]);
-        //       }
-        //    }
-        // }
-
-        // $this->updateCategoryItems($items);
-    }
-
-    /**
-     * update categories in database
-     * @param string[] $next_config [optiona] array of categories like ["cat1", "cat2" ]
-     */
-    private function updateCategories($next_config = [])
-    {
-        $previous_config = $this->getCategoriesNames();
-
-        foreach (array_diff($next_config, $previous_config) as $to_add) {
-            // Toolbox::logInFile('reservations_plugin', "category to Add : ".json_encode($toAdd)."\n", $force = false);
-            $this->addCategory($to_add);
-        }
-        foreach (array_diff($previous_config, $next_config) as $to_delete) {
-            // Toolbox::logInFile('reservations_plugin', "category to Delete : ".json_encode($toDelete)."\n", $force = false);
-            $this->deleteCategory($to_delete);
-        }
-    }
-
-    /**
-     * update category items in database
-     * @param $list_items_by_categories  array of items by categories like ["cat1" => [1,2,3,4], "cat2" => [5,6] ]
-     */
-    private function updateCategoryItems($list_items_by_categories = [])
-    {
-        global $DB;
-
-        foreach ($list_items_by_categories as $category_name => $category_items) {
-            $this->getFromDBByCrit(['name' => $category_name]);
-
-            for ($i = 0; $i < count($category_items); ++$i) {
-                $items = new PluginReservationCategory_Item();
-                $items_table = $items->getTable();
-
-                if ($items->getFromDBByCrit(['reservationitems_id' => $category_items[$i]])) {
-                    $DB->updateOrDie(
-                        $items_table,
-                        [
-                            'categories_id' => $this->getId(),
-                            'priority' => $i + 1,
-                        ],
-                        [
-                            'reservationitems_id' => $category_items[$i],
-                        ]
-                    );
-                } else {
-                    $DB->insertOrDie(
-                        $items_table,
-                        [
-                            'categories_id' => $this->getId(),
-                            'reservationitems_id' => $category_items[$i],
-                            'priority' => $i + 1,
-                        ]
-                    );
-                }
             }
         }
     }

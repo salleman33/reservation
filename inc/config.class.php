@@ -80,36 +80,40 @@ class PluginReservationConfig extends CommonDBTM
                 return ($element['category_name'] === $category);
             }
         );
+        echo '<div id=div_availableItems>';
+        foreach ($availableItems_array as $item) {
+            echo '<input type="hidden" value="' . $item['id'] . '" id="hidden_availableItem_' . $item['id'] . '" name="option_availableItems_' . $item['id'] . '">';
+        }
         echo '<select id="select_availableItems" multiple size="' . count($availableItems_array) + count($selectedItems_array) . '">';
         foreach ($availableItems_array as $item) {
-            echo '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
-        }
-        foreach ($availableItems_array as $item) {
-            echo '<input type="hidden" value="' . $item['id'] . '" id="option_availableItem_' . $item['id'] . '" name="CategoryAvailableItem_' . $item['id'] . '">';
+            echo '<option value="' .$item['id']. '">' . $item['name'] . '</option>';
         }
         echo '</select>';
+        echo '</div>';
 
         echo '</td>';
         echo '<td>';
-        echo '<button class="submit"  type="button" onclick="addItemToCategory(\'' . $category . '\')" >' . __('Add') . '</button>';
-        echo '<button type="button" onclick="removeItemFromCategory(\'' . $category . '\')"  >' . __('Delete') . '</button>';
+        echo '<button class="submit"  type="button" onclick="addItemToCategory()" >' . _sx('button', 'Add') . '</button>';
+        echo '<button type="button" onclick="removeItemFromCategory()"  >' . _sx('button', 'Delete') . '</button>';
         echo '</td>';
         echo '<td>';
-        // echo json_encode($all_reservation_items);
 
-        echo '<select id="categorySelectedItems" multiple size="' . count($availableItems_array) + count($selectedItems_array) . '">';
+        echo '<div id=div_selectedItems>';
+        foreach ($selectedItems_array as $item) {
+            echo '<input type="hidden" value="' . $item['id'] . '" id="hidden_selectedItem_' . $item['id'] . '" name="option_selectedItems_' . $item['id'] . '">';
+        }
+        echo '<select id="select_selectedItems" multiple size="' . count($availableItems_array) + count($selectedItems_array) . '">';
         foreach ($selectedItems_array as $item) {
             echo '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
         }
-        foreach ($selectedItems_array as $item) {
-            echo '<input type="hidden" value="' . $item['id'] . '" id="categorySelectedItem_' . $item['id'] . '" name="categorySelectedItem_' . $item['id'] . '">';
-        }
         echo '</select>';
+        echo '</div>';
+
         echo '</td>';
         echo '</tr>';
         echo '<tr>';
         echo '<td colspan="3">';
-        echo '<input class="submit" type="submit" value="' . __('VALIDER') . '">';
+        echo '<input class="submit" type="submit" value="' . _sx('button', 'Save') . '">';
         echo '</td>';
         echo '</tr>';
         echo '</table>';

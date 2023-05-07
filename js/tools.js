@@ -25,9 +25,9 @@ function createCategoryEnter() {
    }
 }
 
-function addItemToCategory(category) {
+function addItemToCategory() {
    var left = document.getElementById("select_availableItems");
-   var right = document.getElementById("categorySelectedItems");
+   var right = document.getElementById("select_selectedItems");
 
    var collection = left.options;
    for (let i = 0; i < collection.length; i++) {
@@ -37,39 +37,44 @@ function addItemToCategory(category) {
          option.setAttribute('value', item.value);
          option.appendChild(document.createTextNode(item.innerText));
          right.appendChild(option);
+
          const newhidden = document.createElement('input');
          newhidden.setAttribute('type','hidden');
          newhidden.setAttribute('value',item.value);
-         newhidden.setAttribute('id','categorySelectedItem_'+item.value);
-         newhidden.setAttribute('name','categorySelectedItem_'+item.value);
-         right.appendChild(newhidden);
-         const oldhidden = document.getElementById("option_availableItem_" + collection[i].value);
-         oldhidden.remove();
+         newhidden.setAttribute('id','hidden_selectedItem_'+item.value);
+         newhidden.setAttribute('name','option_selectedItems_'+item.value);
+         document.getElementById("div_selectedItems").appendChild(newhidden);
+
+         document.getElementById("hidden_availableItem_" + item.value).remove();
       }      
    }
    $('#select_availableItems option:selected').remove();
 }
 
-function removeItemFromCategory(category) {
+function removeItemFromCategory() {
    const left = document.getElementById("select_availableItems");
-   const right = document.getElementById("categorySelectedItems");
+   const right = document.getElementById("select_selectedItems");
 
    const collection = right.selectedOptions;
    for (let i = 0; i < collection.length; i++) {
-      const option = document.createElement('option');
-      option.setAttribute('value', collection[i].value);
-      option.appendChild(document.createTextNode(collection[i].innerText));
-      left.appendChild(option);
-      const newhidden = document.createElement('input');
-      newhidden.setAttribute('type','hidden');
-      newhidden.setAttribute('value',item.value);
-      newhidden.setAttribute('id','option_availableItem_'+item.value);
-      newhidden.setAttribute('name','option_availableItem_'+item.value);
-      left.appendChild(newhidden);
-      const oldhidden = document.getElementById("categorySelectedItem_" + collection[i].value);
-      oldhidden.remove();
+      var item = collection[i];
+      if (item.selected) {
+         const option = document.createElement('option');
+         option.setAttribute('value', collection[i].value);
+         option.appendChild(document.createTextNode(collection[i].innerText));
+         left.appendChild(option);
+
+         const newhidden = document.createElement('input');
+         newhidden.setAttribute('type','hidden');
+         newhidden.setAttribute('value',item.value);
+         newhidden.setAttribute('id','hidden_availableItem_'+item.value);
+         newhidden.setAttribute('name','option_availableItems_'+item.value);
+         document.getElementById("div_availableItems").appendChild(newhidden);
+
+         document.getElementById("hidden_selectedItem_" + item.value).remove();
+      }
    }
-   $('#categorySelectedItems option:selected').remove();
+   $('#select_selectedItems option:selected').remove();
 }
 
 function configCategory(category) {
