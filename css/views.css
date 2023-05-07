@@ -32,17 +32,29 @@ color: black;
     cursor: default; 
 }
 .categoryClose {
-    /* position:absolute;
-    margin:0;
-    padding:5px; */
     color:red;
-    /* top:0;
-    right:0; */
+    font: bold 11px Arial;
     cursor: pointer;
-    width: 15px;
-    text-align: center;
-    vertical-align: middle;
+    text-decoration: none;
+    background-color: #EEEEEE;
+      
 }
+
+.categoryConfig {
+    font: bold 11px Arial;
+    cursor: pointer;
+    text-decoration: none;
+    background-color: #EEEEEE;
+}
+
+.listCustomCategories {
+    border: 1px solid;
+}
+
+table.listCustomCategories td {
+    border: 1px solid;
+}
+
 
 
 .dropper {

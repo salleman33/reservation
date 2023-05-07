@@ -10,38 +10,38 @@ define('PLUGIN_VERSION', '2.4.2');
  */
 function plugin_init_reservation()
 {
-   global $PLUGIN_HOOKS;
+    global $PLUGIN_HOOKS;
 
-   $PLUGIN_HOOKS['csrf_compliant']['reservation'] = true;
-   $PLUGIN_HOOKS['add_css']['reservation'][] = "css/views.css";
-   $PLUGIN_HOOKS['add_javascript']['reservation'] = ['js/tools.js'];
-   $PLUGIN_HOOKS['config_page']['reservation'] = 'front/config.form.php';
-   $PLUGIN_HOOKS['item_add']['reservation'] = ['Reservation' => 'plugin_item_add_reservation'];
-   $PLUGIN_HOOKS['item_update']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
-   $PLUGIN_HOOKS['item_purge']['reservation'] = ['Reservation' => 'plugin_item_purge_reservation'];
-   $PLUGIN_HOOKS['menu_toadd']['reservation'] = ['plugins' => 'PluginReservationMenu'];
-   $PLUGIN_HOOKS['multi_edit']['reservation'] = 'front/multiedit.form.php';
+    $PLUGIN_HOOKS['csrf_compliant']['reservation'] = true;
+    $PLUGIN_HOOKS['add_css']['reservation'][] = "css/views.css";
+    $PLUGIN_HOOKS['add_javascript']['reservation'] = ['js/tools.js'];
+    $PLUGIN_HOOKS['config_page']['reservation'] = 'front/config.form.php';
+    $PLUGIN_HOOKS['item_add']['reservation'] = ['Reservation' => 'plugin_item_add_reservation'];
+    $PLUGIN_HOOKS['item_update']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
+    $PLUGIN_HOOKS['item_purge']['reservation'] = ['Reservation' => 'plugin_item_purge_reservation'];
+    $PLUGIN_HOOKS['menu_toadd']['reservation'] = ['plugins' => 'PluginReservationMenu'];
+    $PLUGIN_HOOKS['multi_edit']['reservation'] = 'front/multiedit.form.php';
 
-   Plugin::registerClass('PluginReservationMenu');
-   Plugin::registerClass('PluginReservationConfig');
-   Plugin::registerClass('PluginReservationReservation');
-   Plugin::registerClass('PluginReservationCategory');
-   Plugin::registerClass('PluginReservationCategory_Item');
-   Plugin::registerClass('PluginReservationTask');
-   Plugin::registerClass('PluginReservationApi');
-   Plugin::registerClass('PluginReservationMultiEdit');
+    Plugin::registerClass('PluginReservationMenu');
+    Plugin::registerClass('PluginReservationConfig');
+    Plugin::registerClass('PluginReservationReservation');
+    Plugin::registerClass('PluginReservationCategory');
+    Plugin::registerClass('PluginReservationCategory_Item');
+    Plugin::registerClass('PluginReservationTask');
+    Plugin::registerClass('PluginReservationApi');
+    Plugin::registerClass('PluginReservationMultiEdit');
 
-   // Notifications
-   $PLUGIN_HOOKS['item_get_events']['reservation'] =
-      ['NotificationTargetReservation' => ['PluginReservationTask', 'addEvents']];
-   $PLUGIN_HOOKS['item_get_datas']['reservation'] =
-      ['NotificationTargetReservation' => ['PluginReservationTask', 'addData']];
-   $PLUGIN_HOOKS['item_add_targets']['reservation'] =
-      ['NotificationTargetReservation' => ['PluginReservationTask', 'addTarget']];
+    // Notifications
+    $PLUGIN_HOOKS['item_get_events']['reservation'] =
+        ['NotificationTargetReservation' => ['PluginReservationTask', 'addEvents']];
+    $PLUGIN_HOOKS['item_get_datas']['reservation'] =
+        ['NotificationTargetReservation' => ['PluginReservationTask', 'addData']];
+    $PLUGIN_HOOKS['item_add_targets']['reservation'] =
+        ['NotificationTargetReservation' => ['PluginReservationTask', 'addTarget']];
 
-   if (Session::getLoginUserID()) {
-      $PLUGIN_HOOKS['menu_entry']['reservation'] = 'front/reservation.php';
-   }
+    if (Session::getLoginUserID()) {
+        $PLUGIN_HOOKS['menu_entry']['reservation'] = 'front/reservation.php';
+    }
 }
 
 /**
@@ -51,18 +51,18 @@ function plugin_init_reservation()
  */
 function plugin_version_reservation()
 {
-   return [
-      'name' => 'Reservation',
-      'version' => PLUGIN_VERSION,
-      'author' => 'Sylvain Allemand',
-      'license' => 'GLPv3',
-      'homepage' => 'https://github.com/salleman33/reservation',
-      'requirements' => [
-         'glpi' => [
-            'min' => PLUGIN_RESERVATION_GLPI_MIN_VERSION,
-         ],
-      ],
-   ];
+    return [
+        'name' => 'Reservation',
+        'version' => PLUGIN_VERSION,
+        'author' => 'Sylvain Allemand',
+        'license' => 'GLPv3',
+        'homepage' => 'https://github.com/salleman33/reservation',
+        'requirements' => [
+            'glpi' => [
+                'min' => PLUGIN_RESERVATION_GLPI_MIN_VERSION,
+            ],
+        ],
+    ];
 }
 
 /**
@@ -72,7 +72,7 @@ function plugin_version_reservation()
  */
 function plugin_reservation_check_prerequisites()
 {
-   return true;
+    return true;
 }
 
 /**
@@ -85,12 +85,12 @@ function plugin_reservation_check_prerequisites()
  */
 function plugin_reservation_check_config($verbose = false)
 {
-   if (true) { // Your configuration check
-      return true;
-   }
+    if (true) { // Your configuration check
+        return true;
+    }
 
-   if ($verbose) {
-      echo 'Installed / not configured';
-   }
-   return false;
+    if ($verbose) {
+        echo 'Installed / not configured';
+    }
+    return false;
 }

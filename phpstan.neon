@@ -1,0 +1,10 @@
+parameters:
+    parallel:
+        maximumNumberOfProcesses: 2
+    level: 0
+    paths:
+        - inc
+    scanDirectories:
+        - /tmp/glpi/src
+        - /tmp/glpi/inc
+

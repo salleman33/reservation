@@ -25,30 +25,96 @@ function createCategoryEnter() {
    }
 }
 
-function deleteCategory(category) {
-   var categorieOther = document.getElementById("itemsCategory_zzpluginnotcategorized");
-   var tbody_dst = categorieOther.getElementsByTagName('tbody')[0];
+function addItemToCategory() {
+   var left = document.getElementById("select_availableItems");
+   var right = document.getElementById("select_selectedItems");
 
-   var element = document.getElementById("itemsCategory_" + category);
-   var tbody_source = element.getElementsByTagName('tbody')[0];
-   while (tbody_source.firstChild) {
-      if (/^item_[0-9]+$/.test(tbody_source.firstChild.id)) {
+   var collection = left.options;
+   for (let i = 0; i < collection.length; i++) {
+      var item = collection[i];
+      if (item.selected) {
+         const option = document.createElement('option');
+         option.setAttribute('value', item.value);
+         option.appendChild(document.createTextNode(item.innerText));
+         right.appendChild(option);
 
-         clonedElement = tbody_source.firstChild.cloneNode(true);
-         var input = clonedElement.getElementsByTagName('input')[0];
-         input.value = "zzpluginnotcategorized";
+         const newhidden = document.createElement('input');
+         newhidden.setAttribute('type','hidden');
+         newhidden.setAttribute('value',item.value);
+         newhidden.setAttribute('id','hidden_selectedItem_'+item.value);
+         newhidden.setAttribute('name','option_selectedItems_'+item.value);
+         document.getElementById("div_selectedItems").appendChild(newhidden);
 
-         clonedElement = tbody_dst.appendChild(clonedElement);
+         document.getElementById("hidden_availableItem_" + item.value).remove();
+      }      
+   }
+   $('#select_availableItems option:selected').remove();
+}
+
+function removeItemFromCategory() {
+   const left = document.getElementById("select_availableItems");
+   const right = document.getElementById("select_selectedItems");
+
+   const collection = right.selectedOptions;
+   for (let i = 0; i < collection.length; i++) {
+      var item = collection[i];
+      if (item.selected) {
+         const option = document.createElement('option');
+         option.setAttribute('value', collection[i].value);
+         option.appendChild(document.createTextNode(collection[i].innerText));
+         left.appendChild(option);
+
+         const newhidden = document.createElement('input');
+         newhidden.setAttribute('type','hidden');
+         newhidden.setAttribute('value',item.value);
+         newhidden.setAttribute('id','hidden_availableItem_'+item.value);
+         newhidden.setAttribute('name','option_availableItems_'+item.value);
+         document.getElementById("div_availableItems").appendChild(newhidden);
+
+         document.getElementById("hidden_selectedItem_" + item.value).remove();
       }
-      tbody_source.removeChild(tbody_source.firstChild);
    }
-   element.removeChild(tbody_source);
-   element.parentNode.removeChild(element);
+   $('#select_selectedItems option:selected').remove();
+}
 
-   // maj des index destination
-   for (var i = 0; i < tbody_dst.childNodes.length; i++) {
-      tbody_dst.childNodes[i].getElementsByClassName('index')[0].innerHTML = i + 1;
+function upItemInCategory() {
+   var opt = $('#select_selectedItems option:selected');
+  
+   if(opt.is(':first-child')) {
+      opt.insertAfter($('#select_selectedItems option:last-child'));
    }
+   else {
+      opt.insertBefore(opt.prev());
+   }
+}
+
+function downItemInCategory() {
+   var opt = $('#select_selectedItems option:selected');
+  
+   if(opt.is(':last-child')) {
+      opt.insertBefore($('#select_selectedItems option:first-child'));
+   }
+   else {
+      opt.insertAfter(opt.next());
+   }
+}
+
+
+function configCategory(category) {
+   const form = document.getElementById("formPluginReservationConfigs");
+   const hiddenField = document.createElement('input');
+   hiddenField.type = 'hidden';
+   hiddenField.name = 'configCategorySubmit';
+   hiddenField.value = category;
+   form.appendChild(hiddenField);
+   form.submit();
+}
+
+function deleteCategory(category) {
+   var element = document.getElementById("trConfigCategory_" + category);
+   // var tbody_source = element.getElementsByTagName('tbody')[0];
+   // element.removeChild(tbody_source);
+   element.parentNode.removeChild(element);
 }
 
 function createCategory() {
@@ -64,41 +130,36 @@ function createCategory() {
    titleField.style.backgroundColor = "initial";
    titleField.value = "";
    
-   var th = document.createElement("th");
-   th.appendChild(document.createTextNode(titleValue));
-   th.setAttribute('class', 'categoryTitle');
-   th.setAttribute('colspan', 3);
+   var tr = document.createElement('tr');
+   tr.setAttribute('class', 'listCustomCategories');
+   tr.setAttribute('id', 'trConfigCategory_' + titleValue);
+
+   var td1 = document.createElement("td");
+   td1.appendChild(document.createTextNode(titleValue));
+
+   var tdconfig = document.createElement("td");
+   tdconfig.appendChild(document.createTextNode("config"));
+   tdconfig.setAttribute('class', 'categoryConfig');
+   tdconfig.setAttribute('onclick', 'configCategory(\'' + titleValue + '\')');
 
    var del = document.createElement("td");
    del.appendChild(document.createTextNode("X"));
    del.setAttribute('class', 'categoryClose');
    del.setAttribute('onclick', 'deleteCategory(\'' + titleValue + '\')');
 
-   var thead = document.createElement("thead");
-   thead.appendChild(th);
-   thead.appendChild(del);   
-
    var input = document.createElement("input");
    input.setAttribute('type', 'hidden');
    input.setAttribute('name', 'category_' + titleValue);
    input.setAttribute('value', titleValue);
 
-   var table = document.createElement("table");
-   table.appendChild(thead);
-   table.appendChild(input);
-   table.appendChild(document.createElement("tbody"));
-   table.setAttribute('class', 'dropper');
-   table.setAttribute("id", "itemsCategory_" + titleValue);
+   tr.appendChild(td1);
+   tr.appendChild(tdconfig);
+   tr.appendChild(del);
+   tr.appendChild(input);
 
-    	   
-   document.getElementById("categoriesContainer").appendChild(table);
-   $(table).sortable(
-      {
-         connectWith: '.dropper',
-         items: 'tbody tr',
-         stop: updateHiddenConfig,
-         receive: function (e, ui) { $(this).find("tbody").append(ui.item); }
-      }).disableSelection();
+   var table = document.getElementById('categoriesContainer');
+   var tbody_source = table.getElementsByTagName('tbody')[0];
+   tbody_source.appendChild(tr);
 }
 
 var fixHelper = function (e, ui) {
@@ -160,7 +221,7 @@ function onClickAllowMultipleEditCheckbox(checkbox) {
 function checkin(resa_id) {
    $.ajax({
       type: "GET",
-      url: window.location.href+'/../query.php',
+      url: window.location.origin + window.location.pathname+'/../query.php',
       data: "checkin="+resa_id,
       success: function() {
          document.getElementById('checkin'+resa_id).innerHTML = "checked in !";
@@ -174,7 +235,7 @@ function checkin(resa_id) {
 function checkout(resa_id) {
    $.ajax({
       type: "GET",
-      url: window.location.href+'/../query.php',
+      url: window.location.origin + window.location.pathname+'/../query.php',
       data: "checkout="+resa_id,
       success: function() {
          document.getElementById('checkout'+resa_id).innerHTML = "checked out !";
@@ -188,13 +249,27 @@ function checkout(resa_id) {
 function mailuser(resa_id) {
    $.ajax({
       type: "GET",
-      url: window.location.href+'/../query.php',
+      url: window.location.origin + window.location.pathname+'/../query.php',
       data: "mailuser="+resa_id,
       success: function() {
          document.getElementById('mailed'+resa_id).innerHTML = "mail sent";
       },
       error: function() {
          document.getElementById('mailed'+resa_id).innerHTML = "error...";
+      }
+   });
+}
+
+function makeAChange(redirect) {
+   $.ajax({
+      type: "GET",
+      url: window.location.origin + window.location.pathname+'/../query.php',
+      data: "change_in_progress",
+      success: function() {
+         location.href = redirect;
+      },
+      error: function() {
+         console.log("error");
       }
    });
 }
