@@ -61,13 +61,13 @@ class PluginReservationConfig extends CommonDBTM
         echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
         echo '<input type="hidden" name="configCategoryItems" value="' . $category . '">';
         echo '<tr>';
-        echo '<th>' . __('Available Items', "reservation") . '</th>';
+        echo '<th style="text-align: right;">' . __('Available Items', "reservation") . '</th>';
         echo '<th></th>';
-        echo '<th>' . __('Selected Items', "reservation") . '</th>';
+        echo '<th style="text-align: left;">' . __('Selected Items', "reservation") . '</th>';
         echo '</tr>';
 
         echo '<tr>';
-        echo '<td>';
+        echo '<td style="text-align: right;">';
         $availableItems_array = array_filter(
             $all_reservation_items,
             function ($element) {
@@ -84,7 +84,7 @@ class PluginReservationConfig extends CommonDBTM
         foreach ($availableItems_array as $item) {
             echo '<input type="hidden" value="' . $item['id'] . '" id="hidden_availableItem_' . $item['id'] . '" name="option_availableItems_' . $item['id'] . '">';
         }
-        echo '<select id="select_availableItems" multiple size="' . count($availableItems_array) + count($selectedItems_array) . '">';
+        echo '<select id="select_availableItems" size="' . count($availableItems_array) + count($selectedItems_array) . '">';
         foreach ($availableItems_array as $item) {
             echo '<option value="' .$item['id']. '">' . $item['name'] . '</option>';
         }
@@ -92,17 +92,23 @@ class PluginReservationConfig extends CommonDBTM
         echo '</div>';
 
         echo '</td>';
-        echo '<td>';
-        echo '<button class="submit"  type="button" onclick="addItemToCategory()" >' . _sx('button', 'Add') . '</button>';
-        echo '<button type="button" onclick="removeItemFromCategory()"  >' . _sx('button', 'Delete') . '</button>';
+        echo '<td style="text-align: center;">';
+        echo '<div style="text-align: center;">';
+        echo '<div><button class="submit"  type="button" onclick="upItemInCategory()" >' . _sx('button', '↑') . '</button></div>';
+        echo '<div>';
+        echo '<button style="margin-right:10px;" type="button" onclick="removeItemFromCategory()"  >' . _sx('button', '←') . '</button>';
+        echo '<button style="margin-left:10px;" type="button" onclick="addItemToCategory()" >' . _sx('button', '→') . '</button>';
+        echo '</div>';
+        echo '<div><button class="submit"  type="button" onclick="downItemInCategory()" >' . _sx('button', '↓') . '</button></div>';
+        echo '</div>';
         echo '</td>';
-        echo '<td>';
+        echo '<td style="text-align: left;">';
 
         echo '<div id=div_selectedItems>';
         foreach ($selectedItems_array as $item) {
             echo '<input type="hidden" value="' . $item['id'] . '" id="hidden_selectedItem_' . $item['id'] . '" name="option_selectedItems_' . $item['id'] . '">';
         }
-        echo '<select id="select_selectedItems" multiple size="' . count($availableItems_array) + count($selectedItems_array) . '">';
+        echo '<select id="select_selectedItems" size="' . count($availableItems_array) + count($selectedItems_array) . '">';
         foreach ($selectedItems_array as $item) {
             echo '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
         }

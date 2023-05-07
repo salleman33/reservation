@@ -77,6 +77,29 @@ function removeItemFromCategory() {
    $('#select_selectedItems option:selected').remove();
 }
 
+function upItemInCategory() {
+   var opt = $('#select_selectedItems option:selected');
+  
+   if(opt.is(':last-child')) {
+      opt.insertAfter($('#select_selectedItems option:last-child'));
+   }
+   else {
+      opt.insertBefore(opt.prev());
+   }
+}
+
+function downItemInCategory() {
+   var opt = $('#select_selectedItems option:selected');
+  
+   if(opt.is(':last-child')) {
+      opt.insertBefore($('#select_selectedItems option:first-child'));
+   }
+   else {
+      opt.insertAfter(opt.next());
+   }
+}
+
+
 function configCategory(category) {
    const form = document.getElementById("formPluginReservationConfigs");
    const hiddenField = document.createElement('input');
