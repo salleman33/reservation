@@ -1,3 +1,8 @@
+# 2.4.3
+* correction de bug
+* nouvelle vue de configuration des catégories personnalisées
+* meilleure gestion des dates du formulaire
+
 # 2.3.7
 * added german language (thanks to mahanovi)
 * tanslations updated
@@ -7,7 +12,6 @@
 
 * new feature : check-in mode : warn 
 * bug fix 
-
 
 # 2.2.1
 
