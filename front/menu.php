@@ -88,6 +88,10 @@ if (isset($_POST['switch_item_to_reservation'])) {
     $item_to_switch = $_POST['switch_item'];
     PluginReservationReservation::switchItemToResa($item_to_switch, $current_reservation);
 }
+if (isset($_SESSION['glpi_plugin_reservation_change_in_progress'])) {
+    $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+    unset($_SESSION['glpi_plugin_reservation_change_in_progress']);
+}
 
 $_SESSION['glpi_plugin_reservation_form_dates'] = $form_dates;
 

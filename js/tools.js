@@ -259,3 +259,17 @@ function mailuser(resa_id) {
       }
    });
 }
+
+function makeAChange(redirect) {
+   $.ajax({
+      type: "GET",
+      url: window.location.origin + window.location.pathname+'/../query.php',
+      data: "change_in_progress",
+      success: function() {
+         location.href = redirect;
+      },
+      error: function() {
+         console.log("error");
+      }
+   });
+}

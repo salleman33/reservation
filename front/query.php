@@ -38,4 +38,9 @@ if (isset($_GET['checkin'])) {
     }
 }
 
+if (isset($_GET['change_in_progress'])) {
+    $_SESSION['glpi_plugin_reservation_change_in_progress'] = true;
+    return http_response_code(200);
+}
+
 return http_response_code(400);

@@ -531,20 +531,20 @@ class PluginReservationMenu extends CommonGLPI
 
                         // case if multi edit enabled for first item
                         echo "<td class='showIfMultiEditEnabled' rowspan='" . $rowspan_line . "'>";
-                        echo "<a class='bouton' title='" . __('Edit multiple', 'reservation') . "' href='" . 'multiedit.form.php' . $str_multiEditParams . "'>" . __('Edit multiple', 'reservation') . "</a>";
+                        echo "<a class='bouton' title='" . __('Edit multiple', 'reservation') . "' onclick=\"makeAChange('" .'multiedit.form.php' . $str_multiEditParams . "');\"   href=\"javascript:void(0);\">" . __('Edit multiple', 'reservation') . "</a>";
                         echo "</td>";
 
                         // case if multi edit disable for first item
                         echo "<td class='hideIfMultiEditEnabled' style='display: none;'>";
                         echo '<ul style="list-style: none;">';
-                        echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" href='" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
+                        echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\" href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
                         echo "</ul>";
                         echo "</td>";
                     } else {
                         // normal case (no group)
                         echo "<td>";
                         echo '<ul style="list-style: none;">';
-                        echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" href='" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
+                        echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\" href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
                         echo "</ul>";
                         echo "</td>";
                     }
@@ -552,7 +552,7 @@ class PluginReservationMenu extends CommonGLPI
                     // case if multi edit enabled for other items
                     echo "<td class='hideIfMultiEditEnabled' style='display: none;'>";
                     echo '<ul style="list-style: none;">';
-                    echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" href='" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "'>" . _sx('button', 'Edit') . "</a></li>";
+                    echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\"  href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
                     echo "</ul>";
                     echo "</td>";
                 }
