@@ -37,15 +37,6 @@ function addItemToCategory() {
          option.setAttribute('value', item.value);
          option.appendChild(document.createTextNode(item.innerText));
          right.appendChild(option);
-
-         const newhidden = document.createElement('input');
-         newhidden.setAttribute('type','hidden');
-         newhidden.setAttribute('value',item.value);
-         newhidden.setAttribute('id','hidden_selectedItem_'+item.value);
-         newhidden.setAttribute('name','option_selectedItems_'+item.value);
-         document.getElementById("div_selectedItems").appendChild(newhidden);
-
-         document.getElementById("hidden_availableItem_" + item.value).remove();
       }      
    }
    $('#select_availableItems option:selected').remove();
@@ -63,15 +54,6 @@ function removeItemFromCategory() {
          option.setAttribute('value', collection[i].value);
          option.appendChild(document.createTextNode(collection[i].innerText));
          left.appendChild(option);
-
-         const newhidden = document.createElement('input');
-         newhidden.setAttribute('type','hidden');
-         newhidden.setAttribute('value',item.value);
-         newhidden.setAttribute('id','hidden_availableItem_'+item.value);
-         newhidden.setAttribute('name','option_availableItems_'+item.value);
-         document.getElementById("div_availableItems").appendChild(newhidden);
-
-         document.getElementById("hidden_selectedItem_" + item.value).remove();
       }
    }
    $('#select_selectedItems option:selected').remove();

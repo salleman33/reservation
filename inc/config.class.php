@@ -58,6 +58,17 @@ class PluginReservationConfig extends CommonDBTM
     {
         $all_reservation_items = PluginReservationCategory::getReservationItems('', '', false, ["filter_is_active" => false]);
         echo "<div class='center'>";
+        echo "<script>$('#formPluginReservationConfigs').submit( function(eventObj) {
+            var items = document.getElementById('select_selectedItems');
+            for (let i = 0; i < items.options.length; i++) {
+                var item = items.options[i];
+                $('<input />').attr('type', 'hidden')
+                    .attr('name', 'option_selectedItems_'+item.value)
+                    .attr('value',item.value)
+                    .appendTo('#formPluginReservationConfigs');
+            }
+            return true;
+        });</script>";
         echo '<h1>' . $category . '</h1>';
         echo "<table class='tab_cadre_fixe'  cellpadding='2'>";
         echo '<input type="hidden" name="configCategoryItems" value="' . $category . '">';
@@ -82,9 +93,6 @@ class PluginReservationConfig extends CommonDBTM
             }
         );
         echo '<div id=div_availableItems>';
-        foreach ($availableItems_array as $item) {
-            echo '<input type="hidden" value="' . $item['id'] . '" id="hidden_availableItem_' . $item['id'] . '" name="option_availableItems_' . $item['id'] . '">';
-        }
         echo '<select id="select_availableItems" size="' . count($availableItems_array) + count($selectedItems_array) . '">';
         foreach ($availableItems_array as $item) {
             echo '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
@@ -106,9 +114,6 @@ class PluginReservationConfig extends CommonDBTM
         echo '<td style="text-align: left;">';
 
         echo '<div id=div_selectedItems>';
-        foreach ($selectedItems_array as $item) {
-            echo '<input type="hidden" value="' . $item['id'] . '" id="hidden_selectedItem_' . $item['id'] . '" name="option_selectedItems_' . $item['id'] . '">';
-        }
         echo '<select id="select_selectedItems" size="' . count($availableItems_array) + count($selectedItems_array) . '">';
         foreach ($selectedItems_array as $item) {
             echo '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
