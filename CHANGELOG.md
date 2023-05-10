@@ -1,3 +1,6 @@
+# 2.4.4
+* correction de bug (#79)
+
 # 2.4.3
 * correction de bug
 * nouvelle vue de configuration des catégories personnalisées
