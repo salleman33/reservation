@@ -15,7 +15,7 @@ if (Session::getCurrentInterface() == "helpdesk") {
 // Check if plugin is activated...
 $plugin = new Plugin();
 if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')) {
-    Html::displayNotFoundError();
+    return Html::displayNotFoundError();    
 }
 
 Session::checkRightsOr("reservation", [CREATE, UPDATE, DELETE]);
