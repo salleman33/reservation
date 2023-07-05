@@ -705,7 +705,7 @@ class PluginReservationMenu extends CommonGLPI
             echo "<td>";
             echo Html::link($item->fields['name'], $item->getFormURLWithID($item->fields['id']));
             echo "</td>";
-            echo "<td>" . nl2br($reservation_item['comment']) . "</td>";
+            echo "<td>" . nl2br($reservation_item['comment'] ?? '') . "</td>";
 
             if ($showentity) {
                 echo "<td>" . Dropdown::getDropdownName("glpi_entities", $reservation_item["entities_id"]) . "</td>";
