@@ -93,7 +93,7 @@ class PluginReservationConfig extends CommonDBTM
             }
         );
         echo '<div id=div_availableItems>';
-        echo '<select id="select_availableItems" size="' . count($availableItems_array) + count($selectedItems_array) . '">';
+        echo '<select id="select_availableItems" size="' . (count($availableItems_array) + count($selectedItems_array)) . '">';
         foreach ($availableItems_array as $item) {
             echo '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
         }
@@ -114,7 +114,7 @@ class PluginReservationConfig extends CommonDBTM
         echo '<td style="text-align: left;">';
 
         echo '<div id=div_selectedItems>';
-        echo '<select id="select_selectedItems" size="' . count($availableItems_array) + count($selectedItems_array) . '">';
+        echo '<select id="select_selectedItems" size="' . (count($availableItems_array) + count($selectedItems_array)) . '">';
         foreach ($selectedItems_array as $item) {
             echo '<option value="' . $item['id'] . '">' . $item['name'] . '</option>';
         }
