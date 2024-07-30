@@ -220,8 +220,10 @@ class PluginReservationReservation extends CommonDBTM
         $now = date("Y-m-d H:i:s", $time);
 
         $input = $resa->fields;
+        Toolbox::logInFile('reservations_plugin', "test1 : ".json_encode($input)."\n", $force = false);
         $input['begin'] = $now;
         $input = Toolbox::addslashes_deep($input);
+        Toolbox::logInFile('reservations_plugin', "test2 : ".json_encode($input)."\n", $force = false);
         
         if ($resa->update($input)) {
             $tablename = getTableForItemType(__CLASS__);
@@ -245,6 +247,7 @@ class PluginReservationReservation extends CommonDBTM
             NotificationEvent::raiseEvent('plugin_reservation_checkin', $resa);
             return true;
         }
+        Toolbox::logInFile('reservations_plugin', "test3 : ".json_encode($resa->fields)."\n", $force = false);
         return false;
     }
 
