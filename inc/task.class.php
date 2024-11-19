@@ -134,6 +134,10 @@ class PluginReservationTask extends CommonDBTM
             $task->log(sprintf(__('Extending reservation : %1$s', 'reservation'), $res['reservations_id']));
 
             $reservation = new Reservation();
+            if($reservation === false) {
+                // occur when current reservation has been deleted because it conflicts with another 
+                continue;
+            }
             $reservation->getFromDB($res['reservations_id']);
             $reservationitems = $reservation->getConnexityItem('reservationitem', 'reservationitems_id');
             $item = $reservationitems->getConnexityItem($reservationitems->fields['itemtype'], 'items_id');
