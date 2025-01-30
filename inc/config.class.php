@@ -177,6 +177,16 @@ class PluginReservationConfig extends CommonDBTM
         echo "</td>";
         echo "</tr>";
 
+        // read and make access
+        $read_make_access = $this->getConfigurationValue("read_make_access", 0);
+        echo '<tr class="tab_bg_2">';
+        echo "<input type=\"hidden\" name=\"read_make_access\" value=\"0\">";
+        echo "<td style=\"padding-left:20px;\">";
+        echo "<input type=\"checkbox\" name=\"read_make_access\" value=\"1\" " . ($read_make_access ? 'checked' : '') . "> ";
+        echo __('Enable access for users with Read and Make a reservation right', 'reservation') . "</td>";
+        echo '</tr>';
+
+
         // checkin
         $checkin = $this->getConfigurationValue("checkin", 0);
         $checkin_timeout = $this->getConfigurationValue("checkin_timeout", 1);

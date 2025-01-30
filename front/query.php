@@ -12,7 +12,17 @@ if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')
     return http_response_code(401);
 }
 
-if (!Session::haveRightsOr("reservation", [CREATE, UPDATE, DELETE])) {
+
+// Check if the user is allowed to go here
+$config = new PluginReservationConfig();
+$read_make_access = $config->getConfigurationValue("read_make_access");
+$access = [CREATE, UPDATE, DELETE];
+    
+if($read_make_access) {
+    $access = [READ, ReservationItem::RESERVEANITEM, CREATE, UPDATE, DELETE, PURGE];
+}
+
+if (!Session::haveRightsOr("reservation", $access)) {
     return http_response_code(401);
 }
 

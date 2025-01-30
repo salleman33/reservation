@@ -11,7 +11,16 @@ $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {
     $PluginReservationMultiEdit = new PluginReservationMultiEdit();
 
-    Session::checkRightsOr('reservation', [CREATE, UPDATE, DELETE, PURGE]);
+    // Check if the user is allowed to go here
+    $config = new PluginReservationConfig();
+    $read_make_access = $config->getConfigurationValue("read_make_access");
+    $access = [CREATE, UPDATE, DELETE, PURGE];
+    
+    if($read_make_access) {
+        $access = [READ, CREATE, UPDATE, DELETE, PURGE];
+    }
+
+    Session::checkRightsOr('reservation', $access);
 
     Html::header(PluginReservationMultiEdit::getTypeName(2), $_SERVER['PHP_SELF'], "plugins", "pluginreservationmenu", "reservation");
 
