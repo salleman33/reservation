@@ -22,6 +22,12 @@ if ($plugin->isActivated("reservation")) {
     if (isset($_POST["conflict_action"])) {
         $PluginReservationConfig->setConfigurationValue("conflict_action", $_POST["conflict_action"]);
     }
+    if (isset($_POST["read_make_access"])) {
+        $PluginReservationConfig->setConfigurationValue("read_make_access", $_POST["read_make_access"]);
+    }
+    if (isset($_POST["only_ckeckin_own"])) {
+        $PluginReservationConfig->setConfigurationValue("only_ckeckin_own", $_POST["only_ckeckin_own"]);
+    }    
     if (isset($_POST["checkin"])) {
         $PluginReservationConfig->setConfigurationValue("checkin", $_POST["checkin"]);
         $PluginReservationConfig->setConfigurationValue("checkin_timeout", $_POST["checkin_timeout"]);

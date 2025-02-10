@@ -18,7 +18,17 @@ if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')
     return Html::displayNotFoundError();    
 }
 
-Session::checkRightsOr("reservation", [CREATE, UPDATE, DELETE]);
+
+// Check if the user is allowed to go here
+$config = new PluginReservationConfig();
+$read_make_access = $config->getConfigurationValue("read_make_access");
+$access = [CREATE, UPDATE, DELETE];
+
+if($read_make_access) {
+   $access = [READ, ReservationItem::RESERVEANITEM, CREATE, UPDATE, DELETE];
+}
+
+Session::checkRightsOr("reservation", $access);
 
 global $CFG_GLPI;
 $form_dates = [];

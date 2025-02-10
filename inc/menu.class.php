@@ -316,12 +316,15 @@ class PluginReservationMenu extends CommonGLPI
     private static function displayTabReservations($begin, $end, $listResaByUser, $includeFuture)
     {
         global $DB;
+        
+        $user_id = $_SESSION['glpiID'];
         $ReservationsByUser = self::filterEntitiesItems($listResaByUser);
 
         $showentity = Session::isMultiEntitiesMode();
         $config = new PluginReservationConfig();
         $mode_auto = $config->getConfigurationValue("mode_auto");
         $checkin_enable = $config->getConfigurationValue("checkin", 0);
+        $only_ckeckin_own = $config->getConfigurationValue("only_ckeckin_own", 1);
 
         echo "<div class='center'>";
         echo "<table class='tab_cadre'>";
@@ -364,6 +367,9 @@ class PluginReservationMenu extends CommonGLPI
             });
             $user = new User();
             $user->getFromDB($reservation_user);
+            $reservation_user_id = $user->fields["id"];
+
+            $can_be_edited = (!$only_ckeckin_own || $user_id == $reservation_user_id) || Session::haveRight("reservation", DELETE);
 
             echo "<tr class='tab_bg_2'>";
             echo "<td colspan='100%' bgcolor='lightgrey' style='padding:1px;'/>";
@@ -371,7 +377,7 @@ class PluginReservationMenu extends CommonGLPI
 
             echo "<tr class='tab_bg_2'>";
             // user name
-            $formatName = formatUserName($user->fields["id"], $user->fields["name"], $user->fields["realname"], $user->fields["firstname"]);
+            $formatName = formatUserName($reservation_user_id, $user->fields["name"], $user->fields["realname"], $user->fields["firstname"]);
             echo "<td rowspan=" . count($reservations_user_list) . ">" . $formatName . "</td>";
 
             $count = 0;
@@ -446,11 +452,16 @@ class PluginReservationMenu extends CommonGLPI
                     if ($reservation_user_info['checkindate'] != null) {
                         echo "<td>" . date(self::getDateFormat() . " H:i", strtotime($reservation_user_info['checkindate'])) . "</td>";
                     } else {
-                        echo '<td id="checkin' . $reservation_user_info['reservations_id'] . '">';
-                        echo '<center>';
-                        echo '<a class="bouton" href="javascript:void(0);" onclick="checkin(' . $reservation_user_info['reservations_id'] . ')">';
-                        echo '<img title="' . _sx('tooltip', 'Set As Gone', "reservation") . '" alt="" src="../pics/redbutton.png"></img>';
-                        echo '</a></center></td>';
+                        if ($can_be_edited) {
+                            echo '<td id="checkin' . $reservation_user_info['reservations_id'] . '">';
+                            echo '<center>';
+                            echo '<a class="bouton" href="javascript:void(0);" onclick="checkin(' . $reservation_user_info['reservations_id'] . ')">';
+                            echo '<img title="' . _sx('tooltip', 'Set As Gone', "reservation") . '" alt="" src="../pics/redbutton.png"></img>';
+                            echo '</a></center></td>';
+                        } else {
+                                echo '<td id="checkin' . $reservation_user_info['reservations_id'] . '">';
+                                echo '</td>';
+                        }
                     }
                 }
 
@@ -458,103 +469,115 @@ class PluginReservationMenu extends CommonGLPI
                 if ($reservation_user_info['effectivedate'] != null) {
                     echo "<td>" . date(self::getDateFormat() . " \à H:i:s", strtotime($reservation_user_info['effectivedate'])) . "</td>";
                 } else {
-                    echo '<td id="checkout' . $reservation_user_info['reservations_id'] . '">';
-                    echo '<center>';
-                    echo '<a class="bouton" href="javascript:void(0);" onclick="checkout(' . $reservation_user_info['reservations_id'] . ')">';
-                    echo '<img title="' . _sx('tooltip', 'Set As Returned', "reservation") . '" alt="" src="../pics/greenbutton.png"></img>';
-                    echo '</a></center></td>';
-                }
-
-                // action
-                $available_reservationsitem = PluginReservationReservation::getAvailablesItems($reservation->fields['begin'], $reservation->fields['end']);
-                echo "<td>";
-                echo '<ul style="list-style: none";>';
-
-                // add item
-                echo "<li><span class=\"bouton\" id=\"bouton_add" . $reservation_user_info['reservations_id'] . "\" onclick=\"javascript:afficher_cacher('add" . $reservation_user_info['reservations_id'] . "');\">" . _sx('button', 'Add an item') . "</span>
-            <div id=\"add" . $reservation_user_info['reservations_id'] . "\" style=\"display:none;\">
-            <form method='POST' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
-                echo '<select name="add_item">';
-                foreach ($available_reservationsitem as $item) {
-                    echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . $item["name"], '</option>';
-                }
-
-                echo "<input type='hidden' name='add_item_to_reservation' value='" . $reservation_user_info['reservations_id'] . "'>";
-                echo "<input type='submit' class='submit' name='add' value=" . _sx('button', 'Add') . ">";
-                Html::closeForm();
-                echo "</div></li>";
-
-                // switch item
-                echo "<li><span class=\"bouton\" id=\"bouton_replace" . $reservation_user_info['reservations_id'] . "\" onclick=\"javascript:afficher_cacher('replace" . $reservation_user_info['reservations_id'] . "');\">" . _sx('button', 'Replace an item', 'reservation') . "</span>
-            <div id=\"replace" . $reservation_user_info['reservations_id'] . "\" style=\"display:none;\">
-            <form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
-                echo '<select name="switch_item">';
-                foreach ($available_reservationsitem as $item) {
-                    echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . $item["name"], '</option>';
-                }
-                echo "<input type='hidden' name='switch_item_to_reservation' value='" . $reservation_user_info['reservations_id'] . "'>";
-                echo "<input type='submit' class='submit' name='submit' value=" . _sx('button', 'Save') . ">";
-                Html::closeForm();
-                echo "</div></li>";
-                echo "</ul>";
-                echo "</td>";
-
-                // Edit
-                $rowspan_line = 1;
-                $multiEditParams = [];
-                $multiEditParams[$reservation_user_info['reservations_id']] = $reservation_user_info['reservations_id'];
-                if ($count == $rowspan_end_bis) {
-                    $i = $count;
-                    while ($i < count($reservations_user_list)) {
-                        if (
-                            $reservations_user_list[$i]['begin'] == $reservation_user_info['begin']
-                            && $reservations_user_list[$i]['end'] == $reservation_user_info['end']
-                        ) {
-                            $rowspan_line++;
-                            $multiEditParams[$reservations_user_list[$i]['reservations_id']] = $reservations_user_list[$i]['reservations_id'];
-                        } else {
-                            break;
-                        }
-                        $i++;
-                    }
-                    if ($rowspan_line > 1) {
-                        $rowspan_end_bis = $count + $rowspan_line;
+                    if ($can_be_edited) {
+                        echo '<td id="checkout' . $reservation_user_info['reservations_id'] . '">';
+                        echo '<center>';
+                        echo '<a class="bouton" href="javascript:void(0);" onclick="checkout(' . $reservation_user_info['reservations_id'] . ')">';
+                        echo '<img title="' . _sx('tooltip', 'Set As Returned', "reservation") . '" alt="" src="../pics/greenbutton.png"></img>';
+                        echo '</a></center></td>';
                     } else {
-                        $rowspan_end_bis++;
+                        echo '<td id="checkout' . $reservation_user_info['reservations_id'] . '">';
+                        echo '</td>';
+                    }
+                }
+
+                if ($can_be_edited) {
+                    // action
+                    $available_reservationsitem = PluginReservationReservation::getAvailablesItems($reservation->fields['begin'], $reservation->fields['end']);
+                    echo "<td>";
+                    echo '<ul style="list-style: none";>';
+
+                    // add item
+                    echo "<li><span class=\"bouton\" id=\"bouton_add" . $reservation_user_info['reservations_id'] . "\" onclick=\"javascript:afficher_cacher('add" . $reservation_user_info['reservations_id'] . "');\">" . _sx('button', 'Add an item') . "</span>
+                        <div id=\"add" . $reservation_user_info['reservations_id'] . "\" style=\"display:none;\">
+                        <form method='POST' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
+                    echo '<select name="add_item">';
+                    foreach ($available_reservationsitem as $item) {
+                        echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . $item["name"], '</option>';
                     }
 
-                    if ($rowspan_line > 1) {
-                        $str_multiEditParams = "?";
-                        foreach ($multiEditParams as $key => $value) {
-                            $str_multiEditParams = $str_multiEditParams . "&ids[$key]=$value";
+                    echo "<input type='hidden' name='add_item_to_reservation' value='" . $reservation_user_info['reservations_id'] . "'>";
+                    echo "<input type='submit' class='submit' name='add' value=" . _sx('button', 'Add') . ">";
+                    Html::closeForm();
+                    echo "</div></li>";
+
+                    // switch item
+                    echo "<li><span class=\"bouton\" id=\"bouton_replace" . $reservation_user_info['reservations_id'] . "\" onclick=\"javascript:afficher_cacher('replace" . $reservation_user_info['reservations_id'] . "');\">" . _sx('button', 'Replace an item', 'reservation') . "</span>
+                        <div id=\"replace" . $reservation_user_info['reservations_id'] . "\" style=\"display:none;\">
+                    <form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
+                    echo '<select name="switch_item">';
+                    foreach ($available_reservationsitem as $item) {
+                        echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . $item["name"], '</option>';
+                    }
+                    echo "<input type='hidden' name='switch_item_to_reservation' value='" . $reservation_user_info['reservations_id'] . "'>";
+                    echo "<input type='submit' class='submit' name='submit' value=" . _sx('button', 'Save') . ">";
+                    Html::closeForm();
+                    echo "</div></li>";
+                    echo "</ul>";
+                    echo "</td>";
+
+                    // Edit
+                    $rowspan_line = 1;
+                    $multiEditParams = [];
+                    $multiEditParams[$reservation_user_info['reservations_id']] = $reservation_user_info['reservations_id'];
+                    if ($count == $rowspan_end_bis) {
+                        $i = $count;
+                        while ($i < count($reservations_user_list)) {
+                            if (
+                                $reservations_user_list[$i]['begin'] == $reservation_user_info['begin']
+                                && $reservations_user_list[$i]['end'] == $reservation_user_info['end']
+                            ) {
+                                $rowspan_line++;
+                                $multiEditParams[$reservations_user_list[$i]['reservations_id']] = $reservations_user_list[$i]['reservations_id'];
+                            } else {
+                                break;
+                            }
+                            $i++;
+                        }
+                        if ($rowspan_line > 1) {
+                            $rowspan_end_bis = $count + $rowspan_line;
+                        } else {
+                            $rowspan_end_bis++;
                         }
 
-                        // case if multi edit enabled for first item
-                        echo "<td class='showIfMultiEditEnabled' rowspan='" . $rowspan_line . "'>";
-                        echo "<a class='bouton' title='" . __('Edit multiple', 'reservation') . "' onclick=\"makeAChange('" . 'multiedit.form.php' . $str_multiEditParams . "');\"   href=\"javascript:void(0);\">" . __('Edit multiple', 'reservation') . "</a>";
-                        echo "</td>";
+                        if ($rowspan_line > 1) {
+                            $str_multiEditParams = "?";
+                            foreach ($multiEditParams as $key => $value) {
+                                $str_multiEditParams = $str_multiEditParams . "&ids[$key]=$value";
+                            }
 
-                        // case if multi edit disable for first item
+                            // case if multi edit enabled for first item
+                            echo "<td class='showIfMultiEditEnabled' rowspan='" . $rowspan_line . "'>";
+                            echo "<a class='bouton' title='" . __('Edit multiple', 'reservation') . "' onclick=\"makeAChange('" . 'multiedit.form.php' . $str_multiEditParams . "');\"   href=\"javascript:void(0);\">" . __('Edit multiple', 'reservation') . "</a>";
+                            echo "</td>";
+
+                            // case if multi edit disable for first item
+                            echo "<td class='hideIfMultiEditEnabled' style='display: none;'>";
+                            echo '<ul style="list-style: none;">';
+                            echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\" href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
+                            echo "</ul>";
+                            echo "</td>";
+                        } else {
+                            // normal case (no group)
+                            echo "<td>";
+                            echo '<ul style="list-style: none;">';
+                            echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\" href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
+                            echo "</ul>";
+                            echo "</td>";
+                        }
+                    } else {
+                        // case if multi edit enabled for other items
                         echo "<td class='hideIfMultiEditEnabled' style='display: none;'>";
                         echo '<ul style="list-style: none;">';
-                        echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\" href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
-                        echo "</ul>";
-                        echo "</td>";
-                    } else {
-                        // normal case (no group)
-                        echo "<td>";
-                        echo '<ul style="list-style: none;">';
-                        echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\" href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
+                        echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\"  href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
                         echo "</ul>";
                         echo "</td>";
                     }
                 } else {
-                    // case if multi edit enabled for other items
-                    echo "<td class='hideIfMultiEditEnabled' style='display: none;'>";
-                    echo '<ul style="list-style: none;">';
-                    echo "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\"  href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
-                    echo "</ul>";
-                    echo "</td>";
+                    echo '<td>';
+                    echo '</td>';
+                    echo '<td>';
+                    echo '</td>';
                 }
 
                 if (!$mode_auto) {
