@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-24 11:12+0100\n"
+"POT-Creation-Date: 2025-02-11 11:22+0100\n"
 "PO-Revision-Date: 2019-02-13 19:07+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
-#: inc/task.class.php:153
+#: inc/task.class.php:168
 #, php-format
 msgid "%1$s created a new reservation for the same item : %2$s"
 msgstr ""
@@ -33,34 +33,39 @@ msgstr ""
 msgid "%1$s updated the reservation %2$s with new dates"
 msgstr ""
 
-#: inc/config.class.php:122
+#: inc/config.class.php:223
 msgid "Action when reservation are not checkin"
 msgstr ""
 
-#: inc/menu.class.php:354
+#: inc/menu.class.php:359
 msgid "Allow multiple edit"
 msgstr ""
 
-#: inc/config.class.php:81
+#: inc/config.class.php:162
 msgid "Automatic"
 msgstr "Automaticky"
 
-#: inc/menu.class.php:179
+#: inc/menu.class.php:176
 msgid "Available Hardware"
 msgstr "Hardware k kdispozici"
 
-#: inc/config.class.php:65
+#: inc/config.class.php:76
+#, fuzzy
+msgid "Available Items"
+msgstr "Hardware k kdispozici"
+
+#: inc/config.class.php:146
 msgid ""
 "By defaut, use value of <b>step for the hours</b> defined in <I>General "
 "Setup > Assistance</I>"
 msgstr ""
 
-#: inc/config.class.php:207
+#: inc/config.class.php:308
 #, fuzzy
 msgid "Categories Configuration"
 msgstr "Nastavení nástrojového tipu"
 
-#: inc/config.class.php:301
+#: inc/config.class.php:400
 msgid "Categories customisation"
 msgstr ""
 
@@ -78,144 +83,140 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: inc/menu.class.php:350
+#: inc/menu.class.php:355
 #, fuzzy
 msgid "Checkin"
 msgstr "Uvolnění"
 
-#: inc/menu.class.php:352
+#: inc/menu.class.php:357
 msgid "Checkout"
 msgstr "Uvolnění"
 
-#: inc/task.class.php:199
+#: inc/task.class.php:217
 #, php-format
 msgid "Could not delay reservation %1$s on item %2$s"
 msgstr ""
 
-#: inc/task.class.php:249
+#: inc/task.class.php:269
 msgid "Could not send notification"
 msgstr "Nedaří se poslat oznámení"
 
-#: inc/menu.class.php:606
+#: inc/menu.class.php:640
 msgid "Create new reservation"
 msgstr "Vytvořit novou rezervaci"
 
-#: inc/config.class.php:193
+#: inc/config.class.php:294
 msgid "Current Reservation tab"
 msgstr "Panel stávající rezervace"
 
-#: inc/menu.class.php:172
+#: inc/menu.class.php:169
 msgid "Current Reservations"
 msgstr "Stávající rezervace"
 
-#: inc/menu.class.php:176
+#: inc/menu.class.php:173
 msgid "Current and Incoming Reservations"
 msgstr "Stávající a nadcházející rezervace"
 
-#: inc/menu.class.php:338
+#: inc/menu.class.php:343
 msgid "Current and future reservations"
 msgstr ""
 
-#: inc/config.class.php:67
+#: inc/config.class.php:148
 msgid "Default"
 msgstr ""
 
-#: inc/config.class.php:94
+#: inc/config.class.php:175
 msgid "Delay the start of the conflicted reservation"
 msgstr ""
 
-#: inc/task.class.php:209
+#: inc/task.class.php:227
 #, fuzzy, php-format
 msgid "Delaying reservation %1$s on item %2$s"
 msgstr "Prodloužení rezervace"
 
-#: inc/config.class.php:93
+#: inc/config.class.php:174
 msgid "Delete the conflicted reservation"
 msgstr ""
 
-#: inc/task.class.php:191
+#: inc/task.class.php:209
 #, fuzzy, php-format
 msgid "Deleting reservation %1$s on item %2$s"
 msgstr "Prodloužení rezervace"
 
-#: inc/task.class.php:92
+#: inc/task.class.php:99
 #, php-format
 msgid "Deleting reservation (check in) : %1$s on item %2$s"
 msgstr ""
 
-#: inc/config.class.php:124
+#: inc/config.class.php:225
 msgid "Do Nothing"
 msgstr ""
 
-#: inc/config.class.php:304
-msgid "Drag and drop items on a custom category :"
-msgstr ""
-
-#: inc/config.class.php:63
+#: inc/config.class.php:144
 msgid "Duration added (in hour) to reservations expiring and not checkout"
 msgstr ""
 
-#: inc/menu.class.php:525
+#: inc/menu.class.php:551
 msgid "Edit multiple"
 msgstr ""
 
-#: inc/config.class.php:148
+#: inc/config.class.php:186
+msgid "Enable access for users with Read and Make a reservation right"
+msgstr ""
+
+#: inc/config.class.php:249
 msgid "Enable auto check in"
 msgstr ""
 
-#: inc/config.class.php:109
+#: inc/config.class.php:210
 msgid "Enable check in"
 msgstr ""
 
-#: inc/task.class.php:124
+#: inc/task.class.php:134
 #, fuzzy, php-format
 msgid "Extending reservation : %1$s"
 msgstr "Prodloužení rezervace"
 
-#: inc/config.class.php:201
+#: inc/config.class.php:302
 msgid "Incoming Reservation tab"
 msgstr "Panel nacházející rezervace"
 
-#: inc/menu.class.php:557
+#: inc/menu.class.php:592
 msgid "Last e-mail sent on"
 msgstr "Poslední e-mail poslán v"
 
-#: inc/config.class.php:303
-msgid "Make your own category !"
-msgstr ""
-
-#: inc/config.class.php:82
+#: inc/config.class.php:163
 msgid "Manual"
 msgstr ""
 
-#: inc/config.class.php:79
+#: inc/config.class.php:160
 msgid "Method used to send e-mails to users with late reservations"
 msgstr ""
 "Metoda použitá pro posílání e-mailům uživatelům kteří včas nevrátili zápůjčky"
 
-#: inc/config.class.php:91
+#: inc/config.class.php:172
 msgid "Method used when there is a conflicted reservation"
 msgstr ""
 
-#: inc/menu.class.php:348
+#: inc/menu.class.php:353
 msgid "Moves"
 msgstr ""
 
-#: inc/config.class.php:185
+#: inc/config.class.php:286
 #, fuzzy
 msgid "My Reservation tab"
 msgstr "Panel stávající rezervace"
 
-#: inc/menu.class.php:168
+#: inc/menu.class.php:165
 #, fuzzy
 msgid "My Reservations"
 msgstr "Rezervace"
 
-#: front/config.form.php:62 front/multiedit.form.php:53
+#: front/config.form.php:77 front/multiedit.form.php:62
 msgid "Please activate the plugin"
 msgstr "Zapněte zásuvný modul"
 
-#: inc/menu.class.php:479
+#: inc/menu.class.php:505
 msgctxt "button"
 msgid "Replace an item"
 msgstr "Nahradit položku"
@@ -227,74 +228,78 @@ msgstr[0] "Rezervace"
 msgstr[1] "Rezervace"
 msgstr[2] "Rezervací"
 
-#: inc/task.class.php:15
+#: inc/task.class.php:16
 #, fuzzy
 msgid "Reservation Checkin (plugin)"
 msgstr "Rezervace v tomto měsící"
 
-#: inc/task.class.php:11
+#: inc/task.class.php:12
 msgid "Reservation Conflict When Extended, new user (plugin)"
 msgstr ""
 
-#: inc/task.class.php:12
+#: inc/task.class.php:13
 msgid "Reservation Conflict When Extended, previous user (plugin)"
 msgstr ""
 
-#: inc/menu.class.php:862
+#: inc/menu.class.php:821
 msgid "Reservations This Month"
 msgstr "Rezervace v tomto měsící"
 
-#: inc/menu.class.php:340
+#: inc/menu.class.php:345
 msgid "Reservations in the selected timeline"
 msgstr "Rezervace ve vybraném období"
 
-#: inc/menu.class.php:555
+#: inc/config.class.php:78
+msgid "Selected Items"
+msgstr ""
+
+#: inc/menu.class.php:589
 msgctxt "button"
 msgid "Send an e-mail"
 msgstr "Poslat e-mail"
 
-#: inc/menu.class.php:555
+#: inc/menu.class.php:588
 msgctxt "tooltip"
 msgid "Send an e-mail for the late reservation"
 msgstr "Poslat e-mail kvůli nevrácené rezervaci"
 
-#: inc/task.class.php:44
+#: inc/task.class.php:48
 #, fuzzy
 msgid "Send an e-mail to users with expired reservations"
 msgstr "Poslat e-mail uživatelům, kteří nevrátili zapůjčené"
 
-#: inc/task.class.php:247
+#: inc/task.class.php:267
 msgid "Sending an e-mail"
 msgstr "Poslat e-mail"
 
-#: inc/task.class.php:244
+#: inc/task.class.php:264
 #, php-format
 msgid "Sending e-mail for reservation %1$s"
 msgstr "Poslat e-mail pro rezervaci %1$s"
 
-#: inc/menu.class.php:448
+#: inc/menu.class.php:459
 msgctxt "tooltip"
 msgid "Set As Gone"
 msgstr ""
 
-#: inc/menu.class.php:456
+#: inc/menu.class.php:476
 msgctxt "tooltip"
 msgid "Set As Returned"
 msgstr ""
 
-#: inc/config.class.php:178
+#: inc/config.class.php:279
 msgid "Tab Configuration"
 msgstr ""
 
-#: inc/config.class.php:237
+#: inc/config.class.php:338
 msgid "ToolTip"
 msgstr "Nástrojový tip"
 
-#: inc/config.class.php:231
+#: inc/config.class.php:332
 msgid "ToolTip Configuration"
 msgstr "Nastavení nástrojového tipu"
 
-#: inc/task.class.php:117
+#: inc/task.class.php:127
 #, php-format
 msgid "Until : %1$s"
 msgstr ""
@@ -303,50 +308,56 @@ msgstr ""
 msgid "Update multiple items"
 msgstr ""
 
-#: inc/config.class.php:213
+#: inc/config.class.php:314
 msgid "Use custom categories"
 msgstr ""
 
-#: inc/config.class.php:221
+#: inc/config.class.php:322
 msgid "Use items types when not in a custom category"
 msgstr ""
 
-#: inc/task.class.php:13
+#: inc/task.class.php:14
 msgid "User Reservation Expired (plugin)"
 msgstr ""
 
-#: inc/task.class.php:14
+#: inc/task.class.php:15
 msgid "User Reservation Not Checkin (plugin)"
 msgstr ""
 
-#: inc/config.class.php:134
+#: inc/config.class.php:196
+msgid ""
+"Users can only checkin/out and edit their own reservations (bypass for "
+"admins with delete rights)"
+msgstr ""
+
+#: inc/config.class.php:235
 msgid "Waiting time (in hour) to cancel the unclaimed reservation"
 msgstr ""
 
-#: inc/config.class.php:125
+#: inc/config.class.php:226
 msgid "Warn"
 msgstr ""
 
-#: inc/config.class.php:126
+#: inc/config.class.php:227
 #, fuzzy
 msgid "Warn and delete unclaimed reservation"
 msgstr "Poslat e-mail kvůli nevrácené rezervaci"
 
-#: inc/task.class.php:42
+#: inc/task.class.php:46
 msgid "Watch Reservations"
 msgstr "Sledovat rezervace"
 
-#: inc/task.class.php:179
+#: inc/task.class.php:196
 #, php-format
 msgid ""
 "conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
 msgstr ""
 
-#: inc/config.class.php:158
+#: inc/config.class.php:259
 msgid "for reservations made until (in minutes) "
 msgstr ""
 
-#: inc/task.class.php:141
+#: inc/task.class.php:156
 #, fuzzy
 msgid "no conflict reservation !"
 msgstr "Panel nacházející rezervace"

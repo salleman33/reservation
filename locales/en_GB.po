@@ -1,23 +1,23 @@
 # English translations for PACKAGE package.
-# Copyright (C) 2022 THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2022.
+# Automatically generated, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-24 11:12+0100\n"
-"PO-Revision-Date: 2022-11-24 11:12+0100\n"
+"POT-Creation-Date: 2025-02-11 11:22+0100\n"
+"PO-Revision-Date: 2025-02-11 11:22+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ASCII\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: inc/task.class.php:153
+#: inc/task.class.php:168
 #, php-format
 msgid "%1$s created a new reservation for the same item : %2$s"
 msgstr "%1$s created a new reservation for the same item : %2$s"
@@ -32,23 +32,27 @@ msgstr "%1$s purges the reservation for item %2$s"
 msgid "%1$s updated the reservation %2$s with new dates"
 msgstr "%1$s updated the reservation %2$s with new dates"
 
-#: inc/config.class.php:122
+#: inc/config.class.php:223
 msgid "Action when reservation are not checkin"
 msgstr "Action when reservation are not checkin"
 
-#: inc/menu.class.php:354
+#: inc/menu.class.php:359
 msgid "Allow multiple edit"
 msgstr "Allow multiple edit"
 
-#: inc/config.class.php:81
+#: inc/config.class.php:162
 msgid "Automatic"
 msgstr "Automatic"
 
-#: inc/menu.class.php:179
+#: inc/menu.class.php:176
 msgid "Available Hardware"
 msgstr "Available Hardware"
 
-#: inc/config.class.php:65
+#: inc/config.class.php:76
+msgid "Available Items"
+msgstr "Available Items"
+
+#: inc/config.class.php:146
 msgid ""
 "By defaut, use value of <b>step for the hours</b> defined in <I>General "
 "Setup > Assistance</I>"
@@ -56,11 +60,11 @@ msgstr ""
 "By defaut, use value of <b>step for the hours</b> defined in <I>General "
 "Setup > Assistance</I>"
 
-#: inc/config.class.php:207
+#: inc/config.class.php:308
 msgid "Categories Configuration"
 msgstr "Categories Configuration"
 
-#: inc/config.class.php:301
+#: inc/config.class.php:400
 msgid "Categories customisation"
 msgstr "Categories customisation"
 
@@ -76,140 +80,136 @@ msgid_plural "CategoriesItems"
 msgstr[0] "CategoryItem"
 msgstr[1] "CategoriesItems"
 
-#: inc/menu.class.php:350
+#: inc/menu.class.php:355
 msgid "Checkin"
 msgstr "Checkin"
 
-#: inc/menu.class.php:352
+#: inc/menu.class.php:357
 msgid "Checkout"
 msgstr "Checkout"
 
-#: inc/task.class.php:199
+#: inc/task.class.php:217
 #, php-format
 msgid "Could not delay reservation %1$s on item %2$s"
 msgstr "Could not delay reservation %1$s on item %2$s"
 
-#: inc/task.class.php:249
+#: inc/task.class.php:269
 msgid "Could not send notification"
 msgstr "Could not send notification"
 
-#: inc/menu.class.php:606
+#: inc/menu.class.php:640
 msgid "Create new reservation"
 msgstr "Create new reservation"
 
-#: inc/config.class.php:193
+#: inc/config.class.php:294
 msgid "Current Reservation tab"
 msgstr "Current Reservation tab"
 
-#: inc/menu.class.php:172
+#: inc/menu.class.php:169
 msgid "Current Reservations"
 msgstr "Current Reservations"
 
-#: inc/menu.class.php:176
+#: inc/menu.class.php:173
 msgid "Current and Incoming Reservations"
 msgstr "Current and Incoming Reservations"
 
-#: inc/menu.class.php:338
+#: inc/menu.class.php:343
 msgid "Current and future reservations"
 msgstr "Current and future reservations"
 
-#: inc/config.class.php:67
+#: inc/config.class.php:148
 msgid "Default"
 msgstr "Default"
 
-#: inc/config.class.php:94
+#: inc/config.class.php:175
 msgid "Delay the start of the conflicted reservation"
 msgstr "Delay the start of the conflicted reservation"
 
-#: inc/task.class.php:209
+#: inc/task.class.php:227
 #, php-format
 msgid "Delaying reservation %1$s on item %2$s"
 msgstr "Delaying reservation %1$s on item %2$s"
 
-#: inc/config.class.php:93
+#: inc/config.class.php:174
 msgid "Delete the conflicted reservation"
 msgstr "Delete the conflicted reservation"
 
-#: inc/task.class.php:191
+#: inc/task.class.php:209
 #, php-format
 msgid "Deleting reservation %1$s on item %2$s"
 msgstr "Deleting reservation %1$s on item %2$s"
 
-#: inc/task.class.php:92
+#: inc/task.class.php:99
 #, php-format
 msgid "Deleting reservation (check in) : %1$s on item %2$s"
 msgstr "Deleting reservation (check in) : %1$s on item %2$s"
 
-#: inc/config.class.php:124
+#: inc/config.class.php:225
 msgid "Do Nothing"
 msgstr "Do Nothing"
 
-#: inc/config.class.php:304
-msgid "Drag and drop items on a custom category :"
-msgstr "Drag and drop items on a custom category :"
-
-#: inc/config.class.php:63
+#: inc/config.class.php:144
 msgid "Duration added (in hour) to reservations expiring and not checkout"
 msgstr "Duration added (in hour) to reservations expiring and not checkout"
 
-#: inc/menu.class.php:525
+#: inc/menu.class.php:551
 msgid "Edit multiple"
 msgstr "Edit multiple"
 
-#: inc/config.class.php:148
+#: inc/config.class.php:186
+msgid "Enable access for users with Read and Make a reservation right"
+msgstr "Enable access for users with Read and Make a reservation right"
+
+#: inc/config.class.php:249
 msgid "Enable auto check in"
 msgstr "Enable auto check in"
 
-#: inc/config.class.php:109
+#: inc/config.class.php:210
 msgid "Enable check in"
 msgstr "Enable check in"
 
-#: inc/task.class.php:124
+#: inc/task.class.php:134
 #, php-format
 msgid "Extending reservation : %1$s"
 msgstr "Extending reservation : %1$s"
 
-#: inc/config.class.php:201
+#: inc/config.class.php:302
 msgid "Incoming Reservation tab"
 msgstr "Incoming Reservation tab"
 
-#: inc/menu.class.php:557
+#: inc/menu.class.php:592
 msgid "Last e-mail sent on"
 msgstr "Last e-mail sent on"
 
-#: inc/config.class.php:303
-msgid "Make your own category !"
-msgstr "Make your own category !"
-
-#: inc/config.class.php:82
+#: inc/config.class.php:163
 msgid "Manual"
 msgstr "Manual"
 
-#: inc/config.class.php:79
+#: inc/config.class.php:160
 msgid "Method used to send e-mails to users with late reservations"
 msgstr "Method used to send e-mails to users with late reservations"
 
-#: inc/config.class.php:91
+#: inc/config.class.php:172
 msgid "Method used when there is a conflicted reservation"
 msgstr "Method used when there is a conflicted reservation"
 
-#: inc/menu.class.php:348
+#: inc/menu.class.php:353
 msgid "Moves"
 msgstr "Moves"
 
-#: inc/config.class.php:185
+#: inc/config.class.php:286
 msgid "My Reservation tab"
 msgstr "My Reservation tab"
 
-#: inc/menu.class.php:168
+#: inc/menu.class.php:165
 msgid "My Reservations"
 msgstr "My Reservations"
 
-#: front/config.form.php:62 front/multiedit.form.php:53
+#: front/config.form.php:77 front/multiedit.form.php:62
 msgid "Please activate the plugin"
 msgstr "Please activate the plugin"
 
-#: inc/menu.class.php:479
+#: inc/menu.class.php:505
 msgctxt "button"
 msgid "Replace an item"
 msgstr "Replace an item"
@@ -220,72 +220,76 @@ msgid_plural "Reservations"
 msgstr[0] "Reservation"
 msgstr[1] "Reservations"
 
-#: inc/task.class.php:15
+#: inc/task.class.php:16
 msgid "Reservation Checkin (plugin)"
 msgstr "Reservation Checkin (plugin)"
 
-#: inc/task.class.php:11
+#: inc/task.class.php:12
 msgid "Reservation Conflict When Extended, new user (plugin)"
 msgstr "Reservation Conflict When Extended, new user (plugin)"
 
-#: inc/task.class.php:12
+#: inc/task.class.php:13
 msgid "Reservation Conflict When Extended, previous user (plugin)"
 msgstr "Reservation Conflict When Extended, previous user (plugin)"
 
-#: inc/menu.class.php:862
+#: inc/menu.class.php:821
 msgid "Reservations This Month"
 msgstr "Reservations This Month"
 
-#: inc/menu.class.php:340
+#: inc/menu.class.php:345
 msgid "Reservations in the selected timeline"
 msgstr "Reservations in the selected timeline"
 
-#: inc/menu.class.php:555
+#: inc/config.class.php:78
+msgid "Selected Items"
+msgstr "Selected Items"
+
+#: inc/menu.class.php:589
 msgctxt "button"
 msgid "Send an e-mail"
 msgstr "Send an e-mail"
 
-#: inc/menu.class.php:555
+#: inc/menu.class.php:588
 msgctxt "tooltip"
 msgid "Send an e-mail for the late reservation"
 msgstr "Send an e-mail for the late reservation"
 
-#: inc/task.class.php:44
+#: inc/task.class.php:48
 msgid "Send an e-mail to users with expired reservations"
 msgstr "Send an e-mail to users with expired reservations"
 
-#: inc/task.class.php:247
+#: inc/task.class.php:267
 msgid "Sending an e-mail"
 msgstr "Sending an e-mail"
 
-#: inc/task.class.php:244
+#: inc/task.class.php:264
 #, php-format
 msgid "Sending e-mail for reservation %1$s"
 msgstr "Sending e-mail for reservation %1$s"
 
-#: inc/menu.class.php:448
+#: inc/menu.class.php:459
 msgctxt "tooltip"
 msgid "Set As Gone"
 msgstr "Set As Gone"
 
-#: inc/menu.class.php:456
+#: inc/menu.class.php:476
 msgctxt "tooltip"
 msgid "Set As Returned"
 msgstr "Set As Returned"
 
-#: inc/config.class.php:178
+#: inc/config.class.php:279
 msgid "Tab Configuration"
 msgstr "Tab Configuration"
 
-#: inc/config.class.php:237
+#: inc/config.class.php:338
 msgid "ToolTip"
 msgstr "ToolTip"
 
-#: inc/config.class.php:231
+#: inc/config.class.php:332
 msgid "ToolTip Configuration"
 msgstr "ToolTip Configuration"
 
-#: inc/task.class.php:117
+#: inc/task.class.php:127
 #, php-format
 msgid "Until : %1$s"
 msgstr "Until : %1$s"
@@ -294,49 +298,57 @@ msgstr "Until : %1$s"
 msgid "Update multiple items"
 msgstr "Update multiple items"
 
-#: inc/config.class.php:213
+#: inc/config.class.php:314
 msgid "Use custom categories"
 msgstr "Use custom categories"
 
-#: inc/config.class.php:221
+#: inc/config.class.php:322
 msgid "Use items types when not in a custom category"
 msgstr "Use items types when not in a custom category"
 
-#: inc/task.class.php:13
+#: inc/task.class.php:14
 msgid "User Reservation Expired (plugin)"
 msgstr "User Reservation Expired (plugin)"
 
-#: inc/task.class.php:14
+#: inc/task.class.php:15
 msgid "User Reservation Not Checkin (plugin)"
 msgstr "User Reservation Not Checkin (plugin)"
 
-#: inc/config.class.php:134
+#: inc/config.class.php:196
+msgid ""
+"Users can only checkin/out and edit their own reservations (bypass for "
+"admins with delete rights)"
+msgstr ""
+"Users can only checkin/out and edit their own reservations (bypass for "
+"admins with delete rights)"
+
+#: inc/config.class.php:235
 msgid "Waiting time (in hour) to cancel the unclaimed reservation"
 msgstr "Waiting time (in hour) to cancel the unclaimed reservation"
 
-#: inc/config.class.php:125
+#: inc/config.class.php:226
 msgid "Warn"
 msgstr "Warn"
 
-#: inc/config.class.php:126
+#: inc/config.class.php:227
 msgid "Warn and delete unclaimed reservation"
 msgstr "Warn and delete unclaimed reservation"
 
-#: inc/task.class.php:42
+#: inc/task.class.php:46
 msgid "Watch Reservations"
 msgstr "Watch Reservations"
 
-#: inc/task.class.php:179
+#: inc/task.class.php:196
 #, php-format
 msgid ""
 "conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
 msgstr ""
 "conflit for reservation %1$s on item %2$s used by %3$s (from %4$s to %5$s)"
 
-#: inc/config.class.php:158
+#: inc/config.class.php:259
 msgid "for reservations made until (in minutes) "
 msgstr "for reservations made until (in minutes) "
 
-#: inc/task.class.php:141
+#: inc/task.class.php:156
 msgid "no conflict reservation !"
 msgstr "no conflict reservation !"
