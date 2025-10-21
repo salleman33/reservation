@@ -1,6 +1,6 @@
 <?php
 
-define('PLUGIN_RESERVATION_GLPI_MIN_VERSION', '10');
+define('PLUGIN_RESERVATION_GLPI_MIN_VERSION', '11.0.0');
 define('PLUGIN_VERSION', '2.5.0');
 
 /**

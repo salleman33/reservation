@@ -4,7 +4,7 @@ if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
 
-include_once GLPI_ROOT . "/plugins/reservation/inc/includes.php";
+include_once(GLPI_ROOT . '/inc/includes.php');
 
 class PluginReservationCategory_Item extends CommonDBChild
 {

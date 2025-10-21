@@ -1,11 +1,6 @@
 <?php
 
-// Définition de la variable GLPI_ROOT obligatoire pour l'instanciation des class
-define('GLPI_ROOT', getAbsolutePath());
-// // Récupération du fichier includes de GLPI, permet l'accès au cœur
-include GLPI_ROOT . "inc/includes.php";
-
-include_once GLPI_ROOT . "plugins/reservation/inc/includes.php";
+include_once(GLPI_ROOT . '/inc/includes.php');
 
 $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {
@@ -50,12 +45,15 @@ if ($plugin->isActivated("reservation")) {
         $PluginReservationCategory->applyCategoryItem($_POST);
     }
 
+
+    $toolTipConfig = ["tooltip", "comment", "location", "serial", "inventory", "group", "man_model", "status"];
     foreach ($toolTipConfig as $config) {
         if (isset($_POST[$config])) {
             $PluginReservationConfig->setConfigurationValue($config, $_POST[$config]);
         }
     }
 
+    $tabConfig = ["tabmine", "tabcurrent", "tabcoming"];
     foreach ($tabConfig as $config) {
         if (isset($_POST[$config])) {
             $PluginReservationConfig->setConfigurationValue($config, $_POST[$config]);
@@ -76,9 +74,4 @@ if ($plugin->isActivated("reservation")) {
         "<img src=\"" . $CFG_GLPI["root_doc"] . "/pics/warning.png\" alt='warning'><br><br>";
     echo "<b>" . __('Please activate the plugin', 'reservation') . "</b></div>";
     Html::footer();
-}
-
-function getAbsolutePath()
-{
-    return realpath("../../..") . "/";
 }

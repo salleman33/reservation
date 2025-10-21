@@ -151,7 +151,7 @@ class PluginReservationTask extends CommonDBTM
             $query = "UPDATE `glpi_reservations`
                         SET `end` = '" . $end . "'
                         WHERE `id`='" . $reservation->fields["id"] . "'";
-            $DB->query($query) or die("error on 'update' into checkReservations : " . $DB->error());
+            $DB->doQuery($query) or die("error on 'update' into checkReservations : " . $DB->error());
             if (count($conflict_reservations) == 0) {
                 $task->log(sprintf(__('no conflict reservation !', 'reservation')));
             }

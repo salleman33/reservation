@@ -1,11 +1,5 @@
 <?php
 
-// Définition de la variable GLPI_ROOT obligatoire pour l'instanciation des class
-// define('GLPI_ROOT', getAbsolutePath());
-// Récupération du fichier includes de GLPI, permet l'accès au cœur
-// include GLPI_ROOT . "inc/includes.php";
-include '../../../inc/includes.php';
-
 if (Session::getCurrentInterface() == "helpdesk") {
     Html::helpHeader(__('Simplified interface'), $_SERVER['PHP_SELF'], $_SESSION["glpiname"]);
 } else {

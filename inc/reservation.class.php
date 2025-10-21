@@ -29,17 +29,17 @@ class PluginReservationReservation extends CommonDBTM
         return PluginReservationReservation::getTypeName(2);
     }
 
-    public static function canCreate()
+    public static function canCreate(): bool
     {
         return Reservation::canCreate();
     }
 
-    public static function canDelete()
+    public static function canDelete(): bool
     {
         return Reservation::canDelete();
     }
 
-    public static function canUpdate()
+    public static function canUpdate(): bool
     {
         return Reservation::canUpdate();
     }
@@ -73,7 +73,7 @@ class PluginReservationReservation extends CommonDBTM
                $where
                $extra";
 
-        if ($result = $DB->query($query)) {
+        if ($result = $DB->doQuery($query)) {
             if ($DB->numrows($result) > 0) {
                 while ($row = $DB->fetchAssoc($result)) {
                     $res[] = $row;
@@ -133,7 +133,7 @@ class PluginReservationReservation extends CommonDBTM
                    ORDER BY `$itemtable`.`entities_id`,
                             `$itemtable`.`name` ASC";
 
-            if ($res = $DB->query($query)) {
+            if ($res = $DB->doQuery($query)) {
                 while ($row = $DB->fetchAssoc($res)) {
                     $result[] = array_merge($row, ['itemtype' => $itemtype]);
                 }
@@ -154,7 +154,7 @@ class PluginReservationReservation extends CommonDBTM
 
         $tablename = getTableForItemType(__CLASS__);
         $query = "UPDATE `" . $tablename . "` SET `mailingdate`= '" . date("Y-m-d H:i:s", time()) . "' WHERE `reservations_id` = " . $reservation_id;
-        $DB->query($query) or die("error on 'update' in sendMail: " . $DB->error());
+        $DB->doQuery($query) or die("error on 'update' in sendMail: " . $DB->error());
 
         Event::log(
             $reservation_id,
@@ -183,10 +183,10 @@ class PluginReservationReservation extends CommonDBTM
         $query = "UPDATE `" . $tablename . "`
                SET `effectivedate` = '" . date("Y-m-d H:i:s", time()) . "'
                WHERE `reservations_id` = '" . $reservation_id . "';";
-        $DB->query($query) or die("error on checkoutReservation 1 : " . $DB->error());
+        $DB->doQuery($query) or die("error on checkoutReservation 1 : " . $DB->error());
 
         $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", time()) . "' WHERE `id`='" . $reservation_id . "';";
-        $DB->query($query) or die("error on checkoutReservation 2 : " . $DB->error());
+        $DB->doQuery($query) or die("error on checkoutReservation 2 : " . $DB->error());
 
         Event::log(
             $reservation_id,
@@ -221,14 +221,13 @@ class PluginReservationReservation extends CommonDBTM
 
         $input = $resa->fields;
         $input['begin'] = $now;
-        $input = Toolbox::addslashes_deep($input);
         
         if ($resa->update($input)) {
             $tablename = getTableForItemType(__CLASS__);
             $query = "UPDATE `" . $tablename . "`
                   SET `checkindate` = '" . date("Y-m-d H:i:s", time()) . "'
                   WHERE `reservations_id` = '" . $reservation_id . "';";
-            $DB->query($query) or die("error on checkinReservation  : " . $DB->error());
+            $DB->doQuery($query) or die("error on checkinReservation  : " . $DB->error());
 
             Event::log(
                 $reservation_id,
@@ -266,7 +265,6 @@ class PluginReservationReservation extends CommonDBTM
         $input['begin'] = $resa->fields['begin'];
         $input['end'] = $resa->fields['end'];
         $input['users_id'] = $resa->fields['users_id'];
-        $input = Toolbox::addslashes_deep($input);
         unset($rr->fields["id"]);
         if ($newID = $rr->add($input)) {
             Event::log(
@@ -301,7 +299,6 @@ class PluginReservationReservation extends CommonDBTM
 
         $input = $resa->fields;
         $input['reservationitems_id'] = $item_id;
-        $input = Toolbox::addslashes_deep($input);
 
         if ($resa->update($input)) {
             Event::log(

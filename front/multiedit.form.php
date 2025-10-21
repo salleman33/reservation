@@ -1,11 +1,7 @@
 <?php
 
-// Définition de la variable GLPI_ROOT obligatoire pour l'instanciation des class
-define('GLPI_ROOT', getAbsolutePath());
-// Récupération du fichier includes de GLPI, permet l'accès au cœur
-include GLPI_ROOT . "inc/includes.php";
 // Reservation plugin includes
-include_once GLPI_ROOT . "plugins/reservation/inc/includes.php";
+include_once(GLPI_ROOT . '/inc/includes.php');
 
 $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {

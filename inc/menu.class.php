@@ -124,22 +124,22 @@ class PluginReservationMenu extends CommonGLPI
         return PluginReservationMenu::getTypeName(2);
     }
 
-    public static function canCreate()
+    public static function canCreate(): bool
     {
         return Reservation::canCreate();
     }
 
-    public static function canDelete()
+    public static function canDelete(): bool
     {
         return Reservation::canDelete();
     }
 
-    public static function canUpdate()
+    public static function canUpdate(): bool
     {
         return Reservation::canUpdate();
     }
 
-    public static function canView()
+    public static function canView(): bool
     {
         return Reservation::canView();
     }
