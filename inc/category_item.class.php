@@ -51,7 +51,7 @@ class PluginReservationCategory_Item extends CommonDBChild
               WHERE `glpi_reservationitems`.`id` = `$table`.reservationitems_id
               AND `$table`.`categories_id` = $category_id";
 
-        if ($result = $DB->query($query)) {
+        if ($result = $DB->doQuery($query)) {
             if ($DB->numrows($result) > 0) {
                 while ($row = $DB->fetchAssoc($result)) {
                     $res[] = $row;
@@ -75,7 +75,7 @@ class PluginReservationCategory_Item extends CommonDBChild
                FROM `glpi_plugin_reservation_categories_items`
                WHERE `reservationitems_id` = $item_id
                ";
-        if ($result = $DB->query($query)) {
+        if ($result = $DB->doQuery($query)) {
             if ($DB->numrows($result) == 1) {
                 $cat_id = $DB->result($result, 0, "categories_id");
             }
@@ -97,7 +97,7 @@ class PluginReservationCategory_Item extends CommonDBChild
                 FROM `glpi_reservationitems`
                 WHERE `id` = $id
                 ";
-        if ($result = $DB->query($query)) {
+        if ($result = $DB->doQuery($query)) {
             if ($DB->numrows($result) == 1) {
                 $itemtype = $DB->result($result, 0, "itemtype");
             }
@@ -119,7 +119,7 @@ class PluginReservationCategory_Item extends CommonDBChild
                 FROM `glpi_reservationitems`
                 WHERE `id` = $id
                 ";
-        if ($result = $DB->query($query)) {
+        if ($result = $DB->doQuery($query)) {
             if ($DB->numrows($result) == 1) {
                 $items_id = $DB->result($result, 0, "items_id");
             }
@@ -145,7 +145,7 @@ class PluginReservationCategory_Item extends CommonDBChild
                FROM `glpi_reservationitems`
                WHERE `id` = $id
                ";
-        if ($result = $DB->query($query)) {
+        if ($result = $DB->doQuery($query)) {
             if ($DB->numrows($result) == 1) {
                 $itemtype = $DB->result($result, 0, "itemtype");
                 $items_id = $DB->result($result, 0, "items_id");
@@ -157,7 +157,7 @@ class PluginReservationCategory_Item extends CommonDBChild
                FROM `$itemtable`
                WHERE `id` = $items_id
                ";
-        if ($result = $DB->query($query)) {
+        if ($result = $DB->doQuery($query)) {
             if ($DB->numrows($result) == 1) {
                 $name = $DB->result($result, 0, "name");
             }
