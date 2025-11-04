@@ -181,12 +181,12 @@ class PluginReservationTask extends CommonDBTM
                         SET `end` = '" . $conflict_reservation->fields["end"] . "',
                            `comment` = '" . $DB->escape($new_comment) . "'
                         WHERE `id`='" . $reservation->fields["id"] . "'";
-                    $DB->query($query) or die("error on 'update' into checkReservations conflict : " . $DB->error());
+                    $DB->doQuery($query) or die("error on 'update' into checkReservations conflict : " . $DB->error());
 
                     $query = "UPDATE `glpi_plugin_reservation_reservations`
                         SET `baselinedate` = '" . $conflict_reservation->fields["end"] . "'
                         WHERE `reservations_id`='" . $reservation->fields["id"] . "'";
-                    $DB->query($query) or die("error on 'update' into checkReservations conflict : " . $DB->error());
+                    $DB->doQuery($query) or die("error on 'update' into checkReservations conflict : " . $DB->error());
                     $task->log(sprintf(__('Deleting reservation %1$s on item %2$s because a new reservation is made by same user'), $conflict_reservation->fields['id'], $item->fields['name']));
                     $conflict_reservation->delete(['id' => $conflict_reservation->fields['id']]);
                     continue;
@@ -223,7 +223,7 @@ class PluginReservationTask extends CommonDBTM
                         $query = "UPDATE `glpi_reservations`
                         SET `begin` = '" . $end . "'
                         WHERE `id`='" . $conflict_reservation->fields["id"] . "'";
-                        $DB->query($query) or die("error on 'update' into checkReservations conflict to delay start of a reservation : " . $DB->error());
+                        $DB->doQuery($query) or die("error on 'update' into checkReservations conflict to delay start of a reservation : " . $DB->error());
                         $task->log(sprintf(__('Delaying reservation %1$s on item %2$s', 'reservation'), $conflict_reservation->fields['id'], $item->fields['name']));
                         break;
                 }
