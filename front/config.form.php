@@ -1,6 +1,6 @@
 <?php
 
-include_once(GLPI_ROOT . '/inc/includes.php');
+include_once(__DIR__ . '/inc/includes.php');
 
 $plugin = new Plugin();
 if ($plugin->isActivated("reservation")) {

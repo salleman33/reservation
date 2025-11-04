@@ -2,7 +2,7 @@
 
 use Glpi\Api\API;
 
-include_once(GLPI_ROOT . '/inc/includes.php');
+include_once(__DIR__ . 'includes.php');
 
 class PluginReservationApi extends API
 {

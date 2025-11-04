@@ -4,7 +4,7 @@ if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
 
-include_once(GLPI_ROOT . '/inc/includes.php');
+include_once(__DIR__ . 'includes.php');
 
 class PluginReservationCategory extends CommonDBTM
 {
@@ -40,7 +40,7 @@ class PluginReservationCategory extends CommonDBTM
 
         // Toolbox::logInFile('reservations_plugin', "QUERY  : ".$query."\n", $force = false);
 
-        if ($result = $DB->query($query)) {
+        if ($result = $DB->doQuery($query)) {
             if ($DB->numrows($result) > 0) {
                 while ($row = $DB->fetchAssoc($result)) {
                     $res[] = $row['name'];
@@ -162,7 +162,7 @@ class PluginReservationCategory extends CommonDBTM
                      `$category_items_table`.`priority`,
                      `$itemtable`.`name` ASC";
 
-            if ($res = $DB->query($query)) {
+            if ($res = $DB->doQuery($query)) {
                 while ($row = $DB->fetchAssoc($res)) {
                     $result[] = array_merge($row, ['itemtype' => $itemtype]);
                 }
