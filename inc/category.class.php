@@ -4,7 +4,7 @@ if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
 
-include_once(__DIR__ . 'includes.php');
+include_once(__DIR__ . '/includes.php');
 
 class PluginReservationCategory extends CommonDBTM
 {
