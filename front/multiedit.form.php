@@ -11,8 +11,8 @@ if ($plugin->isActivated("reservation")) {
     $config = new PluginReservationConfig();
     $read_make_access = $config->getConfigurationValue("read_make_access");
     $access = [CREATE, UPDATE, DELETE, PURGE];
-    
-    if($read_make_access) {
+
+    if ($read_make_access) {
         $access = [READ, CREATE, UPDATE, DELETE, PURGE];
     }
 

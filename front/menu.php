@@ -9,7 +9,7 @@ if (Session::getCurrentInterface() == "helpdesk") {
 // Check if plugin is activated...
 $plugin = new Plugin();
 if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')) {
-    return Html::displayNotFoundError();    
+    return Html::displayNotFoundError();
 }
 
 
@@ -18,8 +18,8 @@ $config = new PluginReservationConfig();
 $read_make_access = $config->getConfigurationValue("read_make_access");
 $access = [CREATE, UPDATE, DELETE];
 
-if($read_make_access) {
-   $access = [READ, ReservationItem::RESERVEANITEM, CREATE, UPDATE, DELETE];
+if ($read_make_access) {
+    $access = [READ, ReservationItem::RESERVEANITEM, CREATE, UPDATE, DELETE];
 }
 
 Session::checkRightsOr("reservation", $access);

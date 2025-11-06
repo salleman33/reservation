@@ -22,7 +22,7 @@ if ($plugin->isActivated("reservation")) {
     }
     if (isset($_POST["only_ckeckin_own"])) {
         $PluginReservationConfig->setConfigurationValue("only_ckeckin_own", $_POST["only_ckeckin_own"]);
-    }    
+    }
     if (isset($_POST["checkin"])) {
         $PluginReservationConfig->setConfigurationValue("checkin", $_POST["checkin"]);
         $PluginReservationConfig->setConfigurationValue("checkin_timeout", $_POST["checkin_timeout"]);

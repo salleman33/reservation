@@ -316,7 +316,7 @@ class PluginReservationMenu extends CommonGLPI
     private static function displayTabReservations($begin, $end, $listResaByUser, $includeFuture)
     {
         global $DB;
-        
+
         $user_id = $_SESSION['glpiID'];
         $ReservationsByUser = self::filterEntitiesItems($listResaByUser);
 
