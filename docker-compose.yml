@@ -13,7 +13,7 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - ./:/tmp/reservation:ro
+      - ./:/var/www/glpi/plugins/reservation:ro
     environment:
       - TIMEZONE=Europe/Paris
       - GLPI_DB_HOST=db
