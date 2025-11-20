@@ -8,7 +8,7 @@
 function plugin_reservation_install()
 {
     global $DB, $CFG_GLPI;
-    $migration = new Migration(Plugin::getInfo('reservation', 'version'));
+    $migration = new Migration(PLUGIN_RESERVATION_VERSION);
 
 
     $default_charset   = DBConnection::getDefaultCharset();

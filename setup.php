@@ -1,7 +1,8 @@
 <?php
 
 define('PLUGIN_RESERVATION_GLPI_MIN_VERSION', '11.0.0');
-define('PLUGIN_VERSION', '2.5.0');
+define('PLUGIN_RESERVATION_GLPI_MAX_VERSION', '11.0.99');
+define('PLUGIN_RESERVATION_VERSION', '3.0.0');
 
 /**
  * Init the hooks of the plugins - Needed
@@ -19,7 +20,7 @@ function plugin_init_reservation()
     $PLUGIN_HOOKS['item_add']['reservation'] = ['Reservation' => 'plugin_item_add_reservation'];
     $PLUGIN_HOOKS['item_update']['reservation'] = ['Reservation' => 'plugin_item_update_reservation'];
     $PLUGIN_HOOKS['item_purge']['reservation'] = ['Reservation' => 'plugin_item_purge_reservation'];
-    $PLUGIN_HOOKS['menu_toadd']['reservation'] = ['plugins' => 'PluginReservationMenu'];
+    $PLUGIN_HOOKS['menu_toadd']['reservation'] = ['plugins' => PluginReservationMenu::class];
     $PLUGIN_HOOKS['multi_edit']['reservation'] = 'front/multiedit.form.php';
 
     Plugin::registerClass('PluginReservationMenu');
@@ -53,13 +54,14 @@ function plugin_version_reservation()
 {
     return [
         'name' => 'Reservation',
-        'version' => PLUGIN_VERSION,
+        'version' => PLUGIN_RESERVATION_VERSION,
         'author' => 'Sylvain Allemand',
         'license' => 'GLPv3',
         'homepage' => 'https://github.com/salleman33/reservation',
         'requirements' => [
             'glpi' => [
                 'min' => PLUGIN_RESERVATION_GLPI_MIN_VERSION,
+                'max' => PLUGIN_RESERVATION_GLPI_MAX_VERSION
             ],
         ],
     ];
