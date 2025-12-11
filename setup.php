@@ -40,9 +40,9 @@ function plugin_init_reservation()
     $PLUGIN_HOOKS['item_add_targets']['reservation'] =
         ['NotificationTargetReservation' => ['PluginReservationTask', 'addTarget']];
 
-    if (Session::getLoginUserID()) {
-        $PLUGIN_HOOKS['menu_entry']['reservation'] = 'front/reservation.php';
-    }
+    // if (Session::getLoginUserID()) {
+    //     $PLUGIN_HOOKS['menu_entry']['reservation'] = 'front/reservation.php';
+    // }
 }
 
 /**

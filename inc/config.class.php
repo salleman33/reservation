@@ -8,7 +8,7 @@ include_once(__DIR__ . '/includes.php');
 
 class PluginReservationConfig extends CommonDBTM
 {
-    public function getConfigurationValue($name, $defaultValue = 0)
+    public static function getConfigurationValue($name, $defaultValue = 0)
     {
         global $DB;
         $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE `name`='" . $name . "'";

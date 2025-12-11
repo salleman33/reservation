@@ -1,5 +1,8 @@
 <?php
 
+use Glpi\Application\View\TemplateRenderer;
+use Glpi\RichText\RichText;
+
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
@@ -48,8 +51,13 @@ function getToolTipforItem($item)
         $status = getStatusFromItem($item);
         $toolTip .= "<br><b>" . __('Status') . " : </b>" . $status;
     }
-    $tooltip = nl2br($toolTip);
-    Html::showToolTip($tooltip, null);
+    // $tooltip = nl2br($toolTip);
+    // Html::showToolTip($tooltip, null);
+    $res = Html::showToolTip(
+                    RichText::getEnhancedHtml($toolTip),
+                    ['display' => false]
+    );
+    return $res;
 }
 
 function getGroupFromItem($item)
@@ -99,18 +107,20 @@ function getModelFromItem($item)
             }
             if ($DB->tableExists($modeltable)) {
                 $query = "SELECT `$modeltable`.`name` AS model
-            FROM `$modeltable` WHERE
-            `$modeltable`.`id` = " . $item->fields[$modelfield];
-                if ($resmodel = $DB->doQuery($query)) {
-                    while ($rowModel = $DB->fetchAssoc($resmodel)) {
-                        $typemodel = $rowModel["model"];
+                    FROM `$modeltable`
+                    WHERE `$modeltable`.`id` = " . $item->fields[$modelfield];
+
+                    if ($resmodel = $DB->doQuery($query)) {
+                        while ($rowModel = $DB->fetchAssoc($resmodel)) {
+                            $typemodel = $rowModel["model"];
+                        }
                     }
-                }
             }
         }
     }
     return $typemodel;
 }
+
 
 class PluginReservationMenu extends CommonGLPI
 {
@@ -198,6 +208,7 @@ class PluginReservationMenu extends CommonGLPI
         }
 
         array_push($tabs, 'PluginReservationMenu::displayTabContentForAvailableHardware');
+        // array_push($tabs, 'ReservationItem::showListSimple');
 
         if (array_key_exists($tabnum - 1, $tabs)) {
             $tabs[$tabnum - 1]($item);
@@ -609,44 +620,316 @@ class PluginReservationMenu extends CommonGLPI
     }
 
     /**
-     *
+     *  largement inspiré de la methode ReservationItem::showListSimple
      */
     public static function displayTabContentForAvailableHardware()
     {
-        $showentity = Session::isMultiEntitiesMode();
-        $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+        global $CFG_GLPI, $DB;
 
-        $begin = $form_dates["begin"];
-        $end = $form_dates["end"];
-
-        echo "<div class='center'>\n";
-        echo "<form name='form' method='GET' action='" . Reservation::getFormURL() . "'>\n";
-        echo "<table class='tab_cadre' style=\"border-spacing:20px;\">\n";
-        echo "<tr>";
-
-        $plugin_config = new PluginReservationConfig();
-        $custom_categories = $plugin_config->getConfigurationValue("custom_categories", 0);
-
-        if ($custom_categories) {
-            $available_reservationsitem = PluginReservationCategory::getReservationItems($begin, $end, true);
-            self::displayItemsInCustomCategories($available_reservationsitem);
-        } else {
-            $available_reservationsitem = PluginReservationReservation::getAvailablesItems($begin, $end);
-            self::displayItemsInTypesCategories($available_reservationsitem);
+        if (!Session::haveRightsOr(ReservationItem::$rightname, [READ, ReservationItem::RESERVEANITEM])) {
+            return false;
         }
 
-        echo "</tr>";
-        echo "<tr class='tab_bg_1 center'><td colspan='" . ($showentity ? "5" : "4") . "'>";
-        echo "<input type='submit' value='" . __('Create new reservation', "reservation") . "' class='submit'></td></tr>\n";
+        $ok         = false;
+        $showentity = Session::isMultiEntitiesMode();
+        $reservation_types     = [];
 
-        echo "</table>\n";
+
+        if (isset($_SESSION['glpi_plugin_reservation_form_dates'])) {
+            $_POST['reserve'] = $_SESSION['glpi_plugin_reservation_form_dates'];
+        }
+
+        $iterator = $DB->request([
+            'SELECT'          => 'itemtype',
+            'DISTINCT'        => true,
+            'FROM'            => 'glpi_reservationitems',
+            'WHERE'           => [
+                'is_active' => 1,
+            ] + getEntitiesRestrictCriteria('glpi_reservationitems', 'entities_id', $_SESSION['glpiactiveentities'], true),
+        ]);
+
+        foreach ($iterator as $data) {
+            /** @var array{itemtype: string} $data */
+            if (is_a($data['itemtype'], CommonDBTM::class, true)) {
+                $reservation_types[$data['itemtype']] = $data['itemtype']::getTypeName();
+            }
+        }
+
+        $iterator = $DB->request([
+            'SELECT'    => [
+                'glpi_peripheraltypes.name',
+                'glpi_peripheraltypes.id',
+            ],
+            'FROM'      => 'glpi_peripheraltypes',
+            'LEFT JOIN' => [
+                'glpi_peripherals'      => [
+                    'ON' => [
+                        'glpi_peripheraltypes'  => 'id',
+                        'glpi_peripherals'      => 'peripheraltypes_id',
+                    ],
+                ],
+                'glpi_reservationitems' => [
+                    'ON' => [
+                        'glpi_reservationitems' => 'items_id',
+                        'glpi_peripherals'      => 'id',
+                    ],
+                ],
+            ],
+            'WHERE'     => [
+                'itemtype'           => 'Peripheral',
+                'is_active'          => 1,
+                'peripheraltypes_id' => ['>', 0],
+            ] + getEntitiesRestrictCriteria('glpi_reservationitems', 'entities_id', $_SESSION['glpiactiveentities'], true),
+            'ORDERBY'   => 'glpi_peripheraltypes.name',
+        ]);
+
+        foreach ($iterator as $ptype) {
+            $id = $ptype['id'];
+            $reservation_types["Peripheral#$id"] = $ptype['name'];
+        }
+
+        // GET method passed to form creation
+        echo "<div id='nosearch' class='card'>";
+        echo "<form name='form' method='GET' action='" . htmlescape(Reservation::getFormURL()) . "'>";
+
+        $entries = [];
+        $location_cache = [];
+        $entity_cache = [];
+        foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
+            if (!($item = getItemForItemtype($itemtype))) {
+                continue;
+            }
+            $itemtable = getTableForItemType($itemtype);
+            $itemname  = $item::getNameField();
+
+            $otherserial = new QueryExpression($DB->quote('') . ' AS ' . $DB::quoteName('otherserial'));
+            if ($item->isField('otherserial')) {
+                $otherserial = "$itemtable.otherserial AS otherserial";
+            }
+            $criteria = [
+                'SELECT' => [
+                    'glpi_reservationitems.id',
+                    'glpi_reservationitems.comment',
+                    "$itemtable.$itemname AS name",
+                    "$itemtable.entities_id AS entities_id",
+                    $otherserial,
+                    'glpi_locations.id AS location',
+                    'glpi_reservationitems.items_id AS items_id',
+                ],
+                'FROM'   => ReservationItem::getTable(),
+                'INNER JOIN'   => [
+                    $itemtable  => [
+                        'ON'  => [
+                            'glpi_reservationitems' => 'items_id',
+                            $itemtable              => 'id', [
+                                'AND' => [
+                                    'glpi_reservationitems.itemtype' => $itemtype,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'LEFT JOIN'    =>  [
+                    'glpi_locations'  => [
+                        'ON'  => [
+                            $itemtable        => 'locations_id',
+                            'glpi_locations'  => 'id',
+                        ],
+                    ],
+                ],
+                'WHERE'        => [
+                    'glpi_reservationitems.is_active'   => 1,
+                    "$itemtable.is_deleted"             => 0,
+                ] + getEntitiesRestrictCriteria($itemtable, '', $_SESSION['glpiactiveentities'], $item->maybeRecursive()),
+                'ORDERBY'      => [
+                    "$itemtable.entities_id",
+                    "$itemtable.$itemname",
+                ],
+            ];
+            $begin = $_POST['reserve']["begin"];
+            $end   = $_POST['reserve']["end"];
+            if (isset($_POST['submit'], $begin, $end)) {
+                $criteria['LEFT JOIN']['glpi_reservations'] = [
+                    'ON'  => [
+                        'glpi_reservationitems' => 'id',
+                        'glpi_reservations'     => 'reservationitems_id', [
+                            'AND' => [
+                                'glpi_reservations.end'    => ['>', $begin],
+                                'glpi_reservations.begin'  => ['<', $end],
+                            ],
+                        ],
+                    ],
+                ];
+                $criteria['WHERE'][] = ['glpi_reservations.id' => null];
+            }
+            if (!empty($_POST["reservation_types"])) {
+                $tmp = explode('#', $_POST["reservation_types"]);
+                $criteria['WHERE'][] = ['glpi_reservationitems.itemtype' => $tmp[0]];
+                if (
+                    isset($tmp[1]) && ($tmp[0] === Peripheral::class)
+                    && ($itemtype === Peripheral::class)
+                ) {
+                    $criteria['LEFT JOIN']['glpi_peripheraltypes'] = [
+                        'ON' => [
+                            'glpi_peripherals'      => 'peripheraltypes_id',
+                            'glpi_peripheraltypes'  => 'id',
+                        ],
+                    ];
+                    $criteria['WHERE'][] = ["$itemtable.peripheraltypes_id" => $tmp[1]];
+                }
+            }
+
+            // Filter locations if location was provided/submitted
+            // if ((int) ($_POST['locations_id'] ?? 0) > 0) {
+            //     $criteria['WHERE'][] = [
+            //         'glpi_locations.id' => getSonsOf('glpi_locations', (int) $_POST['locations_id']),
+            //     ];
+            // }
+
+            $iterator = $DB->request($criteria);
+            foreach ($iterator as $row) {
+                $entry = [
+                    'itemtype' => $itemtype,
+                    'id'       => $row['id'],
+                    'checkbox' => Html::getCheckbox([
+                        'name'  => "item[" . $row["id"] . "]",
+                        'value' => $row["id"],
+                        'zero_on_empty' => false,
+                    ]),
+                    'entity'   => '',
+                ];
+
+                $typename = $item::getTypeName();
+                if ($itemtype === Peripheral::class) {
+                    $item->getFromDB($row['items_id']);
+                    if (
+                        isset($item->fields["peripheraltypes_id"])
+                         && ((int) $item->fields["peripheraltypes_id"] !== 0)
+                    ) {
+                        $typename = Dropdown::getDropdownName(
+                            "glpi_peripheraltypes",
+                            $item->fields["peripheraltypes_id"]
+                        );
+                    }
+                }
+                
+                $item_link = htmlescape(sprintf(__('%1$s - %2$s'), $typename, $row["name"]));
+                if ($itemtype::canView()) {
+                    $item_link = "<a href='" . htmlescape($itemtype::getFormURLWithId($row['items_id'])) . "&forcetab=Reservation$1'>"
+                        . $item_link
+                        . "</a>";
+                    if (PluginReservationConfig::getConfigurationValue("tooltip")) {
+                        $item->getFromDB($row['items_id']);
+                        $item_link .= getToolTipforItem($item);
+                    }
+                    
+                }
+                $entry['item'] = $item_link;
+
+                if (!isset($location_cache[$row["location"]])) {
+                    $location_cache[$row["location"]] = Dropdown::getDropdownName("glpi_locations", $row["location"]);
+                }
+                $entry['location'] = $location_cache[$row["location"]];
+
+                $entry['comment'] = RichText::getSafeHtml($row["comment"]);
+
+                if ($showentity) {
+                    if (!isset($entity_cache[$row["entities_id"]])) {
+                        $entity_cache[$row["entities_id"]] = Dropdown::getDropdownName("glpi_entities", $row["entities_id"]);
+                    }
+                    $entry['entity'] = $entity_cache[$row["entities_id"]];
+                }
+                $cal_href = htmlescape(Reservation::getSearchURL() . "?reservationitems_id=" . $row['id']);
+                $entry['calendar'] = "<a href='$cal_href'>";
+                $entry['calendar'] .= "<i class='" . htmlescape(Planning::getIcon()) . " fa-2x cursor-pointer' title=\"" . __s("Reserve this item") . "\"></i>";
+
+                $ok = true;
+                $entries[] = $entry;
+            }
+        }
+
+        $columns = [
+            'checkbox' => [
+                'label' => Html::getCheckAllAsCheckbox('nosearch'),
+                'raw_header' => true,
+            ],
+            'item' => self::getTypeName(1),
+            'location' => Location::getTypeName(1),
+            'comment' => _n('Comment', 'Comments', 1),
+        ];
+        if ($showentity) {
+            $columns['entity'] = Entity::getTypeName(1);
+        }
+        $columns['calendar'] = __("Booking calendar");
+        TemplateRenderer::getInstance()->display('components/datatable.html.twig', [
+            'is_tab' => true,
+            'nofilter' => true,
+            'nosort' => true,
+            'columns' => $columns,
+            'formatters' => [
+                'checkbox' => 'raw_html',
+                'item' => 'raw_html',
+                'comment' => 'raw_html',
+                'calendar' => 'raw_html',
+            ],
+            'entries' => $entries,
+            'total_number' => count($entries),
+            'filtered_number' => count($entries),
+            'showmassiveactions' => false,
+        ]);
+
+        if ($ok && Session::haveRight("reservation", ReservationItem::RESERVEANITEM)) {
+            echo "<i class='ti ti-corner-left-up mx-3'></i>";
+            echo "<th colspan='" . ($showentity ? "5" : "4") . "'>";
+            if (isset($_POST['reserve'])) {
+                echo Html::hidden('begin', ['value' => $_POST['reserve']["begin"]]);
+                echo Html::hidden('end', ['value'   => $_POST['reserve']["end"]]);
+            }
+            echo Html::submit(_x('button', 'Book'), [
+                'class' => 'btn btn-primary mt-2 mb-2',
+                'icon'  => 'ti ti-calendar-plus',
+            ]);
+        }
 
         echo "<input type='hidden' name='id' value=''>";
-        echo "<input type='hidden' name='begin' value='" . $begin . "'>";
-        echo "<input type='hidden' name='end' value='" . $end . "'>";
-        Html::closeForm();
+        echo "</form>";// No CSRF token needed
         echo "</div>";
     }
+    // {
+    //     $showentity = Session::isMultiEntitiesMode();
+    //     $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+
+    //     $begin = $form_dates["begin"];
+    //     $end = $form_dates["end"];
+
+    //     echo "<div class='center'>\n";
+    //     echo "<form name='form' method='GET' action='" . Reservation::getFormURL() . "'>\n";
+    //     echo "<table class='tab_cadre' style=\"border-spacing:20px;\">\n";
+    //     echo "<tr>";
+
+    //     $plugin_config = new PluginReservationConfig();
+    //     $custom_categories = $plugin_config->getConfigurationValue("custom_categories", 0);
+
+    //     if ($custom_categories) {
+    //         $available_reservationsitem = PluginReservationCategory::getReservationItems($begin, $end, true);
+    //         self::displayItemsInCustomCategories($available_reservationsitem);
+    //     } else {
+    //         $available_reservationsitem = PluginReservationReservation::getAvailablesItems($begin, $end);
+    //         self::displayItemsInTypesCategories($available_reservationsitem);
+    //     }
+
+    //     echo "</tr>";
+    //     echo "<tr class='tab_bg_1 center'><td colspan='" . ($showentity ? "5" : "4") . "'>";
+    //     echo "<input type='submit' value='" . __('Create new reservation', "reservation") . "' class='submit'></td></tr>\n";
+
+    //     echo "</table>\n";
+
+    //     echo "<input type='hidden' name='id' value=''>";
+    //     echo "<input type='hidden' name='begin' value='" . $begin . "'>";
+    //     echo "<input type='hidden' name='end' value='" . $end . "'>";
+    //     Html::closeForm();
+    //     echo "</div>";
+    // }
 
     private static function displayItemsInCustomCategories($available_reservationsitem = [])
     {
@@ -713,8 +996,9 @@ class PluginReservationMenu extends CommonGLPI
 
         echo "\n\t<table class='tab_cadre'>";
         echo "<tr><th colspan='" . ($showentity ? "6" : "5") . "'>" . $category_name . "</th></tr>\n";
-
         foreach ($category_items as $reservation_item) {
+            var_dump("toto");
+            var_dump( getItemForItemtype($reservation_item['itemtype']));
             $item = getItemForItemtype($reservation_item['itemtype']);
             $item->getFromDB($reservation_item['items_id']);
             echo "<td>";
@@ -750,53 +1034,66 @@ class PluginReservationMenu extends CommonGLPI
      */
     public function showFormDate()
     {
-        $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
+        // $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
 
-        echo "<div id='viewresasearch'  class='center'>";
-        echo "<table class='tab_cadre' style='background-color:transparent;box-shadow:none'>";
+        // echo "<div id='viewresasearch'  class='center'>";
+        // echo "<table class='tab_cadre' style='background-color:transparent;box-shadow:none'>";
 
-        echo "<tr>";
-        echo "<td>";
-        $this->showCurrentMonthForAllLink();
-        echo "</td>";
-        echo "<td>";
+        // echo "<tr>";
+        // echo "<td>";
+        // $this->showCurrentMonthForAllLink();
+        // echo "</td>";
+        // echo "<td>";
 
-        echo "<form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
-        echo "<table class='tab_cadre'><tr class='tab_bg_2'>";
-        echo "<th colspan='6'>" . __('Date') . "</th>";
-        echo "</tr>";
+        // echo "<form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
+        // echo "<table class='tab_cadre'><tr class='tab_bg_2'>";
+        // echo "<th colspan='6'>" . __('Date') . "</th>";
+        // echo "</tr>";
 
-        echo "<tr class='tab_bg_2'>";
+        // echo "<tr class='tab_bg_2'>";
 
-        echo "<td rowspan='3'>";
-        echo "<input type='submit' class='submit' name='previousday' value='" . __('Previous') . "'>";
-        echo "</td>";
+        // echo "<td rowspan='3'>";
+        // echo "<input type='submit' class='submit' name='previousday' value='" . __('Previous') . "'>";
+        // echo "</td>";
 
-        echo "<td>" . __('Start date') . "</td><td>";
-        Html::showDateTimeField('date_begin', ['value' => $form_dates["begin"], 'maybeempty' => false]);
-        echo "</td><td rowspan='3'>";
-        echo "<input type='submit' class='submit' name='submit' value=\"" . _sx('button', 'Search') . "\">";
-        echo "</td>";
-        echo "<td rowspan='3'>";
-        echo "<input type='submit' class='submit' name='nextday' value='" . __('Next') . "'>";
-        echo "</td>";
-        echo "<td rowspan='3'>";
-        echo '<a class="fa fa-undo reset-search" href="' . Toolbox::getItemTypeSearchURL(__CLASS__) . '?reset=reset" title="' . __('Reset') . '"><span class="sr-only">' . __('Reset') . '</span></a>';
-        echo "</td>";
-        echo "</tr>";
+        // echo "<td>" . __('Start date') . "</td><td>";
+        // Html::showDateTimeField('date_begin', ['value' => $form_dates["begin"], 'maybeempty' => false]);
+        // echo "</td><td rowspan='3'>";
+        // echo "<input type='submit' class='submit' name='submit' value=\"" . _sx('button', 'Search') . "\">";
+        // echo "</td>";
+        // echo "<td rowspan='3'>";
+        // echo "<input type='submit' class='submit' name='nextday' value='" . __('Next') . "'>";
+        // echo "</td>";
+        // echo "<td rowspan='3'>";
+        // echo '<a class="fa fa-undo reset-search" href="' . Toolbox::getItemTypeSearchURL(__CLASS__) . '?reset=reset" title="' . __('Reset') . '"><span class="sr-only">' . __('Reset') . '</span></a>';
+        // echo "</td>";
+        // echo "</tr>";
 
-        echo "<tr class='tab_bg_2'><td>" . __('End date') . "</td><td>";
-        Html::showDateTimeField('date_end', ['value' => $form_dates["end"], 'maybeempty' => false]);
-        echo "</td></tr>";
-        echo "</td></tr>";
-        echo "</table>";
+        // echo "<tr class='tab_bg_2'><td>" . __('End date') . "</td><td>";
+        // Html::showDateTimeField('date_end', ['value' => $form_dates["end"], 'maybeempty' => false]);
+        // echo "</td></tr>";
+        // echo "</td></tr>";
+        // echo "</table>";
 
-        Html::closeForm();
+        // Html::closeForm();
 
-        echo "</td>";
-        echo "</tr>";
-        echo "</table>";
+        // echo "</td>";
+        // echo "</tr>";
+        // echo "</table>";
 
+        // echo "</div>";
+        $reserve = isset($_POST['reserve']);
+        if ($reserve) {
+            Toolbox::manageBeginAndEndPlanDates($_POST['reserve']);
+        } else {
+            $begin_time                 = time();
+            $begin_time                -= ($begin_time % HOUR_TIMESTAMP);
+            $_POST['reserve']["begin"]  = date("Y-m-d H:i:s", $begin_time);
+            $_POST['reserve']["end"]    = date("Y-m-d H:i:s", $begin_time + HOUR_TIMESTAMP);
+        }
+        TemplateRenderer::getInstance()->display('@reservation/dates_forms.html.twig', [ 
+            'dates' => $_POST['reserve']
+        ]);
         echo "</div>";
     }
 
