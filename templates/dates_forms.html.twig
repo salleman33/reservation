@@ -39,8 +39,17 @@
                     {{ fields.datetimeField('reserve[begin]', dates['begin'], __('Start date'), {
                         maybeempty: false
                     }) }}
+
                     {{ fields.datetimeField('reserve[end]', dates['end'], __('End date'), {
                         maybeempty: false
+                    }) }}
+                    
+                    {{ fields.dropdownArrayField('reservation_types', _post['reservation_types'], reservation_types, __('Item type'), {
+                        display_emptychoice: true
+                    }) }}
+
+                    {{ fields.dropdownField('Location', 'locations_id', default_location, __('Item location'), {
+                        entity: session('glpiactiveentities')
                     }) }}
                 </div>
                 {{ inputs.submit('nextday', _x('button', 'Next')) }}

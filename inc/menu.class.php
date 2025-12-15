@@ -32,7 +32,7 @@ function getToolTipforItem($item)
         $location = getLocationFromItem($item);
         $toolTip .= "<br><b>" . __('Location') . " : </b>" . $location;
     }
-    if ($show_group && array_key_exists("groups_id", $item->fields)) {
+    if ($show_group && $item->isField('groups_id')) {
         $group_name = getGroupFromItem($item);
         $toolTip .= "<br><b>" . __('Group') . " : </b>" . $group_name;
     }
@@ -780,11 +780,11 @@ class PluginReservationMenu extends CommonGLPI
             }
 
             // Filter locations if location was provided/submitted
-            // if ((int) ($_POST['locations_id'] ?? 0) > 0) {
-            //     $criteria['WHERE'][] = [
-            //         'glpi_locations.id' => getSonsOf('glpi_locations', (int) $_POST['locations_id']),
-            //     ];
-            // }
+            if ((int) ($_POST['locations_id'] ?? 0) > 0) {
+                $criteria['WHERE'][] = [
+                    'glpi_locations.id' => getSonsOf('glpi_locations', (int) $_POST['locations_id']),
+                ];
+            }
 
             $iterator = $DB->request($criteria);
             foreach ($iterator as $row) {
