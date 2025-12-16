@@ -274,7 +274,6 @@ class PluginReservationMenu extends CommonGLPI
         $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
         ksort($ReservationsByUser);
         //Toolbox::logInFile('reservations_plugin', "reservations_list : ".json_encode($list)."\n", $force = false);
-
         self::displayTabReservations($begin, $end, $ReservationsByUser, false);
     }
 
@@ -693,7 +692,6 @@ class PluginReservationMenu extends CommonGLPI
 
         $ok         = false;
         $showentity = Session::isMultiEntitiesMode();
-        $reservation_types = self::getReservationTypes();
 
         if (isset($_SESSION['glpi_saved']['PluginReservationMenu'])) {
             $_POST = $_SESSION['glpi_saved']['PluginReservationMenu'];
@@ -706,6 +704,7 @@ class PluginReservationMenu extends CommonGLPI
         $entries = [];
         $location_cache = [];
         $entity_cache = [];
+
         foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
             if (!($item = getItemForItemtype($itemtype))) {
                 continue;
@@ -760,20 +759,19 @@ class PluginReservationMenu extends CommonGLPI
             $begin = $_SESSION['glpi_plugin_reservation_form_dates']["begin"];
             $end   = $_SESSION['glpi_plugin_reservation_form_dates']["end"];
 
-            if (isset($begin, $end)) {
-                $criteria['LEFT JOIN']['glpi_reservations'] = [
-                    'ON'  => [
-                        'glpi_reservationitems' => 'id',
-                        'glpi_reservations'     => 'reservationitems_id', [
-                            'AND' => [
-                                'glpi_reservations.end'    => ['>', $begin],
-                                'glpi_reservations.begin'  => ['<', $end],
-                            ],
+            $criteria['LEFT JOIN']['glpi_reservations'] = [
+                'ON'  => [
+                    'glpi_reservationitems' => 'id',
+                    'glpi_reservations'     => 'reservationitems_id', [
+                        'AND' => [
+                            'glpi_reservations.end'    => ['>', $begin],
+                            'glpi_reservations.begin'  => ['<', $end],
                         ],
                     ],
-                ];
-                $criteria['WHERE'][] = ['glpi_reservations.id' => null];
-            }
+                ],
+            ];
+            $criteria['WHERE'][] = ['glpi_reservations.id' => null];
+            
             if (!empty($_POST["reservation_types"])) {
                 $tmp = explode('#', $_POST["reservation_types"]);
                 $criteria['WHERE'][] = ['glpi_reservationitems.itemtype' => $tmp[0]];
