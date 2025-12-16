@@ -622,22 +622,11 @@ class PluginReservationMenu extends CommonGLPI
     /**
      *  largement inspiré de la methode ReservationItem::showListSimple
      */
-    public static function displayTabContentForAvailableHardware()
+    static function getReservationTypes() 
     {
         global $CFG_GLPI, $DB;
 
-        if (!Session::haveRightsOr(ReservationItem::$rightname, [READ, ReservationItem::RESERVEANITEM])) {
-            return false;
-        }
-
-        $ok         = false;
-        $showentity = Session::isMultiEntitiesMode();
         $reservation_types     = [];
-
-
-        if (isset($_SESSION['glpi_plugin_reservation_form_dates'])) {
-            $_POST['reserve'] = $_SESSION['glpi_plugin_reservation_form_dates'];
-        }
 
         $iterator = $DB->request([
             'SELECT'          => 'itemtype',
@@ -686,6 +675,28 @@ class PluginReservationMenu extends CommonGLPI
         foreach ($iterator as $ptype) {
             $id = $ptype['id'];
             $reservation_types["Peripheral#$id"] = $ptype['name'];
+        }
+
+        return $reservation_types;
+    }
+
+    /**
+     *  largement inspiré de la methode ReservationItem::showListSimple
+     */
+    public static function displayTabContentForAvailableHardware()
+    {
+        global $CFG_GLPI, $DB;
+        
+        if (!Session::haveRightsOr(ReservationItem::$rightname, [READ, ReservationItem::RESERVEANITEM])) {
+            return false;
+        }
+
+        $ok         = false;
+        $showentity = Session::isMultiEntitiesMode();
+        $reservation_types = self::getReservationTypes();
+
+        if (isset($_SESSION['glpi_saved']['PluginReservationMenu'])) {
+            $_POST = $_SESSION['glpi_saved']['PluginReservationMenu'];
         }
 
         // GET method passed to form creation
@@ -746,9 +757,10 @@ class PluginReservationMenu extends CommonGLPI
                     "$itemtable.$itemname",
                 ],
             ];
-            $begin = $_POST['reserve']["begin"];
-            $end   = $_POST['reserve']["end"];
-            if (isset($_POST['submit'], $begin, $end)) {
+            $begin = $_SESSION['glpi_plugin_reservation_form_dates']["begin"];
+            $end   = $_SESSION['glpi_plugin_reservation_form_dates']["end"];
+
+            if (isset($begin, $end)) {
                 $criteria['LEFT JOIN']['glpi_reservations'] = [
                     'ON'  => [
                         'glpi_reservationitems' => 'id',
@@ -877,13 +889,13 @@ class PluginReservationMenu extends CommonGLPI
             'filtered_number' => count($entries),
             'showmassiveactions' => false,
         ]);
-
+        
         if ($ok && Session::haveRight("reservation", ReservationItem::RESERVEANITEM)) {
             echo "<i class='ti ti-corner-left-up mx-3'></i>";
             echo "<th colspan='" . ($showentity ? "5" : "4") . "'>";
-            if (isset($_POST['reserve'])) {
-                echo Html::hidden('begin', ['value' => $_POST['reserve']["begin"]]);
-                echo Html::hidden('end', ['value'   => $_POST['reserve']["end"]]);
+            if (isset($_SESSION['glpi_saved']['PluginReservationMenu'])) {
+                echo Html::hidden('begin', ['value' => $begin]);
+                echo Html::hidden('end', ['value'   => $end]);
             }
             echo Html::submit(_x('button', 'Book'), [
                 'class' => 'btn btn-primary mt-2 mb-2',
@@ -1034,6 +1046,7 @@ class PluginReservationMenu extends CommonGLPI
      */
     public function showFormDate()
     {
+        global $CFG_GLPI, $DB;
         // $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
 
         // echo "<div id='viewresasearch'  class='center'>";
@@ -1082,45 +1095,34 @@ class PluginReservationMenu extends CommonGLPI
         // echo "</table>";
 
         // echo "</div>";
-        $reserve = isset($_POST['reserve']);
-        if ($reserve) {
-            Toolbox::manageBeginAndEndPlanDates($_POST['reserve']);
-        } else {
-            $begin_time                 = time();
-            $begin_time                -= ($begin_time % HOUR_TIMESTAMP);
-            $_POST['reserve']["begin"]  = date("Y-m-d H:i:s", $begin_time);
-            $_POST['reserve']["end"]    = date("Y-m-d H:i:s", $begin_time + HOUR_TIMESTAMP);
-        }
-        TemplateRenderer::getInstance()->display('@reservation/dates_forms.html.twig', [ 
-            'dates' => $_POST['reserve']
-        ]);
-        echo "</div>";
+      
+        
     }
 
     /**
      * Link with current month reservations
      */
-    public function showCurrentMonthForAllLink()
-    {
-        global $CFG_GLPI;
-        if (!Session::haveRight("reservation", "1")) {
-            return false;
-        }
-        $mois_courant = intval(date('m'));
-        $annee_courante = date('Y');
+    // public function showCurrentMonthForAllLink()
+    // {
+    //     global $CFG_GLPI;
+    //     if (!Session::haveRight("reservation", "1")) {
+    //         return false;
+    //     }
+    //     $mois_courant = intval(date('m'));
+    //     $annee_courante = date('Y');
 
-        $mois_courant = intval($mois_courant);
+    //     $mois_courant = intval($mois_courant);
 
-        $all = "<a class='vsubmit' href='../../../front/reservation.php?reservationitems_id=&amp;mois_courant=" . "$mois_courant&amp;annee_courante=$annee_courante'>" . __('Show all') . "</a>";
+    //     $all = "<a class='vsubmit' href='../../../front/reservation.php?reservationitems_id=&amp;mois_courant=" . "$mois_courant&amp;annee_courante=$annee_courante'>" . __('Show all') . "</a>";
 
-        echo "<div class='center'>";
-        echo "<table class='tab_cadre'>";
-        echo "<tr><th colspan='2'>" . __('Reservations This Month', "reservation") . "</th></tr>\n";
-        echo "<td>";
-        echo "<img src='" . $CFG_GLPI["root_doc"] . "/pics/reservation.png' alt=''>";
-        echo "</td>";
-        echo "<td >$all</td>\n";
-        echo "</table>";
-        echo "</div>";
-    }
+    //     echo "<div class='center'>";
+    //     echo "<table class='tab_cadre'>";
+    //     echo "<tr><th colspan='2'>" . __('Reservations This Month', "reservation") . "</th></tr>\n";
+    //     echo "<td>";
+    //     echo "<img src='" . $CFG_GLPI["root_doc"] . "/pics/reservation.png' alt=''>";
+    //     echo "</td>";
+    //     echo "<td >$all</td>\n";
+    //     echo "</table>";
+    //     echo "</div>";
+    // }
 }
