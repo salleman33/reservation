@@ -55,6 +55,14 @@ table.listCustomCategories td {
     border: 1px solid;
 }
 
+tr.expired {
+    background-color:  rgb(206, 101, 101);
+    /* border: 5px solid;
+    border-color: red; */
+}
+tr.futur {
+    background-color: lightgrey;
+}
 
 
 .dropper {

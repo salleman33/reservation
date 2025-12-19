@@ -265,17 +265,293 @@ class PluginReservationMenu extends CommonGLPI
      */
     public static function displayTabContentForCurrentReservations()
     {
+        
+        global $CFG_GLPI, $DB;
+        
+        if (!Session::haveRightsOr(ReservationItem::$rightname, [READ, ReservationItem::RESERVEANITEM])) {
+            return false;
+        }
+
         $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
         $begin = $form_dates["begin"];
         $end = $form_dates["end"];
 
-        $filters = ["'" . $begin . "' < `end`", "'" . $end . "' > `begin`"];
-        $list = PluginReservationReservation::getAllReservations($filters);
-        $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
-        ksort($ReservationsByUser);
-        //Toolbox::logInFile('reservations_plugin', "reservations_list : ".json_encode($list)."\n", $force = false);
-        self::displayTabReservations($begin, $end, $ReservationsByUser, false);
+        $ok         = false;
+        $showentity = Session::isMultiEntitiesMode();
+        
+        $reservations = PluginReservationReservation::getReservations(['start' => $begin, 'end' => $end]);
+        $entries = [];
+        $entity_cache = [];
+
+        $user_id = $_SESSION['glpiID'];
+        $config = new PluginReservationConfig();
+        $mode_auto = $config->getConfigurationValue("mode_auto");
+        $checkin_enable = $config->getConfigurationValue("checkin", 0);
+        $only_ckeckin_own = $config->getConfigurationValue("only_ckeckin_own", 1);
+
+        foreach ($reservations as $res) {
+            $can_be_edited = (!$only_ckeckin_own || $user_id == $res['users_id']) || Session::haveRight("reservation", DELETE);
+
+            $entry = [
+                'checkbox' => Html::getCheckbox([
+                    'name'  => "item[" . $res["id"] . "]",
+                    'value' => $res["id"],
+                    'zero_on_empty' => false,
+                ]),
+                'user'     => $res['user'],
+                'title'    => $res['title'],
+                'start'    => $res['start'],
+                'end'      => $res['end'],
+                'comment'  => RichText::getSafeHtml($res["comment"]),
+                'itemtype' => $res['itemtype'],
+                'id'       => $res['id'],
+                'entity'   => '',
+            ];
+            if ($res['start'] > $end) {
+                $entry['row_class'] = 'futur';
+            }
+
+            if ($res['baselinedate'] < $end
+                && $res['baselinedate'] < date("Y-m-d H:i:s", time())
+                && $res['effectivedate'] == null) {
+                $entry['row_class'] = 'expired';
+            }
+
+            $entry['moves'] = '';
+            if (date("Y-m-d", strtotime($res['start'])) == date("Y-m-d", strtotime($begin))) {
+                $entry['moves'] .= "<img title=\"\" alt=\"\" src=\"../pics/up-icon.png\"></img>";
+            }
+            if (date("Y-m-d", strtotime($res['baselinedate'])) == date("Y-m-d", strtotime($end))) {
+                $entry['moves'] .= "<img title=\"\" alt=\"\" src=\"../pics/down-icon.png\"></img>";
+            }
+
+            if ($checkin_enable) {
+                $entry['checkin'] = '';
+                if ($res['checkindate'] != null) {
+                    $entry['checkin'] = date(Toolbox::getDateFormat('php')  . " H:i", strtotime($res['checkindate']));
+                } else {
+                    if ($can_be_edited) {
+                        // $entry['checkin'] .= '<td id="checkin' . $res['id'] . '">';
+                        $entry['checkin'] .= '<center>';
+                        $entry['checkin'] .= '<a class="bouton" href="javascript:void(0);" onclick="checkin(' . $res['id'] . ')">';
+                        $entry['checkin'] .= '<img title="' . _sx('tooltip', 'Set As Gone', "reservation") . '" alt="" src="../pics/redbutton.png"></img>';
+                        $entry['checkin'] .= '</a></center>';
+                        // </td>';
+                    }
+                }
+            }
+
+            $entry['checkout'] = '';
+            if ($res['effectivedate'] != null) {
+                $entry['checkout'] = date(Toolbox::getDateFormat('php') . " \à H:i:s", strtotime($res['effectivedate']));
+            } else {
+                if ($can_be_edited) {
+                    // $entry['checkout'] .= '<td id="checkout' . $res['id'] . '">';
+                    $entry['checkout'] .= '<center>';
+                    $entry['checkout'] .= '<a class="bouton" href="javascript:void(0);" onclick="checkout(' . $res['id'] . ')">';
+                    $entry['checkout'] .= '<img title="' . _sx('tooltip', 'Set As Returned', "reservation") . '" alt="" src="../pics/greenbutton.png"></img>';
+                    $entry['checkout'] .= '</a></center>';
+                    // </td>';
+                } 
+            }
+            
+            $entry['action'] = '';
+            if ($can_be_edited) {
+                // action
+                $available_reservationsitem = PluginReservationReservation::getAvailablesItems($res['start'], $res['end']);
+                // $entry['action'] .= "<td>";
+                $entry['action'] .= '<ul style="list-style: none";>';
+
+                // add item ti ti-cube-plus
+                $entry['action'] .= "<li><span class=\"bouton\" id=\"bouton_add" . $res['id'] . "\" onclick=\"javascript:afficher_cacher('add" . $res['id'] . "');\">" . _sx('button', 'Add an item') . "</span>
+                    <div id=\"add" . $res['id'] . "\" style=\"display:none;\">
+                    <form method='POST' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
+                $entry['action'] .= '<select name="add_item">';
+                foreach ($available_reservationsitem as $item) {
+                    $entry['action'] .= "\t";
+                    $entry['action'] .= '<option value="';
+                    $entry['action'] .= $item['id'];
+                    $entry['action'] .= '">';
+                    $entry['action'] .= getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . $item["name"];
+                    $entry['action'] .= '</option>';
+                }
+
+                $entry['action'] .= "<input type='hidden' name='add_item_to_reservation' value='" . $res['id'] . "'>";
+                $entry['action'] .= "<input type='submit' class='submit' name='add' value=" . _sx('button', 'Add') . ">";
+                $entry['action'] .= "<i class='ti repeat fa-2x cursor-pointer' title=\"" . __s("Reserve this item") . "\"></i>";
+
+                $entry['action'] .= Html::closeForm(false);
+                $entry['action'] .= "</div></li>";
+
+                // switch item ti ti-replace
+                $entry['action'] .= "<li><span class=\"bouton\" id=\"bouton_replace" . $res['id'] . "\" onclick=\"javascript:afficher_cacher('replace" . $res['id'] . "');\">" . _sx('button', 'Replace an item', 'reservation') . "</span>
+                    <div id=\"replace" . $res['id'] . "\" style=\"display:none;\">
+                <form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
+                $entry['action'] .= '<select name="switch_item">';
+                foreach ($available_reservationsitem as $item) {
+                    $entry['action'] .= "\t";
+                    $entry['action'] .= '<option value="';
+                    $entry['action'] .= $item['id'];
+                    $entry['action'] .= '">';
+                    $entry['action'] .= getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . $item["name"];
+                    $entry['action'] .= '</option>';
+                }
+                $entry['action'] .= "<input type='hidden' name='switch_item_to_reservation' value='" . $res['id'] . "'>";
+                $entry['action'] .= "<input type='submit' class='submit' name='submit' value=" . _sx('button', 'Save') . ">";
+                $entry['action'] .= Html::closeForm(false);
+                $entry['action'] .= "</div></li>";
+                $entry['action'] .= "</ul>";
+                $entry['action'] .= "</td>";
+
+                // // Edit ti ti-edit
+                // $rowspan_line = 1;
+                // $multiEditParams = [];
+                // $multiEditParams[$res['id']] = $res['id'];
+                // if ($count == $rowspan_end_bis) {
+                //     $i = $count;
+                //     while ($i < count($reservations_user_list)) {
+                //         if (
+                //             $reservations_user_list[$i]['begin'] == $res['begin']
+                //             && $reservations_user_list[$i]['end'] == $reservation_user_info['end']
+                //         ) {
+                //             $rowspan_line++;
+                //             $multiEditParams[$reservations_user_list[$i]['reservations_id']] = $reservations_user_list[$i]['reservations_id'];
+                //         } else {
+                //             break;
+                //         }
+                //         $i++;
+                //     }
+                //     if ($rowspan_line > 1) {
+                //         $rowspan_end_bis = $count + $rowspan_line;
+                //     } else {
+                //         $rowspan_end_bis++;
+                //     }
+
+                //     if ($rowspan_line > 1) {
+                //         $str_multiEditParams = "?";
+                //         foreach ($multiEditParams as $key => $value) {
+                //             $str_multiEditParams = $str_multiEditParams . "&ids[$key]=$value";
+                //         }
+
+                //         // case if multi edit enabled for first item
+                //         $entry['action'] .= "<td class='showIfMultiEditEnabled' rowspan='" . $rowspan_line . "'>";
+                //         $entry['action'] .= "<a class='bouton' title='" . __('Edit multiple', 'reservation') . "' onclick=\"makeAChange('" . 'multiedit.form.php' . $str_multiEditParams . "');\"   href=\"javascript:void(0);\">" . __('Edit multiple', 'reservation') . "</a>";
+                //         $entry['action'] .= "</td>";
+
+                //         // case if multi edit disable for first item
+                //         $entry['action'] .= "<td class='hideIfMultiEditEnabled' style='display: none;'>";
+                //         $entry['action'] .= '<ul style="list-style: none;">';
+                //         $entry['action'] .= "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\" href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
+                //         $entry['action'] .= "</ul>";
+                //         $entry['action'] .= "</td>";
+                //     } else {
+                //         // normal case (no group)
+                //         $entry['action'] .= "<td>";
+                //         $entry['action'] .= '<ul style="list-style: none;">';
+                //         $entry['action'] .= "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\" href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
+                //         $entry['action'] .= "</ul>";
+                //         $entry['action'] .= "</td>";
+                //     }
+                // } else {
+                //     // case if multi edit enabled for other items
+                //     $entry['action'] .= "<td class='hideIfMultiEditEnabled' style='display: none;'>";
+                //     $entry['action'] .= '<ul style="list-style: none;">';
+                //     $entry['action'] .= "<li><a class=\"bouton\" title=\"" . __('Edit') . "\" onclick=\"makeAChange('" . Toolbox::getItemTypeFormURL('Reservation') . "?id=" . $reservation_user_info['reservations_id'] . "');\"  href=\"javascript:void(0);\">" . _sx('button', 'Edit') . "</a></li>";
+                //     $entry['action'] .= "</ul>";
+                //     $entry['action'] .= "</td>";
+                // }
+            } else {
+                // $entry['action'] .= '<td>';
+                // $entry['action'] .= '</td>';
+                // $entry['action'] .= '<td>';
+                // $entry['action'] .= '</td>';
+            }
+
+            // if (!$mode_auto) {
+            //     $entry['action'] .= "<td>";
+            //     $entry['action'] .= '<ul style="list-style: none;">';
+            //     if ($reservation_user_info['baselinedate'] < date("Y-m-d H:i", time()) && $reservation_user_info['effectivedate'] == null) {
+            //         $entry['action'] .= '<li id="mailed' . $reservation_user_info['reservations_id'] . '">';
+            //         $entry['action'] .= '<a class="bouton" href="javascript:void(0);" onclick="mailuser(' . $reservation_user_info['reservations_id'] . ')" title="' . _sx('tooltip', 'Send an e-mail for the late reservation', "reservation") . '">';
+            //         $entry['action'] .= _sx('button', 'Send an e-mail', "reservation");
+            //         $entry['action'] .= '</a></li>';
+            //         if (isset($reservation_user_info['mailingdate'])) {
+            //             echo "<li>" . __('Last e-mail sent on', "reservation") . " </li>";
+            //             echo "<li>" . date(self::getDateFormat() . " H:i", strtotime($reservation_user_info['mailingdate'])) . "</li>";
+            //         }
+            //     }
+            //     echo "</ul>";
+            //     echo "</td>";
+            // }
+
+            if ($showentity) {
+                if (!isset($entity_cache[$row["entities_id"]])) {
+                    $entity_cache[$row["entities_id"]] = Dropdown::getDropdownName("glpi_entities", $row["entities_id"]);
+                }
+                $entry['entity'] = $entity_cache[$row["entities_id"]];
+            }
+
+
+
+            $ok = true;
+            $entries[] = $entry;
+        }
+        
+        
+
+        $columns = [
+            'checkbox' => [
+                'label' => Html::getCheckAllAsCheckbox('nosearch'),
+                'raw_header' => true,
+            ],
+            'user' => __('User'),
+            'title' => ReservationItem::getTypeName(1),
+            'start' => __('Begin'),
+            'end' => __('End'),
+            'comment' => _n('Comment', 'Comments', 1),
+            'moves' => __('Moves', 'reservation'),
+        ];
+        if ($checkin_enable) {
+            $columns['checkin'] = Entity::getTypeName(1);
+        }
+        $columns['checkout'] = __('Checkout', 'reservation');
+        $columns['action'] = __('Action');
+        if ($showentity) {
+            $columns['entity'] = Entity::getTypeName(1);
+        }
+        
+
+        TemplateRenderer::getInstance()->display('components/datatable.html.twig', [
+            'is_tab' => true,
+            'nofilter' => true,
+            'nosort' => true,
+            'columns' => $columns,
+            'formatters' => [
+                'checkbox' => 'raw_html',
+                'title' => 'raw_html',
+                'comment' => 'raw_html',
+                'start' => 'datatime',
+                'end' => 'datetime',
+                'moves' => 'raw_html',
+                'checkin' => 'raw_html',
+                'checkout' => 'raw_html',
+                'action' => 'raw_html',
+            ],
+            'entries' => $entries,
+            'total_number' => count($entries),
+            'filtered_number' => count($entries),
+            'showmassiveactions' => false,
+        ]);
+
+        // $filters = ["'" . $begin . "' < `end`", "'" . $end . "' > `begin`"];
+        // $list = PluginReservationReservation::getAllReservations($filters);
+        // $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
+        // ksort($ReservationsByUser);
+        // //Toolbox::logInFile('reservations_plugin', "reservations_list : ".json_encode($list)."\n", $force = false);
+        // self::displayTabReservations($begin, $end, $ReservationsByUser, false);
     }
+
+
 
     /**
      *

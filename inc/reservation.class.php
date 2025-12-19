@@ -45,6 +45,131 @@ class PluginReservationReservation extends CommonDBTM
         return Reservation::canUpdate();
     }
 
+    /*
+    * largement inspiré de Reservation::getEvents
+    */
+    public static function getReservations(array $params): array
+    {
+        global $DB, $CFG_GLPI;
+
+        $defaults = [
+            'start'               => '',
+            'end'                 => '',
+            'reservationitems_id' => 0,
+        ];
+        $params = array_merge($defaults, $params);
+
+        $start = date("Y-m-d H:i:s", strtotime($params['start']));
+        $end   = date("Y-m-d H:i:s", strtotime($params['end']));
+
+        $res_table   = Reservation::getTable();
+        $res_i_table = ReservationItem::getTable();
+        $plugin_table = static::getTable();
+
+        $can_read    = Session::haveRight("reservation", READ);
+        $can_edit    = Session::getCurrentInterface() === "central" && Session::haveRight("reservation", UPDATE);
+        $can_reserve = Session::haveRight("reservation", ReservationItem::RESERVEANITEM);
+
+        $user = new User();
+
+        $where = [];
+        if ($params['reservationitems_id'] > 0) {
+            $where = [
+                "$res_table.reservationitems_id" => $params['reservationitems_id'],
+            ];
+        }
+        
+        $iterator = $DB->request([
+            'SELECT'     => [
+                "$res_table.id",
+                "$res_table.begin",
+                "$res_table.end",
+                "$res_table.comment",
+                "$res_table.users_id",
+                "$res_i_table.items_id",
+                "$res_i_table.itemtype",
+                "$plugin_table.baselinedate",
+                "$plugin_table.effectivedate",
+                "$plugin_table.checkindate",
+                "$plugin_table.mailingdate"
+            ],
+            'FROM'       => $res_table,
+            'INNER JOIN' => [
+                $res_i_table => [
+                    'ON' => [
+                        $res_i_table => 'id',
+                        $res_table   => 'reservationitems_id',
+                    ],
+                ],
+                $plugin_table => [
+                    'ON' => [
+                        $plugin_table => 'reservations_id',
+                        $res_table => 'id',
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                'end'   => ['>', $start],
+                'begin' => ['<', $end],
+            ] + $where,
+        ]);
+
+
+        $reservations = [];
+        if (!count($iterator)) {
+            return [];
+        }
+        foreach ($iterator as $data) {
+            $item = getItemForItemtype($data['itemtype']);
+            if (!$item->getFromDB($data['items_id'])) {
+                continue;
+            }
+            if (!Session::haveAccessToEntity($item->getEntityID(), $item->isRecursive())) {
+                continue;
+            }
+
+            $my_item = $data['users_id'] === Session::getLoginUserID();
+
+            $data['comment'] = RichText::getSafeHtml($data['comment']);
+            if ($can_read || $my_item) {
+                $user->getFromDB($data['users_id']);
+                // $data['comment'] .= '<br />' . htmlescape(sprintf(__("Reserved by %s"), $user->getFriendlyName()));
+                $data['user'] = $user->getFriendlyName();
+            }            
+
+            $name = $item->getName([
+                'complete' => true,
+            ]);
+
+            $editable = $can_edit || ($can_reserve && $my_item);
+
+            $reservations[] = [
+                'id'          => $data['id'],
+                'resourceId'  => $data['itemtype'] . "-" . $data['items_id'],
+                'start'       => $data['begin'],
+                'end'         => $data['end'],
+                'users_id'        => $data['users_id'],
+                'user'        => $data['user'],
+                'baselinedate'=> $data['baselinedate'],
+                'effectivedate' => $data['effectivedate'],
+                'checkindate' => $data['checkindate'],
+                'mailingdate' => $data['mailingdate'],
+                'comment'     => $can_read || $my_item ? $data['comment'] : '',
+                'title'       => $params['reservationitems_id'] ? "" : $name,
+                'icon'        => $item->getIcon(),
+                'description' => $item->getTypeName(),
+                'itemtype'    => $data['itemtype'],
+                'items_id'    => $data['items_id'],
+                'color'       => Toolbox::getColorForString($name),
+                'ajaxurl'     => $CFG_GLPI['root_doc'] . '/ajax/reservations.php?action=add_edit_reservation_fromselect&id=' . $data['id'],
+                'editable'    => $editable, // "editable" is used by fullcalendar, but is not accessible
+                '_editable'   => $editable, // "_editable" will be used by custom event handlers
+            ];
+        }
+
+        return $reservations;
+    }
+
     /**
      * get all reservations info merged with plugin_reservation info
      * @param string[] $filters [optional] filters to apply to DB request
