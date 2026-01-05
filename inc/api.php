@@ -1,12 +1,9 @@
 <?php
 
-#include '../../../inc/includes.php';
-#include (__DIR__ . '/../../../inc/includes.php');
-#include (__DIR__ . '/../../../inc/api.class.php');
-#include '../../../inc/api.class.php';
+
 use Glpi\Api\API;
 
-include_once 'includes.php';
+include_once(__DIR__ . 'includes.php');
 
 class PluginReservationApi extends API
 {

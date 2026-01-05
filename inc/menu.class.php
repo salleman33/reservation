@@ -29,7 +29,7 @@ function getToolTipforItem($item)
         $location = getLocationFromItem($item);
         $toolTip .= "<br><b>" . __('Location') . " : </b>" . $location;
     }
-    if ($show_group && array_key_exists("groups_id", $item->fields)) {
+    if ($show_group && $item->isField('groups_id')) {
         $group_name = getGroupFromItem($item);
         $toolTip .= "<br><b>" . __('Group') . " : </b>" . $group_name;
     }
@@ -48,8 +48,11 @@ function getToolTipforItem($item)
         $status = getStatusFromItem($item);
         $toolTip .= "<br><b>" . __('Status') . " : </b>" . $status;
     }
-    $tooltip = nl2br($toolTip);
-    Html::showToolTip($tooltip, null);
+    $res = Html::showToolTip(
+                RichText::getEnhancedHtml($toolTip),
+                ['display' => false]
+    );
+    return $res;
 }
 
 function getGroupFromItem($item)
@@ -99,8 +102,8 @@ function getModelFromItem($item)
             }
             if ($DB->tableExists($modeltable)) {
                 $query = "SELECT `$modeltable`.`name` AS model
-            FROM `$modeltable` WHERE
-            `$modeltable`.`id` = " . $item->fields[$modelfield];
+                    FROM `$modeltable` WHERE
+                    `$modeltable`.`id` = " . $item->fields[$modelfield];
                 if ($resmodel = $DB->query($query)) {
                     while ($rowModel = $DB->fetchAssoc($resmodel)) {
                         $typemodel = $rowModel["model"];
@@ -124,22 +127,22 @@ class PluginReservationMenu extends CommonGLPI
         return PluginReservationMenu::getTypeName(2);
     }
 
-    public static function canCreate()
+    public static function canCreate(): bool
     {
         return Reservation::canCreate();
     }
 
-    public static function canDelete()
+    public static function canDelete(): bool
     {
         return Reservation::canDelete();
     }
 
-    public static function canUpdate()
+    public static function canUpdate(): bool
     {
         return Reservation::canUpdate();
     }
 
-    public static function canView()
+    public static function canView(): bool
     {
         return Reservation::canView();
     }
@@ -254,6 +257,12 @@ class PluginReservationMenu extends CommonGLPI
      */
     public static function displayTabContentForCurrentReservations()
     {
+        global $CFG_GLPI, $DB;
+
+        if (!Session::haveRightsOr(ReservationItem::$rightname, [READ, ReservationItem::RESERVEANITEM])) {
+            return false;
+        }
+
         $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
         $begin = $form_dates["begin"];
         $end = $form_dates["end"];
@@ -613,6 +622,12 @@ class PluginReservationMenu extends CommonGLPI
      */
     public static function displayTabContentForAvailableHardware()
     {
+        global $CFG_GLPI, $DB;
+
+        if (!Session::haveRightsOr(ReservationItem::$rightname, [READ, ReservationItem::RESERVEANITEM])) {
+            return false;
+        }
+
         $showentity = Session::isMultiEntitiesMode();
         $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
 
@@ -743,87 +758,5 @@ class PluginReservationMenu extends CommonGLPI
         }
         echo "</table>\n";
         echo "</td>";
-    }
-
-    /**
-     * Display the form with begin and end dates, next day, previous day, etc.
-     */
-    public function showFormDate()
-    {
-        $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
-
-        echo "<div id='viewresasearch'  class='center'>";
-        echo "<table class='tab_cadre' style='background-color:transparent;box-shadow:none'>";
-
-        echo "<tr>";
-        echo "<td>";
-        $this->showCurrentMonthForAllLink();
-        echo "</td>";
-        echo "<td>";
-
-        echo "<form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
-        echo "<table class='tab_cadre'><tr class='tab_bg_2'>";
-        echo "<th colspan='6'>" . __('Date') . "</th>";
-        echo "</tr>";
-
-        echo "<tr class='tab_bg_2'>";
-
-        echo "<td rowspan='3'>";
-        echo "<input type='submit' class='submit' name='previousday' value='" . __('Previous') . "'>";
-        echo "</td>";
-
-        echo "<td>" . __('Start date') . "</td><td>";
-        Html::showDateTimeField('date_begin', ['value' => $form_dates["begin"], 'maybeempty' => false]);
-        echo "</td><td rowspan='3'>";
-        echo "<input type='submit' class='submit' name='submit' value=\"" . _sx('button', 'Search') . "\">";
-        echo "</td>";
-        echo "<td rowspan='3'>";
-        echo "<input type='submit' class='submit' name='nextday' value='" . __('Next') . "'>";
-        echo "</td>";
-        echo "<td rowspan='3'>";
-        echo '<a class="fa fa-undo reset-search" href="' . Toolbox::getItemTypeSearchURL(__CLASS__) . '?reset=reset" title="' . __('Reset') . '"><span class="sr-only">' . __('Reset') . '</span></a>';
-        echo "</td>";
-        echo "</tr>";
-
-        echo "<tr class='tab_bg_2'><td>" . __('End date') . "</td><td>";
-        Html::showDateTimeField('date_end', ['value' => $form_dates["end"], 'maybeempty' => false]);
-        echo "</td></tr>";
-        echo "</td></tr>";
-        echo "</table>";
-
-        Html::closeForm();
-
-        echo "</td>";
-        echo "</tr>";
-        echo "</table>";
-
-        echo "</div>";
-    }
-
-    /**
-     * Link with current month reservations
-     */
-    public function showCurrentMonthForAllLink()
-    {
-        global $CFG_GLPI;
-        if (!Session::haveRight("reservation", "1")) {
-            return false;
-        }
-        $mois_courant = intval(date('m'));
-        $annee_courante = date('Y');
-
-        $mois_courant = intval($mois_courant);
-
-        $all = "<a class='vsubmit' href='../../../front/reservation.php?reservationitems_id=&amp;mois_courant=" . "$mois_courant&amp;annee_courante=$annee_courante'>" . __('Show all') . "</a>";
-
-        echo "<div class='center'>";
-        echo "<table class='tab_cadre'>";
-        echo "<tr><th colspan='2'>" . __('Reservations This Month', "reservation") . "</th></tr>\n";
-        echo "<td>";
-        echo "<img src='" . $CFG_GLPI["root_doc"] . "/pics/reservation.png' alt=''>";
-        echo "</td>";
-        echo "<td >$all</td>\n";
-        echo "</table>";
-        echo "</div>";
     }
 }

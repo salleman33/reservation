@@ -1,34 +1,29 @@
 <?php
 
-// Définition de la variable GLPI_ROOT obligatoire pour l'instanciation des class
-// define('GLPI_ROOT', getAbsolutePath());
-// Récupération du fichier includes de GLPI, permet l'accès au cœur
-// include GLPI_ROOT . "inc/includes.php";
-include '../../../inc/includes.php';
-
-if (Session::getCurrentInterface() == "helpdesk") {
-    Html::helpHeader(__('Simplified interface'), $_SERVER['PHP_SELF'], $_SESSION["glpiname"]);
-} else {
-    Html::header(PluginReservationMenu::getTypeName(2), $_SERVER['PHP_SELF'], "plugins", "pluginreservationmenu", "reservation");
-}
-
-// Check if plugin is activated...
-$plugin = new Plugin();
-if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')) {
-    return Html::displayNotFoundError();    
-}
-
+use Glpi\Application\View\TemplateRenderer;
 
 // Check if the user is allowed to go here
 $config = new PluginReservationConfig();
 $read_make_access = $config->getConfigurationValue("read_make_access");
 $access = [CREATE, UPDATE, DELETE];
 
-if($read_make_access) {
-   $access = [READ, ReservationItem::RESERVEANITEM, CREATE, UPDATE, DELETE];
+if ($read_make_access) {
+    $access = [READ, ReservationItem::RESERVEANITEM, CREATE, UPDATE, DELETE];
 }
 
 Session::checkRightsOr("reservation", $access);
+
+if (Session::getCurrentInterface() == "helpdesk") {
+    Html::helpHeader(__('Simplified interface'), $_SERVER['PHP_SELF'], $_SESSION["glpiname"]);
+} else {
+    Html::header(PluginReservationMenu::getTypeName(Session::getPluralNumber()), $_SERVER['PHP_SELF'], "plugins", "pluginreservationmenu", "reservation");
+}
+
+// Check if plugin is activated...
+$plugin = new Plugin();
+if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')) {
+    return Html::displayNotFoundError();
+}
 
 global $CFG_GLPI;
 $form_dates = [];
@@ -105,12 +100,20 @@ if (isset($_SESSION['glpi_plugin_reservation_change_in_progress'])) {
 
 $_SESSION['glpi_plugin_reservation_form_dates'] = $form_dates;
 
-$menu = new PluginReservationMenu();
-$menu->showFormDate();
-$menu->display($_POST);
+$reservation_types = PluginReservationMenu::getReservationTypes();
 
-if ($_SESSION["glpiactiveprofile"]["interface"] == "central") {
-    Html::footer();
-} else {
+TemplateRenderer::getInstance()->display('@reservation/dates_forms.html.twig', [ 
+    'reservation_types' => $reservation_types,
+    'default_location' => (int) ($_POST['locations_id'] ?? User::getById(Session::getLoginUserID())->fields['locations_id'] ?? 0),
+    'form_dates' => $form_dates
+]);
+
+$menu = new PluginReservationMenu();
+// $menu->showFormDate();
+$menu->display();
+
+if (Session::getCurrentInterface() == "helpdesk") {
     Html::helpFooter();
+} else {
+    Html::footer();
 }

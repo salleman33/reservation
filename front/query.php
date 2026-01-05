@@ -1,11 +1,5 @@
 <?php
 
-// Définition de la variable GLPI_ROOT obligatoire pour l'instanciation des class
-// define('GLPI_ROOT', getAbsolutePath());
-// Récupération du fichier includes de GLPI, permet l'accès au cœur
-// include GLPI_ROOT . "inc/includes.php";
-include '../../../inc/includes.php';
-
 // Check if plugin is activated...
 $plugin = new Plugin();
 if (!$plugin->isInstalled('reservation') || !$plugin->isActivated('reservation')) {
@@ -18,7 +12,7 @@ $config = new PluginReservationConfig();
 $read_make_access = $config->getConfigurationValue("read_make_access");
 $access = [CREATE, UPDATE, DELETE];
     
-if($read_make_access) {
+if ($read_make_access) {
     $access = [READ, ReservationItem::RESERVEANITEM, CREATE, UPDATE, DELETE, PURGE];
 }
 

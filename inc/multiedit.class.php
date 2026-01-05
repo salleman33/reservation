@@ -6,7 +6,7 @@ if (!defined('GLPI_ROOT')) {
 
 use Glpi\Event;
 
-include_once GLPI_ROOT . "/plugins/reservation/inc/includes.php";
+include_once(__DIR__ . 'includes.php');
 
 class PluginReservationMultiEdit extends CommonDBTM
 {

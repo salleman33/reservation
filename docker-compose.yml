@@ -1,33 +1,43 @@
-version: '2.2'
+volumes:
+  glpi_mysql_data:
 services:
   glpi:
-    build: .
-    restart: always
-    image: glpi
+    image: docker.io/glpi/glpi
     container_name: glpi
-    depends_on:
-            - mariadb
+    restart: "unless-stopped"
     ports:
       - 8080:80
-    links:
-      - mariadb
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - ./:/var/www/html/glpi/plugins/reservation:ro
+      - ./:/var/www/glpi/plugins/reservation:ro
     environment:
       - TIMEZONE=Europe/Paris
-  mariadb:
-    restart: always
-    image: mariadb:10.7
-    container_name: mariadb
+      - GLPI_DB_HOST=db
+      - GLPI_DB_PORT=3306
+      - GLPI_DB_NAME=glpi
+      - GLPI_DB_USER=glpi
+      - GLPI_DB_PASSWORD=glpi
+  db:
+    image: docker.io/mysql
+    container_name: db
+    restart: "unless-stopped"
     expose:
       - 3306
     volumes:
-      - /tmp/mysql_data:/var/lib/mysql
+      - glpi_mysql_data:/var/lib/mysql
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      MYSQL_USER: "user"
+      MYSQL_USER: "glpi"
       MYSQL_ROOT_PASSWORD: "password"
-      MYSQL_PASSWORD: "password"
+      MYSQL_PASSWORD: "glpi"
       MYSQL_DATABASE: "glpi"
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 10

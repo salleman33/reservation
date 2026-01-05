@@ -4,16 +4,16 @@ if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
 
-include_once GLPI_ROOT . "/plugins/reservation/inc/includes.php";
+include_once(__DIR__ . '/includes.php');
 
 class PluginReservationConfig extends CommonDBTM
 {
-    public function getConfigurationValue($name, $defaultValue = 0)
+    public static function getConfigurationValue($name, $defaultValue = 0)
     {
         global $DB;
         $query = "SELECT * FROM glpi_plugin_reservation_configs WHERE `name`='" . $name . "'";
         $value = $defaultValue;
-        if ($result = $DB->query($query)) {
+        if ($result = $DB->doQuery($query)) {
             if ($DB->numrows($result) > 0) {
                 while ($row = $DB->fetchAssoc($result)) {
                     $value = $row['value'];
@@ -29,7 +29,7 @@ class PluginReservationConfig extends CommonDBTM
 
         if ($value != '') {
             $query = "INSERT INTO glpi_plugin_reservation_configs (name,value) VALUES('" . $name . "','" . $value . "') ON DUPLICATE KEY UPDATE value=Values(value)";
-            $DB->query($query) or die($DB->error());
+            $DB->doQuery($query) or die($DB->error());
         }
     }
 
@@ -38,7 +38,7 @@ class PluginReservationConfig extends CommonDBTM
         global $DB;
 
         $query = "UPDATE `glpi_crontasks` SET state='" . $value . "' WHERE name = 'sendMailLateReservations'";
-        $DB->query($query) or die($DB->error());
+        $DB->doQuery($query) or die($DB->error());
     }
 
     public function showForm($ID, array $option = [])
@@ -187,7 +187,7 @@ class PluginReservationConfig extends CommonDBTM
         echo '</tr>';
         
         $only_ckeckin_own = $this->getConfigurationValue("only_ckeckin_own", 1);
-        if ($read_make_access){
+        if ($read_make_access) {
             // only checkin own reservation (by pass for admins)
             echo '<tr class="tab_bg_2">';
             echo "<input type=\"hidden\" name=\"only_ckeckin_own\" value=\"0\">";

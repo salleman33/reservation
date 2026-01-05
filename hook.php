@@ -9,8 +9,11 @@ function plugin_reservation_install()
 {
     global $DB, $CFG_GLPI;
 
-    $version = plugin_version_reservation();
-    $migration = new Migration($version['version']);
+    $migration = new Migration(PLUGIN_RESERVATION_VERSION);
+
+    $default_charset   = DBConnection::getDefaultCharset();
+    $default_collation = DBConnection::getDefaultCollation();
+    $default_key_sign  = DBConnection::getDefaultPrimaryKeySignOption();
 
     if (!$DB->tableExists("glpi_plugin_reservation_categories")) {
         $query = "CREATE TABLE `glpi_plugin_reservation_categories` (
@@ -18,9 +21,9 @@ function plugin_reservation_install()
                 `name` VARCHAR(255) NOT NULL,
                 PRIMARY KEY (`id`),
                 UNIQUE (`name`)
-                ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+                ) ENGINE=InnoDB  DEFAULT CHARSET={$default_charset} COLLATE={$default_collation}";
 
-        $DB->queryOrDie($query, $DB->error());
+        $DB->doQuery($query, $DB->error());
     }
 
     if (!$DB->tableExists("glpi_plugin_reservation_categories_items")) {
@@ -33,9 +36,9 @@ function plugin_reservation_install()
                   KEY `reservationitems_id` (`reservationitems_id`),
                   KEY `categories_id` (`categories_id`),
                   UNIQUE (`categories_id`, `reservationitems_id`)
-                ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+                ) ENGINE=InnoDB  DEFAULT CHARSET={$default_charset} COLLATE={$default_collation}";
 
-        $DB->queryOrDie($query, $DB->error());
+        $DB->doQuery($query, $DB->error());
     }
 
     if ($DB->tableExists('glpi_plugin_reservation_reservations')) { // UPDATE 2.2.0
@@ -57,9 +60,9 @@ function plugin_reservation_install()
                 `checkindate` timestamp NULL,
                 PRIMARY KEY (`id`),
                 KEY `reservations_id` (`reservations_id`)
-                ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+                ) ENGINE=InnoDB  DEFAULT CHARSET={$default_charset} COLLATE={$default_collation}";
 
-        $DB->queryOrDie($query, $DB->error());
+        $DB->doQuery($query, $DB->error());
     }
 
     // 2.2.0
@@ -82,7 +85,7 @@ function plugin_reservation_install()
                   FROM glpi_plugin_reservation_reservations
                )";
     $reservation = new Reservation();
-    foreach ($DB->request($query) as $data) {
+    foreach ($DB->doQuery($query) as $data) {
         $reservation->getFromDb($data['id']);
         plugin_item_add_reservation($reservation);
     }
@@ -94,14 +97,15 @@ function plugin_reservation_install()
                `value` VARCHAR(255) NOT NULL,
                PRIMARY KEY (`id`),
                UNIQUE (`name`)
-               ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
-        $DB->queryOrDie($query, $DB->error());
+               ) ENGINE=InnoDB  DEFAULT CHARSET={$default_charset} COLLATE={$default_collation}";
+        $DB->doQuery($query, $DB->error());
+               
 
         $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
                VALUES  (\"mode_auto\",0),
                         (\"conflict_action\",\"delete\")";
 
-        $DB->queryOrDie($query, $DB->error());
+        $DB->doQuery($query, $DB->error());
     }
 
     $cron = new CronTask();
@@ -136,7 +140,7 @@ function plugin_reservation_install()
       `event` = \"plugin_reservation_conflit\"
    OR
       `event` = \"plugin_reservation_conflict\"";
-    $DB->queryOrDie($query, $DB->error());
+    $DB->doQuery($query, $DB->error());
 
     //execute the whole migration
     $migration->executeMigration();
@@ -154,7 +158,7 @@ function plugin_reservation_uninstall()
     global $DB;
     $tables = ["glpi_plugin_reservation_reservations", "glpi_plugin_reservation_configs", "glpi_plugin_reservation_categories", "glpi_plugin_reservation_categories_items"];
     foreach ($tables as $table) {
-        $DB->query("DROP TABLE IF EXISTS `$table`");
+        $DB->doQuery("DROP TABLE IF EXISTS `$table`");
     }
     CronTask::unregister("Reservation");
     return true;
@@ -203,7 +207,7 @@ function plugin_item_update_reservation($reservation)
             WHERE `reservations_id` = ' . $reservation->fields['id'];
     // maybe the reservation is over
     $resume = false;
-    foreach ($DB->request($query) as $data) {
+    foreach ($DB->doQuery($query) as $data) {
         if ($end >= $data['effectivedate']) {
             $resume = true;
         }
