@@ -1,5 +1,8 @@
 <?php
 
+use Glpi\Application\View\TemplateRenderer;
+use Glpi\RichText\RichText;
+
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
 }
