@@ -107,7 +107,7 @@ function getModelFromItem($item)
                 $query = "SELECT `$modeltable`.`name` AS model
                     FROM `$modeltable` WHERE
                     `$modeltable`.`id` = " . $item->fields[$modelfield];
-                if ($resmodel = $DB->query($query)) {
+                if ($resmodel = $DB->doQuery($query)) {
                     while ($rowModel = $DB->fetchAssoc($resmodel)) {
                         $typemodel = $rowModel["model"];
                     }
@@ -618,6 +618,67 @@ class PluginReservationMenu extends CommonGLPI
         echo "</tbody>";
         echo "</table>";
         echo "</div>";
+    }
+
+    /**
+     * largement inspiré de la methode ReservationItem::showListSimple
+     */
+    static function getReservationTypes()
+    {
+        global $CFG_GLPI, $DB;
+ 
+        $reservation_types     = [];
+
+        $iterator = $DB->request([
+            'SELECT'          => 'itemtype',
+            'DISTINCT'        => true,
+            'FROM'            => 'glpi_reservationitems',
+            'WHERE'           => [
+                'is_active' => 1,
+            ] + getEntitiesRestrictCriteria('glpi_reservationitems', 'entities_id', $_SESSION['glpiactiveentities'], true),
+        ]);
+
+        foreach ($iterator as $data) {
+            /** @var array{itemtype: string} $data */
+            if (is_a($data['itemtype'], CommonDBTM::class, true)) {
+                $reservation_types[$data['itemtype']] = $data['itemtype']::getTypeName();
+            }
+        }
+
+        $iterator = $DB->request([
+            'SELECT'    => [
+                'glpi_peripheraltypes.name',
+                'glpi_peripheraltypes.id',
+            ],
+            'FROM'      => 'glpi_peripheraltypes',
+            'LEFT JOIN' => [
+                'glpi_peripherals'      => [
+                    'ON' => [
+                        'glpi_peripheraltypes'  => 'id',
+                        'glpi_peripherals'      => 'peripheraltypes_id',
+                    ],
+                ],
+                'glpi_reservationitems' => [
+                    'ON' => [
+                        'glpi_reservationitems' => 'items_id',
+                        'glpi_peripherals'      => 'id',
+                    ],
+                ],
+            ],
+            'WHERE'     => [
+                'itemtype'           => 'Peripheral',
+                'is_active'          => 1,
+                'peripheraltypes_id' => ['>', 0],
+            ] + getEntitiesRestrictCriteria('glpi_reservationitems', 'entities_id', $_SESSION['glpiactiveentities'], true),
+            'ORDERBY'   => 'glpi_peripheraltypes.name',
+        ]);
+
+        foreach ($iterator as $ptype) {
+            $id = $ptype['id'];
+            $reservation_types["Peripheral#$id"] = $ptype['name'];
+        }
+
+        return $reservation_types;
     }
 
     /**
