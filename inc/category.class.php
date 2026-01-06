@@ -124,58 +124,110 @@ class PluginReservationCategory extends CommonDBTM
             $categories_table = getTableForItemType(__CLASS__);
             $category_items_table = getTableForItemType("PluginReservationCategory_Item");
 
-            $left = '';
+
+            $criteria = [
+                'SELECT' => [
+                    'glpi_reservationitems.id',
+                    'glpi_reservationitems.comment',
+                    "$itemtable.$itemname AS name",
+                    "$itemtable.entities_id AS entities_id",
+                    $otherserial,
+                    'glpi_locations.id AS location',
+                    "$categories_table.name AS category_name",
+                    "$categories_table.id AS category_id",
+                    "$category_items_table.priority AS items_priority",
+                    'glpi_reservationitems.items_id AS items_id',
+                    'glpi_reservationitems.is_active',
+                ],
+                'FROM'   => ReservationItem::getTable(),
+                'INNER JOIN'   => [
+                    $itemtable  => [
+                        'ON'  => [
+                            'glpi_reservationitems' => 'items_id',
+                            $itemtable              => 'id', 
+                            [
+                                'AND' => [
+                                    'glpi_reservationitems.itemtype' => $itemtype,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'LEFT JOIN' =>  [
+                    'glpi_locations'  => [
+                        'ON'  => [
+                            $itemtable        => 'locations_id',
+                            'glpi_locations'  => 'id',
+                        ],
+                    ],
+                    $category_items_table  => [
+                        'ON'  => [
+                            'glpi_reservationitems' => 'id',
+                            $category_items_table => 'id',
+                        ],
+                    ],
+                    $categories_table => [
+                        'ON' => [
+                            $category_items_table => 'categories_id',
+                            $categories_table => 'id',
+                        ]
+                    ]
+                ],
+                'WHERE'        => [
+                    "$itemtable.is_deleted" => 0,
+                ] + getEntitiesRestrictCriteria($itemtable, '', $_SESSION['glpiactiveentities'], $item->maybeRecursive()),
+                'ORDERBY'      => [
+                    "$itemtable.entities_id",
+                    "$itemtable.$itemname",
+                ],
+            ];
             if ($begin != '' && $end != '') {
-                $left .= "LEFT JOIN `glpi_reservations`
-                        ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`";
-                if ($begin != '') {
-                    $left .= "AND '" . $begin . "' < `glpi_reservations`.`end`";
-                }
-                if ($end != '') {
-                    $left .= "AND '" . $end . "' > `glpi_reservations`.`begin`";
-                }
-                $left .= ")";
+                $criteria['LEFT JOIN']['glpi_reservations'] = [
+                    'ON'  => [
+                        'glpi_reservationitems'  => 'id',
+                        'glpi_reservations'  => 'reservationitems_id', [
+                            'AND' => [
+                                'glpi_reservations.end'    => ['>', $begin],
+                                'glpi_reservations.begin'  => ['<', $end],
+                            ],
+                        ],
+                    ],
+                ];
+            }
+            if ($filter_is_active) {
+               $criteria['WHERE'][] = ['glpi_reservationitems.is_active' => '1']; 
+            }
+            if ($available) {
+                $criteria['WHERE'][] = ['glpi_reservations.id' => null];
             }
 
-            $where = $available ? " AND `glpi_reservations`.`id` IS NULL " : '';
-
-            $query = "SELECT `glpi_reservationitems`.`id`,
-                           `glpi_reservationitems`.`comment`,
-                           `$itemtable`.`name` AS name,
-                           `$itemtable`.`entities_id` AS entities_id,
-                           `$categories_table`.`name` AS category_name,
-                           `$categories_table`.`id` AS category_id,
-                           `$category_items_table`.`priority` AS items_priority,
-                           `glpi_reservationitems`.`items_id` AS items_id,
-                           `glpi_reservationitems`.`is_active`
-
-                  FROM `glpi_reservationitems`
-                  INNER JOIN `$itemtable`
-                     ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
-                           AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
-                  LEFT OUTER JOIN `$category_items_table`
-                     ON `glpi_reservationitems`.`id` = `$category_items_table`.`reservationitems_id`
-                  LEFT OUTER JOIN `$categories_table`
-                     ON `$category_items_table`.`categories_id` = `$categories_table`.`id`
-                  $left
-                  WHERE `$itemtable`.`is_deleted` = '0'
-                     " . ($filter_is_active ? "AND `glpi_reservationitems`.`is_active` = '1'" : "") . "
-                     $where " .
-            getEntitiesRestrictRequest(
-                " AND",
-                $itemtable,
-                '',
-                $_SESSION['glpiactiveentities'],
-                $item->maybeRecursive()
-            ) . "
-                  ORDER BY `$itemtable`.`entities_id`,
-                     `$category_items_table`.`priority`,
-                     `$itemtable`.`name` ASC";
-
-            if ($res = $DB->doQuery($query)) {
-                while ($row = $DB->fetchAssoc($res)) {
-                    $result[] = array_merge($row, ['itemtype' => $itemtype]);
+            if (!empty($_POST["reservation_types"])) {
+                $tmp = explode('#', $_POST["reservation_types"]);
+                $criteria['WHERE'][] = ['glpi_reservationitems.itemtype' => $tmp[0]];
+                if (
+                    isset($tmp[1]) && ($tmp[0] === Peripheral::class)
+                    && ($itemtype === Peripheral::class)
+                ) {
+                    $criteria['LEFT JOIN']['glpi_peripheraltypes'] = [
+                        'ON' => [
+                            'glpi_peripherals'      => 'peripheraltypes_id',
+                            'glpi_peripheraltypes'  => 'id',
+                        ],
+                    ];
+                    $criteria['WHERE'][] = ["$itemtable.peripheraltypes_id" => $tmp[1]];
                 }
+            }
+
+            // Filter locations if location was provided/submitted
+            if ((int) ($_POST['locations_id'] ?? 0) > 0) {
+                $criteria['WHERE'][] = [
+                    'glpi_locations.id' => getSonsOf('glpi_locations', (int) $_POST['locations_id']),
+                ];
+            }
+
+            $iterator = $DB->request($criteria);
+            foreach ($iterator as $row) {
+                $result[] = array_merge($row, ['itemtype' => $itemtype]);
             }
         }
         return $result;
