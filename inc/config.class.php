@@ -185,7 +185,7 @@ class PluginReservationConfig extends CommonDBTM
         echo "<input type=\"checkbox\" name=\"read_make_access\" value=\"1\" " . ($read_make_access ? 'checked' : '') . "> ";
         echo __('Enable access for users with Read and Make a reservation right', 'reservation') . "</td>";
         echo '</tr>';
-        
+
         $only_ckeckin_own = $this->getConfigurationValue("only_ckeckin_own", 1);
         if ($read_make_access) {
             // only checkin own reservation (by pass for admins)

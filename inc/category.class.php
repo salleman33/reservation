@@ -81,7 +81,7 @@ class PluginReservationCategory extends CommonDBTM
         $DB->deleteOrDie(
             $items_table,
             [
-                'categories_id' => $this->getId()
+                'categories_id' => $this->getId(),
             ]
         );
 
@@ -144,7 +144,7 @@ class PluginReservationCategory extends CommonDBTM
                     $itemtable  => [
                         'ON'  => [
                             'glpi_reservationitems' => 'items_id',
-                            $itemtable              => 'id', 
+                            $itemtable              => 'id',
                             [
                                 'AND' => [
                                     'glpi_reservationitems.itemtype' => $itemtype,
@@ -170,8 +170,8 @@ class PluginReservationCategory extends CommonDBTM
                         'ON' => [
                             $category_items_table => 'categories_id',
                             $categories_table => 'id',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 'WHERE'        => [
                     "$itemtable.is_deleted" => 0,
@@ -195,7 +195,7 @@ class PluginReservationCategory extends CommonDBTM
                 ];
             }
             if ($filter_is_active) {
-               $criteria['WHERE'][] = ['glpi_reservationitems.is_active' => '1']; 
+                $criteria['WHERE'][] = ['glpi_reservationitems.is_active' => '1'];
             }
             if ($available) {
                 $criteria['WHERE'][] = ['glpi_reservations.id' => null];

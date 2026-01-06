@@ -135,7 +135,7 @@ class PluginReservationTask extends CommonDBTM
 
             $reservation = new Reservation();
             if ($reservation === false) {
-                // occur when current reservation has been deleted because it conflicts with another 
+                // occur when current reservation has been deleted because it conflicts with another
                 continue;
             }
             $reservation->getFromDB($res['reservations_id']);
@@ -223,7 +223,8 @@ class PluginReservationTask extends CommonDBTM
                         $query = "UPDATE `glpi_reservations`
                         SET `begin` = '" . $end . "'
                         WHERE `id`='" . $conflict_reservation->fields["id"] . "'";
-                        $DB->doQuery($query) or die("error on 'update' into checkReservations conflict to delay start of a reservation : " . $DB->error());
+                        $DB->doQuery($query) or
+                        die("error on 'update' into checkReservations conflict to delay start of a reservation : " . $DB->error());
                         $task->log(sprintf(__('Delaying reservation %1$s on item %2$s', 'reservation'), $conflict_reservation->fields['id'], $item->fields['name']));
                         break;
                 }

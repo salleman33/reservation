@@ -70,8 +70,8 @@ if ($plugin->isActivated("reservation")) {
     Html::footer();
 } else {
     Html::header(__('Setup'), '', "config", "plugins");
-    echo "<div class='center'><br><br>" .
-        "<img src=\"" . $CFG_GLPI["root_doc"] . "/pics/warning.png\" alt='warning'><br><br>";
+    echo "<div class='center'><br><br>"
+        . "<img src=\"" . $CFG_GLPI["root_doc"] . "/pics/warning.png\" alt='warning'><br><br>";
     echo "<b>" . __('Please activate the plugin', 'reservation') . "</b></div>";
     Html::footer();
 }

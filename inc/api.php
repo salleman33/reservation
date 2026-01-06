@@ -1,6 +1,5 @@
 <?php
 
-
 use Glpi\Api\API;
 
 include_once(__DIR__ . 'includes.php');
@@ -74,8 +73,8 @@ class PluginReservationApi extends API
                     return;
                 case "reservationItem":
                     return $this->reservationItemRoutes();
-                // case "user":
-                //    return $this->userRoutes();
+                    // case "user":
+                    //    return $this->userRoutes();
                 default:
                     return $this->returnError(
                         __("resource not found"),
@@ -135,15 +134,15 @@ class PluginReservationApi extends API
                 $response = "Use GET request !";
                 break;
             case "GET":
-                $response = array();
+                $response = [];
                 $begin = $this->parameters['begin'];
                 $end = $this->parameters['end'];
                 $user = $this->parameters['user'];
 
-                $filters = array(
+                $filters = [
                     "`begin` >= '" . $begin . "'",
                     "`end` <= '" . $end . "'",
-                );
+                ];
 
                 if (isset($user)) {
                     array_push($filters, "`users_id` = '" . $user . "'");
@@ -205,7 +204,7 @@ class PluginReservationApi extends API
                 $response = "Use GET request !";
                 break;
             case "GET":
-                $response = array();
+                $response = [];
                 $begin = $this->parameters['begin'];
                 $end = $this->parameters['end'];
 
@@ -443,7 +442,7 @@ class PluginReservationApi extends API
                 $month = date("m", time());
                 $year = date("Y", time());
                 $now = date("Y-m-d H:i:s", $time);
-                $end_day = date("Y-m-d H:i:s", mktime(23, 59, 00, $month, $day, $year));
+                $end_day = date("Y-m-d H:i:s", mktime(23, 59, 0o0, $month, $day, $year));
                 $res = PluginReservationReservation::getAllReservations(
                     [
                         "`end` >= '" . $now . "'",
@@ -642,7 +641,7 @@ class PluginReservationApi extends API
         $content_type = "";
         if (isset($_SERVER['CONTENT_TYPE'])) {
             $content_type = $_SERVER['CONTENT_TYPE'];
-        } else if (isset($_SERVER['HTTP_CONTENT_TYPE'])) {
+        } elseif (isset($_SERVER['HTTP_CONTENT_TYPE'])) {
             $content_type = $_SERVER['HTTP_CONTENT_TYPE'];
         } else {
             if (!$is_inline_doc) {
@@ -654,7 +653,7 @@ class PluginReservationApi extends API
                 foreach ($body_params as $param_name => $param_value) {
                     $parameters[$param_name] = $param_value;
                 }
-            } else if (strlen($body) > 0) {
+            } elseif (strlen($body) > 0) {
                 $this->returnError(
                     "JSON payload seems not valid",
                     400,
@@ -663,7 +662,7 @@ class PluginReservationApi extends API
                 );
             }
             $this->format = "json";
-        } else if (strpos($content_type, "multipart/form-data") !== false) {
+        } elseif (strpos($content_type, "multipart/form-data") !== false) {
             if (count($_FILES) <= 0) {
                 // likely uploaded files is too big so $_REQUEST will be empty also.
                 // see http://us.php.net/manual/en/ini.core.php#ini.post-max-size
@@ -691,7 +690,7 @@ class PluginReservationApi extends API
             $parameters['upload_result'] = [];
             $parameters['input']->_filename = [];
             $parameters['input']->_prefix_filename = [];
-        } else if (strpos($content_type, "application/x-www-form-urlencoded") !== false) {
+        } elseif (strpos($content_type, "application/x-www-form-urlencoded") !== false) {
             parse_str($body, $postvars);
             foreach ($postvars as $field => $value) {
                 $parameters[$field] = $value;

@@ -49,7 +49,7 @@ class PluginReservationMultiEdit extends CommonDBTM
             $inputForUpdate = $resa->prepareInputForUpdate([
                 'begin' => $post["begin"],
                 'end'   => $post["end"],
-                'comment'   => $post["comment"]
+                'comment'   => $post["comment"],
             ]);
 
             $reservations[$resa_id] = $resa;
@@ -62,7 +62,7 @@ class PluginReservationMultiEdit extends CommonDBTM
                     'id'        => (int) $resa_id,
                     'begin'     => $inputForUpdate["begin"],
                     'end'       => $inputForUpdate["end"],
-                    'comment'   => $inputForUpdate["comment"]
+                    'comment'   => $inputForUpdate["comment"],
                 ]
             );
         }
@@ -117,7 +117,7 @@ class PluginReservationMultiEdit extends CommonDBTM
         foreach ($reservations as $resa_id => $resa_instance) {
             $purgeSuccessful &= $resa_instance->delete([
                 'id'    => (int) $resa_id,
-                'purge' => 'purge'
+                'purge' => 'purge',
             ], 1);
         }
 
@@ -252,7 +252,7 @@ class PluginReservationMultiEdit extends CommonDBTM
             "resa[begin]",
             [
                 'value'      => $confirmedSameBegin,
-                'maybeempty' => false
+                'maybeempty' => false,
             ]
         );
         echo "</td></tr>\n";
@@ -268,7 +268,7 @@ class PluginReservationMultiEdit extends CommonDBTM
                 'min'        => 0,
                 'max'        => 24 * HOUR_TIMESTAMP,
                 'value'      => $default_delay,
-                'emptylabel' => __('Specify an end date')
+                'emptylabel' => __('Specify an end date'),
             ]
         );
 
@@ -276,7 +276,7 @@ class PluginReservationMultiEdit extends CommonDBTM
         $params = [
             'duration'     => '__VALUE__',
             'end'          => $confirmedSameEnd,
-            'name'         => "resa[end]"
+            'name'         => "resa[end]",
         ];
 
         Ajax::updateItemOnSelectEvent(

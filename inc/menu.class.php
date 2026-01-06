@@ -1,6 +1,5 @@
 <?php
 
-use Glpi\Application\View\TemplateRenderer;
 use Glpi\RichText\RichText;
 
 if (!defined('GLPI_ROOT')) {
@@ -52,8 +51,8 @@ function getToolTipforItem($item)
         $toolTip .= "<br><b>" . __('Status') . " : </b>" . $status;
     }
     $res = Html::showToolTip(
-                RichText::getEnhancedHtml($toolTip),
-                ['display' => false]
+        RichText::getEnhancedHtml($toolTip),
+        ['display' => false]
     );
     return $res;
 }
@@ -328,7 +327,7 @@ class PluginReservationMenu extends CommonGLPI
     private static function displayTabReservations($begin, $end, $listResaByUser, $includeFuture)
     {
         global $DB;
-        
+
         $user_id = $_SESSION['glpiID'];
         $ReservationsByUser = self::filterEntitiesItems($listResaByUser);
 
@@ -471,8 +470,8 @@ class PluginReservationMenu extends CommonGLPI
                             echo '<img title="' . _sx('tooltip', 'Set As Gone', "reservation") . '" alt="" src="../pics/redbutton.png"></img>';
                             echo '</a></center></td>';
                         } else {
-                                echo '<td id="checkin' . $reservation_user_info['reservations_id'] . '">';
-                                echo '</td>';
+                            echo '<td id="checkin' . $reservation_user_info['reservations_id'] . '">';
+                            echo '</td>';
                         }
                     }
                 }
@@ -623,10 +622,10 @@ class PluginReservationMenu extends CommonGLPI
     /**
      * largement inspiré de la methode ReservationItem::showListSimple
      */
-    static function getReservationTypes()
+    public static function getReservationTypes()
     {
         global $CFG_GLPI, $DB;
- 
+
         $reservation_types     = [];
 
         $iterator = $DB->request([

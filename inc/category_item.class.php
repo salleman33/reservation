@@ -64,7 +64,7 @@ class PluginReservationCategory_Item extends CommonDBChild
     /**
      * Get the category id of a reservationitem
      * @param $id integer the reservationitem id
-     * @return integer the category id
+     * @return int the category id
      */
     public static function getCategoryId($item_id)
     {
@@ -130,7 +130,7 @@ class PluginReservationCategory_Item extends CommonDBChild
 
     /**
      * Get the name of the reservationitem
-     * @param integer $id the reservationitem id
+     * @param int $id the reservationitem id
      * @return string name of the reservation item
      */
     public static function getItemNameFromId($id)

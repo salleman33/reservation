@@ -1,7 +1,6 @@
 <?php
 
 use Glpi\Event;
-use Glpi\RichText\RichText;
 
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
@@ -162,7 +161,7 @@ class PluginReservationReservation extends CommonDBTM
                 ],
             ];
             $criteria['WHERE'][] = ['glpi_reservations.id' => null];
-            
+
             if (!empty($_POST["reservation_types"])) {
                 $tmp = explode('#', $_POST["reservation_types"]);
                 $criteria['WHERE'][] = ['glpi_reservationitems.itemtype' => $tmp[0]];
@@ -186,7 +185,7 @@ class PluginReservationReservation extends CommonDBTM
                     'glpi_locations.id' => getSonsOf('glpi_locations', (int) $_POST['locations_id']),
                 ];
             }
-            
+
             $iterator = $DB->request($criteria);
             foreach ($iterator as $row) {
                 $result[] = array_merge($row, ['itemtype' => $itemtype]);
@@ -226,7 +225,7 @@ class PluginReservationReservation extends CommonDBTM
 
     /**
      * checkout a reservation
-     * @param integer $reservation_id the id of reservation
+     * @param int $reservation_id the id of reservation
      */
     public static function checkoutReservation($reservation_id)
     {
@@ -259,7 +258,7 @@ class PluginReservationReservation extends CommonDBTM
     /**
      * checkin a reservation
      * @since 2.2.0
-     * @param integer $reservation_id the id of reservation
+     * @param int $reservation_id the id of reservation
      */
     public static function checkinReservation($reservation_id)
     {
@@ -274,7 +273,7 @@ class PluginReservationReservation extends CommonDBTM
 
         $input = $resa->fields;
         $input['begin'] = $now;
-        
+
         if ($resa->update($input)) {
             $tablename = getTableForItemType(__CLASS__);
             $query = "UPDATE `" . $tablename . "`
@@ -302,8 +301,8 @@ class PluginReservationReservation extends CommonDBTM
 
     /**
      * Add an item to an existing reservation
-     * @param integer $item_id id of the item to add
-     * @param integer $reservation_id id of the concerned reservation
+     * @param int $item_id id of the item to add
+     * @param int $reservation_id id of the concerned reservation
      */
     public static function addItemToResa($item_id, $reservation_id)
     {
@@ -343,8 +342,8 @@ class PluginReservationReservation extends CommonDBTM
 
     /**
      * Replace an item to an existing reservation
-     * @param integer $item_id id of the item to replace
-     * @param integer $reservation_id id of the concerned reservation
+     * @param int $item_id id of the item to replace
+     * @param int $reservation_id id of the concerned reservation
      */
     public static function switchItemToResa($item_id, $reservation_id)
     {
@@ -354,7 +353,7 @@ class PluginReservationReservation extends CommonDBTM
         $input = $resa->fields;
         $input['reservationitems_id'] = $item_id;
 
-        
+
         if ($resa->update($input)) {
             Event::log(
                 $reservation_id,

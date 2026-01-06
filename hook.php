@@ -3,7 +3,7 @@
 /**
  * Install hook
  *
- * @return boolean
+ * @return bool
  */
 function plugin_reservation_install()
 {
@@ -99,7 +99,6 @@ function plugin_reservation_install()
                UNIQUE (`name`)
                ) ENGINE=InnoDB  DEFAULT CHARSET={$default_charset} COLLATE={$default_collation}";
         $DB->doQuery($query, $DB->error());
-               
 
         $query = "INSERT INTO `glpi_plugin_reservation_configs` (`name` , `value`)
                VALUES  (\"mode_auto\",0),
@@ -151,7 +150,7 @@ function plugin_reservation_install()
 /**
  * Uninstall hook
  *
- * @return boolean
+ * @return bool
  */
 function plugin_reservation_uninstall()
 {

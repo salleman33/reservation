@@ -33,12 +33,12 @@ function plugin_init_reservation()
     Plugin::registerClass('PluginReservationMultiEdit');
 
     // Notifications
-    $PLUGIN_HOOKS['item_get_events']['reservation'] =
-        ['NotificationTargetReservation' => ['PluginReservationTask', 'addEvents']];
-    $PLUGIN_HOOKS['item_get_datas']['reservation'] =
-        ['NotificationTargetReservation' => ['PluginReservationTask', 'addData']];
-    $PLUGIN_HOOKS['item_add_targets']['reservation'] =
-        ['NotificationTargetReservation' => ['PluginReservationTask', 'addTarget']];
+    $PLUGIN_HOOKS['item_get_events']['reservation']
+        = ['NotificationTargetReservation' => ['PluginReservationTask', 'addEvents']];
+    $PLUGIN_HOOKS['item_get_datas']['reservation']
+        = ['NotificationTargetReservation' => ['PluginReservationTask', 'addData']];
+    $PLUGIN_HOOKS['item_add_targets']['reservation']
+        = ['NotificationTargetReservation' => ['PluginReservationTask', 'addTarget']];
 
     if (Session::getLoginUserID()) {
         $PLUGIN_HOOKS['menu_entry']['reservation'] = 'front/reservation.php';
@@ -61,7 +61,7 @@ function plugin_version_reservation()
         'requirements' => [
             'glpi' => [
                 'min' => PLUGIN_RESERVATION_GLPI_MIN_VERSION,
-                'max' => PLUGIN_RESERVATION_GLPI_MAX_VERSION
+                'max' => PLUGIN_RESERVATION_GLPI_MAX_VERSION,
             ],
         ],
     ];
@@ -70,7 +70,7 @@ function plugin_version_reservation()
 /**
  * Optional : check prerequisites before install : may print errors or add to message after redirect
  *
- * @return boolean
+ * @return bool
  */
 function plugin_reservation_check_prerequisites()
 {
@@ -81,9 +81,9 @@ function plugin_reservation_check_prerequisites()
  * Check configuration process for plugin : need to return true if succeeded
  * Can display a message only if failure and $verbose is true
  *
- * @param boolean $verbose Enable verbosity. Default to false
+ * @param bool $verbose Enable verbosity. Default to false
  *
- * @return boolean
+ * @return bool
  */
 function plugin_reservation_check_config($verbose = false)
 {
