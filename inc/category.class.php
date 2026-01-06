@@ -100,6 +100,11 @@ class PluginReservationCategory extends CommonDBTM
     public static function getReservationItems($begin = '', $end = '', $available = false, $optional = [])
     {
         global $DB, $CFG_GLPI;
+
+        if (isset($_SESSION['glpi_saved']['PluginReservationMenu'])) {
+            $_POST = $_SESSION['glpi_saved']['PluginReservationMenu'];
+        }
+
         $filter_is_active = true;
         if (isset($optional["filter_is_active"])) {
             $filter_is_active = $optional["filter_is_active"];
@@ -111,6 +116,11 @@ class PluginReservationCategory extends CommonDBTM
                 continue;
             }
             $itemtable = getTableForItemType($itemtype);
+            $itemname  = $item::getNameField();
+            $otherserial = new QueryExpression($DB->quote('') . ' AS ' . $DB::quoteName('otherserial'));
+            if ($item->isField('otherserial')) {
+                $otherserial = "$itemtable.otherserial AS otherserial";
+            }
             $categories_table = getTableForItemType(__CLASS__);
             $category_items_table = getTableForItemType("PluginReservationCategory_Item");
 

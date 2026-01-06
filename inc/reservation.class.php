@@ -94,6 +94,10 @@ class PluginReservationReservation extends CommonDBTM
     {
         global $DB, $CFG_GLPI;
 
+        if (isset($_SESSION['glpi_saved']['PluginReservationMenu'])) {
+            $_POST = $_SESSION['glpi_saved']['PluginReservationMenu'];
+        }
+
         $result = [];
 
         foreach ($CFG_GLPI["reservation_types"] as $itemtype) {
@@ -101,43 +105,91 @@ class PluginReservationReservation extends CommonDBTM
                 continue;
             }
             $itemtable = getTableForItemType($itemtype);
-            $left = "";
-            $where = "";
-            $left = "LEFT JOIN `glpi_reservations`
-                        ON (`glpi_reservationitems`.`id` = `glpi_reservations`.`reservationitems_id`
-                            AND '" . $begin . "' < `glpi_reservations`.`end`
-                            AND '" . $end . "' > `glpi_reservations`.`begin`)";
-
-            $where = " AND `glpi_reservations`.`id` IS NULL ";
-
-            $query = "SELECT `glpi_reservationitems`.`id`,
-                          `glpi_reservationitems`.`comment`,
-                          `$itemtable`.`name` AS name,
-                          `$itemtable`.`entities_id` AS entities_id,
-                          `glpi_reservationitems`.`items_id` AS items_id
-                   FROM `glpi_reservationitems`
-                   INNER JOIN `$itemtable`
-                        ON (`glpi_reservationitems`.`itemtype` = '$itemtype'
-                            AND `glpi_reservationitems`.`items_id` = `$itemtable`.`id`)
-                   $left
-                   WHERE `glpi_reservationitems`.`is_active` = '1'
-                        AND `$itemtable`.`is_deleted` = '0'
-                        $where " .
-            getEntitiesRestrictRequest(
-                " AND",
-                $itemtable,
-                '',
-                $_SESSION['glpiactiveentities'],
-                $item->maybeRecursive()
-            )
-                . "
-                   ORDER BY `$itemtable`.`entities_id`,
-                            `$itemtable`.`name` ASC";
-
-            if ($res = $DB->doQuery($query)) {
-                while ($row = $DB->fetchAssoc($res)) {
-                    $result[] = array_merge($row, ['itemtype' => $itemtype]);
+            $itemname  = $item::getNameField();
+            $otherserial = new QueryExpression($DB->quote('') . ' AS ' . $DB::quoteName('otherserial'));
+            if ($item->isField('otherserial')) {
+                $otherserial = "$itemtable.otherserial AS otherserial";
+            }
+            $criteria = [
+                'SELECT' => [
+                    'glpi_reservationitems.id',
+                    'glpi_reservationitems.comment',
+                    "$itemtable.$itemname AS name",
+                    "$itemtable.entities_id AS entities_id",
+                    $otherserial,
+                    'glpi_locations.id AS location',
+                    'glpi_reservationitems.items_id AS items_id',
+                ],
+                'FROM'   => ReservationItem::getTable(),
+                'INNER JOIN'   => [
+                    $itemtable  => [
+                        'ON'  => [
+                            'glpi_reservationitems' => 'items_id',
+                            $itemtable              => 'id', [
+                                'AND' => [
+                                    'glpi_reservationitems.itemtype' => $itemtype,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'LEFT JOIN'    =>  [
+                    'glpi_locations'  => [
+                        'ON'  => [
+                            $itemtable        => 'locations_id',
+                            'glpi_locations'  => 'id',
+                        ],
+                    ],
+                ],
+                'WHERE'        => [
+                    'glpi_reservationitems.is_active'   => 1,
+                    "$itemtable.is_deleted"             => 0,
+                ] + getEntitiesRestrictCriteria($itemtable, '', $_SESSION['glpiactiveentities'], $item->maybeRecursive()),
+                'ORDERBY'      => [
+                    "$itemtable.entities_id",
+                    "$itemtable.$itemname",
+                ],
+            ];
+            $criteria['LEFT JOIN']['glpi_reservations'] = [
+                'ON'  => [
+                    'glpi_reservationitems' => 'id',
+                    'glpi_reservations'     => 'reservationitems_id', [
+                        'AND' => [
+                            'glpi_reservations.end'    => ['>', $begin],
+                            'glpi_reservations.begin'  => ['<', $end],
+                        ],
+                    ],
+                ],
+            ];
+            $criteria['WHERE'][] = ['glpi_reservations.id' => null];
+            
+            if (!empty($_POST["reservation_types"])) {
+                $tmp = explode('#', $_POST["reservation_types"]);
+                $criteria['WHERE'][] = ['glpi_reservationitems.itemtype' => $tmp[0]];
+                if (
+                    isset($tmp[1]) && ($tmp[0] === Peripheral::class)
+                    && ($itemtype === Peripheral::class)
+                ) {
+                    $criteria['LEFT JOIN']['glpi_peripheraltypes'] = [
+                        'ON' => [
+                            'glpi_peripherals'      => 'peripheraltypes_id',
+                            'glpi_peripheraltypes'  => 'id',
+                        ],
+                    ];
+                    $criteria['WHERE'][] = ["$itemtable.peripheraltypes_id" => $tmp[1]];
                 }
+            }
+
+            // Filter locations if location was provided/submitted
+            if ((int) ($_POST['locations_id'] ?? 0) > 0) {
+                $criteria['WHERE'][] = [
+                    'glpi_locations.id' => getSonsOf('glpi_locations', (int) $_POST['locations_id']),
+                ];
+            }
+            
+            $iterator = $DB->request($criteria);
+            foreach ($iterator as $row) {
+                $result[] = array_merge($row, ['itemtype' => $itemtype]);
             }
         }
         return $result;

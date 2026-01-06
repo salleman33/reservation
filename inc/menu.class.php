@@ -693,10 +693,11 @@ class PluginReservationMenu extends CommonGLPI
         }
 
         $showentity = Session::isMultiEntitiesMode();
-        $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];
-
-        $begin = $form_dates["begin"];
-        $end = $form_dates["end"];
+        if (isset($_SESSION['glpi_saved']['PluginReservationMenu'])) {
+            $_POST = $_SESSION['glpi_saved']['PluginReservationMenu'];
+        }
+        $begin = $_SESSION['glpi_plugin_reservation_form_dates']["begin"];
+        $end   = $_SESSION['glpi_plugin_reservation_form_dates']["end"];
 
         echo "<div class='center'>\n";
         echo "<form name='form' method='GET' action='" . Reservation::getFormURL() . "'>\n";
