@@ -17,7 +17,10 @@
     },
     "scripts": {
         "lint": "parallel-lint --show-deprecated --colors --exclude ./vendor/ .",
-        "php-cs-fixer" : "php-cs-fixer check --show-progress=dots --verbose --diff"
+        "phpcs": "phpcs",
+        "phpcs-check" : "php-cs-fixer check --show-progress=dots --verbose --diff",
+        "phpcs-fix" : "php-cs-fixer check --show-progress=dots --verbose --diff",
+        "twigcs" : "twigcs ./templates/"
     },
     "authors": [
         {

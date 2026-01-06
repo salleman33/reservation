@@ -25,7 +25,7 @@
 <div id="makesearch" class="text-center mb-3">
     <a class="btn btn-secondary" href="{{ path('front/reservation.php?reservationitems_id=0') }}">
         <i class="{{ 'Planning'|itemtype_icon }} me-2"></i>{{ __("View calendar for all items") }}
-    </a>    
+    </a>
 </div>
 <div id="viewresasearch" class="text-center">
     <div class="asset mb-3">
@@ -39,8 +39,8 @@
                     <div class="row flex-row">
                         {{ fields.datetimeField('date_begin', form_dates['begin'], __('Start date'), {
                             maybeempty: false
-                        }) }}                        
-    
+                        }) }}
+
                         {{ fields.datetimeField('date_end', form_dates['end'], __('End date'), {
                             maybeempty: false
                         }) }}
