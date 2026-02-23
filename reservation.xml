@@ -65,6 +65,10 @@ Es bringt auch einige vereinfachte Aktionen auf Buchungen wie :
     </authors>
     <versions>
         <version>
+            <num>3.0.0</num>
+            <compatibility>11</compatibility>
+        </version>
+        <version>
             <num>2.5.0</num>
             <compatibility>10</compatibility>
         </version>
