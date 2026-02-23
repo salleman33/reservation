@@ -2,7 +2,7 @@
 
 define('PLUGIN_RESERVATION_GLPI_MIN_VERSION', '11.0.0');
 define('PLUGIN_RESERVATION_GLPI_MAX_VERSION', '11.0.99');
-define('PLUGIN_RESERVATION_VERSION', '3.0.0');
+define('PLUGIN_RESERVATION_VERSION', '3.0.1');
 
 /**
  * Init the hooks of the plugins - Needed
