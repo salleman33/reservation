@@ -7,6 +7,7 @@ $finder = (new PhpCsFixer\Finder())
         'node_modules/',
         'tools/',
         'vendor/',
+        'templates',
     ])
 ;
 
