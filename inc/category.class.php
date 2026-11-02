@@ -1,4 +1,5 @@
 <?php
+use Glpi\DBAL\QueryExpression;
 
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
@@ -58,7 +59,7 @@ class PluginReservationCategory extends CommonDBTM
         global $DB;
         $categories_table = getTableForItemType(__CLASS__);
 
-        $DB->insertOrDie(
+        $DB->insert(
             $categories_table,
             [
                 'name' => $name,
@@ -78,14 +79,14 @@ class PluginReservationCategory extends CommonDBTM
         $items = new PluginReservationCategory_Item();
         $items_table = $items->getTable();
 
-        $DB->deleteOrDie(
+        $DB->delete(
             $items_table,
             [
                 'categories_id' => $this->getId(),
             ]
         );
 
-        $DB->deleteOrDie(
+        $DB->delete(
             $categories_table,
             [
                 'name' => $name,
@@ -291,7 +292,7 @@ class PluginReservationCategory extends CommonDBTM
         $items_table = $items->getTable();
         for ($i = 0; $i < count($items_list); ++$i) {
             if ($items->getFromDBByCrit(['reservationitems_id' => $items_list[$i]])) {
-                $DB->updateOrDie(
+                $DB->update(
                     $items_table,
                     [
                         'categories_id' => $this->getId(),
@@ -302,7 +303,7 @@ class PluginReservationCategory extends CommonDBTM
                     ]
                 );
             } else {
-                $DB->insertOrDie(
+                $DB->insert(
                     $items_table,
                     [
                         'categories_id' => $this->getId(),
@@ -315,7 +316,7 @@ class PluginReservationCategory extends CommonDBTM
 
         for ($i = 0; $i < count($available_list); ++$i) {
             if ($items->getFromDBByCrit(['reservationitems_id' => $available_list[$i]])) {
-                $DB->deleteOrDie(
+                $DB->delete(
                     $items_table,
                     [
                         'reservationitems_id' => $available_list[$i],

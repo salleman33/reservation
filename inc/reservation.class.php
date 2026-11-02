@@ -1,6 +1,7 @@
 <?php
 
 use Glpi\Event;
+use Glpi\DBAL\QueryExpression;
 
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
