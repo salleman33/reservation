@@ -50,18 +50,26 @@ if ($planning_end_date > date("Y-m-d H:i:s", time())) {
 }
 
 if (isset($_POST['date_begin'])) {
-    $form_dates["begin"] = $_POST['date_begin'];
+    if ($date = Datetime::createFromFromat("Y-m-d H:i:s", $_POST['date_begin'])) {
+        $form_dates["begin"] = $date->format("Y-m-d H:i:s");
+    }
     $_SESSION['glpi_saved']['PluginReservationMenu'] = $_POST;
 }
 if (isset($_GET['date_begin'])) {
-    $form_dates["begin"] = $_GET['date_begin'];
+    if ($date = Datetime::createFromFormat("Y-m-d H:i:s", $_GET['date_begin'])) {
+        $form_dates["begin"] = $date->format("Y-m-d H:i:s");
+    }    
 }
 if (isset($_POST['date_end'])) {
-    $form_dates["end"] = $_POST['date_end'];
+    if ($date = Datetime::createFromFromat("Y-m-d H:i:s", $_POST['date_end'])) {
+        $form_dates["end"] = $date->format("Y-m-d H:i:s");
+    }
     $_SESSION['glpi_saved']['PluginReservationMenu'] = $_POST;
 }
 if (isset($_GET['date_end'])) {
-    $form_dates["end"] = $_GET['date_end'];
+    if ($date = Datetime::createFromFormat("Y-m-d H:i:s", $_GET['date_end'])) {
+        $form_dates["end"] = $date->format("Y-m-d H:i:s");
+    }  
 }
 if (isset($_POST['nextday']) || isset($_GET['nextday'])) {
     $form_dates = $_SESSION['glpi_plugin_reservation_form_dates'];

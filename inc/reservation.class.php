@@ -58,29 +58,30 @@ class PluginReservationReservation extends CommonDBTM
         $reservation_table = getTableForItemType('reservation');
         $plugin_table = getTableForItemType(__CLASS__);
 
-        $where = "WHERE " . $plugin_table . ".reservations_id = " . $reservation_table . ".id";
+        $criteria = [
+            'SELECT' => '*',
+            'FROM'   => [
+                $reservation_table,
+                $plugin_table,
+            ],
+            'WHERE' => [
+                "$plugin_table.reservations_id" => "$reservation_table.id"
+            ],
+        ];
+
         foreach ($filters as $filter) {
-            $where .= " AND " . $filter;
+            $criteria['WHERE'][] = [$filter];
         }
 
-        $extra = '';
         foreach ($options as $option) {
-            $extra .= " " . $option;
+            $criteria['WHERE'][] = [$option];
         }
 
-        $query = "SELECT *
-               FROM $reservation_table
-                  , $plugin_table
-               $where
-               $extra";
-
-        if ($result = $DB->doQuery($query)) {
-            if ($DB->numrows($result) > 0) {
-                while ($row = $DB->fetchAssoc($result)) {
-                    $res[] = $row;
-                }
-            }
+        $iterator = $DB->request($criteria);
+        foreach ($iterator as $row) {
+            $res[] = $row;
         }
+
         return $res;
     }
 
@@ -206,8 +207,15 @@ class PluginReservationReservation extends CommonDBTM
         NotificationEvent::raiseEvent('plugin_reservation_expiration', $reservation);
 
         $tablename = getTableForItemType(__CLASS__);
-        $query = "UPDATE `" . $tablename . "` SET `mailingdate`= '" . date("Y-m-d H:i:s", time()) . "' WHERE `reservations_id` = " . $reservation_id;
-        $DB->doQuery($query) or die("error on 'update' in sendMail: " . $DB->error());
+        $DB->update(
+            $tablename,
+            [
+                'mailingdate' => date("Y-m-d H:i:s", time()),
+            ],
+            [
+                'reservations_id' => intval($reservation_id),
+            ]
+        );
 
         Event::log(
             $reservation_id,
@@ -233,13 +241,25 @@ class PluginReservationReservation extends CommonDBTM
         global $DB, $CFG_GLPI;
 
         $tablename = getTableForItemType(__CLASS__);
-        $query = "UPDATE `" . $tablename . "`
-               SET `effectivedate` = '" . date("Y-m-d H:i:s", time()) . "'
-               WHERE `reservations_id` = '" . $reservation_id . "';";
-        $DB->doQuery($query) or die("error on checkoutReservation 1 : " . $DB->error());
+        $DB->update(
+            $tablename,
+            [
+                'effectivedate' => date("Y-m-d H:i:s", time()),
+            ],
+            [
+                'reservations_id' => intval($reservation_id),
+            ]
+        );
 
-        $query = "UPDATE `glpi_reservations` SET `end`='" . date("Y-m-d H:i:s", time()) . "' WHERE `id`='" . $reservation_id . "';";
-        $DB->doQuery($query) or die("error on checkoutReservation 2 : " . $DB->error());
+        $DB->update(
+            'glpi_reservations',
+            [
+                'end' => date("Y-m-d H:i:s", time()),
+            ],
+            [
+                'id' => intval($reservation_id),
+            ]
+        );
 
         Event::log(
             $reservation_id,
@@ -277,10 +297,15 @@ class PluginReservationReservation extends CommonDBTM
 
         if ($resa->update($input)) {
             $tablename = getTableForItemType(__CLASS__);
-            $query = "UPDATE `" . $tablename . "`
-                  SET `checkindate` = '" . date("Y-m-d H:i:s", time()) . "'
-                  WHERE `reservations_id` = '" . $reservation_id . "';";
-            $DB->doQuery($query) or die("error on checkinReservation  : " . $DB->error());
+            $DB->update(
+                $tablename,
+                [
+                    'checkindate' => date("Y-m-d H:i:s", time()),
+                ],
+                [
+                    'reservations_id' => intval($reservation_id),
+                ]
+            );
 
             Event::log(
                 $reservation_id,

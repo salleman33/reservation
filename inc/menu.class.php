@@ -390,7 +390,7 @@ class PluginReservationMenu extends CommonGLPI
             echo "<tr class='tab_bg_2'>";
             // user name
             $formatName = formatUserName($reservation_user_id, $user->fields["name"], $user->fields["realname"], $user->fields["firstname"]);
-            echo "<td rowspan=" . count($reservations_user_list) . ">" . $formatName . "</td>";
+            echo "<td rowspan=" . count($reservations_user_list) . ">" . htmlescape($formatName) . "</td>";
 
             $count = 0;
             $rowspan_end = 1;
@@ -446,7 +446,7 @@ class PluginReservationMenu extends CommonGLPI
                     echo "<td rowspan=" . $rowspan_line . " $color>" . date(self::getDateFormat() . " H:i", strtotime($reservation_user_info['baselinedate'])) . "</td>";
 
                     // comment
-                    echo "<td rowspan=" . $rowspan_line . " $color>" . $reservation->fields['comment'] . "</td>";
+                    echo "<td rowspan=" . $rowspan_line . " $color>" . htmlescape($reservation->fields['comment']) . "</td>";
 
                     // moves
                     echo "<td rowspan=" . $rowspan_line . " ><center>";
@@ -505,7 +505,7 @@ class PluginReservationMenu extends CommonGLPI
                         <form method='POST' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
                     echo '<select name="add_item">';
                     foreach ($available_reservationsitem as $item) {
-                        echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . $item["name"], '</option>';
+                        echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . htmlescape($item["name"]), '</option>';
                     }
 
                     echo "<input type='hidden' name='add_item_to_reservation' value='" . $reservation_user_info['reservations_id'] . "'>";
@@ -519,7 +519,7 @@ class PluginReservationMenu extends CommonGLPI
                     <form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
                     echo '<select name="switch_item">';
                     foreach ($available_reservationsitem as $item) {
-                        echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . $item["name"], '</option>';
+                        echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . htlmescape($item["name"]), '</option>';
                     }
                     echo "<input type='hidden' name='switch_item_to_reservation' value='" . $reservation_user_info['reservations_id'] . "'>";
                     echo "<input type='submit' class='submit' name='submit' value=" . _sx('button', 'Save') . ">";
