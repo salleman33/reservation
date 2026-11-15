@@ -59,16 +59,18 @@ class PluginReservationReservation extends CommonDBTM
         $plugin_table = getTableForItemType(__CLASS__);
 
         $criteria = [
-            'SELECT' => '*',
             'FROM'   => [
-                $reservation_table,
-                $plugin_table,
+                $reservation_table
             ],
-            'WHERE' => [
-                "$plugin_table.reservations_id" => "$reservation_table.id"
+            'INNER JOIN' => [
+                $plugin_table => [
+                    'ON' => [
+                        $plugin_table => "reservations_id",
+                        $reservation_table => "id"   
+                    ]
+                ]
             ],
         ];
-
         foreach ($filters as $filter) {
             $criteria['WHERE'][] = [$filter];
         }
@@ -76,7 +78,6 @@ class PluginReservationReservation extends CommonDBTM
         foreach ($options as $option) {
             $criteria['WHERE'][] = [$option];
         }
-
         $iterator = $DB->request($criteria);
         foreach ($iterator as $row) {
             $res[] = $row;

@@ -120,6 +120,7 @@ function getModelFromItem($item)
 
 class PluginReservationMenu extends CommonGLPI
 {
+    
     public static function getTypeName($nb = 0)
     {
         return PluginReservationReservation::getTypeName($nb);
@@ -247,7 +248,13 @@ class PluginReservationMenu extends CommonGLPI
         $end = $form_dates["end"];
         $user_id = $_SESSION['glpiID'];
 
-        $filters = ["'" . $begin . "' < `end`", "'" . $end . "' > `begin`", "'" . $user_id . "' = `users_id`"];
+        $filters = [
+            'AND' => [
+                'end' => ['>', $begin],
+                'begin' => ['<', $end],
+                'users_id' => $user_id
+            ]
+        ];
         $list = PluginReservationReservation::getAllReservations($filters);
         $ReservationsOfUser = self::arrayGroupBy($list, 'users_id');
         ksort($ReservationsOfUser);
@@ -270,7 +277,12 @@ class PluginReservationMenu extends CommonGLPI
         $begin = $form_dates["begin"];
         $end = $form_dates["end"];
 
-        $filters = ["'" . $begin . "' < `end`", "'" . $end . "' > `begin`"];
+        $filters = [
+            'AND' => [
+                'end' => ['>', $begin],
+                'begin' => ['<', $end]
+            ]
+        ];
         $list = PluginReservationReservation::getAllReservations($filters);
         $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
         ksort($ReservationsByUser);
@@ -289,6 +301,9 @@ class PluginReservationMenu extends CommonGLPI
         $end = $form_dates["end"];
 
         $filters = ["'" . $begin . "' < `end`"];
+        $filters = [
+                'end' => ['>', $begin]
+        ];
         $list = PluginReservationReservation::getAllReservations($filters);
         $ReservationsByUser = self::arrayGroupBy($list, 'users_id');
         ksort($ReservationsByUser);
@@ -519,7 +534,7 @@ class PluginReservationMenu extends CommonGLPI
                     <form method='post' name='form' action='" . Toolbox::getItemTypeSearchURL(__CLASS__) . "'>";
                     echo '<select name="switch_item">';
                     foreach ($available_reservationsitem as $item) {
-                        echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . htlmescape($item["name"]), '</option>';
+                        echo "\t", '<option value="', $item['id'], '">', getItemForItemtype($item['itemtype'])->getTypeName() . ' - ' . htmlescape($item["name"]), '</option>';
                     }
                     echo "<input type='hidden' name='switch_item_to_reservation' value='" . $reservation_user_info['reservations_id'] . "'>";
                     echo "<input type='submit' class='submit' name='submit' value=" . _sx('button', 'Save') . ">";
